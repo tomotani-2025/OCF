@@ -15,7 +15,7 @@
     <header class="site-header">
         <div class="container">
             <a href="index.html" class="logo">
-                <img src="images/ocf1-b.png" alt="Omotani CARING Foundation">
+                <img src="images/logo/OCF-Badge-WhiteRed.svg" alt="Omotani CARING Foundation">
             </a>
             <nav class="main-nav">
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -34,7 +34,7 @@
                     <li><a href="honor-and-memory.html">Honor and Memory</a></li>
                     <li><a href="global-images.html">Global Images</a></li>
                     <li><a href="contact-us.html">Contact Us</a></li>
-                    <li><a href="make-a-donation.html" class="btn btn-donate">Make a Donation</a></li>
+                    <li><a href="make-a-donation.html" class="btn btn-donate">Donate Now</a></li>
                 </ul>
             </nav>
         </div>
@@ -54,7 +54,7 @@
                     <!-- Goal One -->
                     <div class="progress-card">
                         <h3>Goal One: Batwa Farm at Matanda [Kihihi] Uganda</h3>
-                        <div class="chart-container chart-tall">
+                        <div class="chart-container">
                             <canvas id="chart-goal-1"></canvas>
                         </div>
                         <a href="goalone.html" class="btn btn-outline">Learn More</a>
@@ -176,33 +176,34 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <img src="images/ocf1-b.png" alt="Omotani Caring Foundation" class="footer-logo">
-                    <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
-                    <p><strong>EIN:</strong> 85-2581703</p>
-                </div>
-                <div class="footer-nav">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="about-us.html">About Us</a></li>
-                        <li><a href="our-mission.html">Our Mission</a></li>
-                        <li><a href="projects.html">Projects</a></li>
-                        <li><a href="news-updates.html">News + Updates</a></li>
-                        <li><a href="gallery.html">Gallery</a></li>
-                        <li><a href="make-a-donation.html">Make a Donation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>Contact</h4>
-                    <p>For inquiries about our projects or how to get involved, please visit our <a href="contact-us.html">Contact Us</a> page.</p>
-                </div>
+        <!-- Footer -->
+        <footer class="site-footer">
+        <div class="footer-header">
+            <img src="images/logo/OCF-FullWordmark-BlackRed.svg" alt="Omotani Caring Foundation" class="footer-logo">
+        </div>
+
+        <p class="footer-subhead">Supporting charitable, educational, medical, conservation, scientific and humanitarian purposes.</p>
+
+        <div class="footer-contact-info">
+            <div class="footer-column">
+                <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
+                <p><strong>EIN:</strong> 85-2581703</p>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Omotani Caring Foundation. All rights reserved.</p>
+            <div class="footer-column">
+                <a href="mailto:info@omotanicaringfoundation.org">info@omotanicaringfoundation.org</a>
+                <p>8337 N Lee Trevino Drive<br>Tucson, Arizona, USA 85742</p>
             </div>
+            <div class="footer-column">
+                <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://bsky.app" target="_blank" rel="noopener">Bluesky</a>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <span>Omotani Caring Foundation</span>
+            <span>&copy; 2025 All Rights Reserved</span>
         </div>
     </footer>
 
@@ -231,12 +232,8 @@
 
         .chart-container {
             width: 100%;
-            height: 100px;
+            height: 180px;
             margin: 0 auto var(--spacing-lg);
-        }
-
-        .chart-container.chart-tall {
-            height: 140px;
         }
     </style>
 
@@ -245,51 +242,51 @@
             // Goal data from original Squarespace site
             const goalsData = {
                 1: {
-                    labels: ['Donations To Date $34,000', 'Phase One Goal $27,000', 'Overall Goal $54,000'],
+                    labels: ['Raised $34k', 'Phase 1 $27k', 'Goal $54k'],
                     data: [34000, 27000, 54000]
                 },
                 2: {
-                    labels: ['Donations To Date $3,800', 'Overall Goal $5,000'],
+                    labels: ['Raised $3.8k', 'Goal $5k'],
                     data: [3800, 5000]
                 },
                 3: {
-                    labels: ['Donations To Date $6,100', 'Overall Goal $10,000'],
+                    labels: ['Raised $6.1k', 'Goal $10k'],
                     data: [6100, 10000]
                 },
                 4: {
-                    labels: ['Donations To Date $3,500', 'Overall Goal $5,000'],
+                    labels: ['Raised $3.5k', 'Goal $5k'],
                     data: [3500, 5000]
                 },
                 5: {
-                    labels: ['Donations To Date $1,140', 'Overall Goal $5,000'],
+                    labels: ['Raised $1.1k', 'Goal $5k'],
                     data: [1140, 5000]
                 },
                 6: {
-                    labels: ['Donations To Date $6,950', 'Overall Goal $5,000'],
+                    labels: ['Raised $7k', 'Goal $5k'],
                     data: [6950, 5000]
                 },
                 7: {
-                    labels: ['Donations To Date $18,306', 'Overall Goal $30,000'],
+                    labels: ['Raised $18.3k', 'Goal $30k'],
                     data: [18306, 30000]
                 },
                 8: {
-                    labels: ['Donations To Date $23,000', 'Overall Goal $20,000'],
+                    labels: ['Raised $23k', 'Goal $20k'],
                     data: [23000, 20000]
                 },
                 9: {
-                    labels: ['Donations To Date $1,200', 'Overall Goal $5,000'],
+                    labels: ['Raised $1.2k', 'Goal $5k'],
                     data: [1200, 5000]
                 },
                 10: {
-                    labels: ['Donations To Date $31,000', 'Overall Goal $25,000'],
+                    labels: ['Raised $31k', 'Goal $25k'],
                     data: [31000, 25000]
                 },
                 11: {
-                    labels: ['Donations To Date $7,000', 'Overall Goal $10,000'],
+                    labels: ['Raised $7k', 'Goal $10k'],
                     data: [7000, 10000]
                 },
                 12: {
-                    labels: ['Donations To Date $67,218', 'Overall Goal $60,000'],
+                    labels: ['Raised $67k', 'Goal $60k'],
                     data: [67218, 60000]
                 }
             };
@@ -317,7 +314,6 @@
                         }]
                     },
                     options: {
-                        indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
@@ -332,18 +328,20 @@
                         },
                         scales: {
                             x: {
+                                grid: { display: false },
+                                ticks: {
+                                    font: { size: 9 },
+                                    maxRotation: 0,
+                                    minRotation: 0
+                                }
+                            },
+                            y: {
                                 beginAtZero: true,
                                 grid: { display: false },
                                 ticks: {
                                     callback: function(value) {
-                                        return '$' + value.toLocaleString();
+                                        return '$' + (value / 1000) + 'k';
                                     }
-                                }
-                            },
-                            y: {
-                                grid: { display: false },
-                                ticks: {
-                                    font: { size: 11 }
                                 }
                             }
                         }

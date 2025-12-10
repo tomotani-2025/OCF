@@ -81,6 +81,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Scroll reveal animation for offering items
+    if ('IntersectionObserver' in window) {
+        const offeringItems = document.querySelectorAll('.offering-item');
+
+        const revealObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        offeringItems.forEach(function(item) {
+            revealObserver.observe(item);
+        });
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        document.querySelectorAll('.offering-item').forEach(function(item) {
+            item.classList.add('revealed');
+        });
+    }
+
     // Gallery lightbox (simple implementation)
     const galleryItems = document.querySelectorAll('.gallery-item');
 
