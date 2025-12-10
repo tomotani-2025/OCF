@@ -1,0 +1,706 @@
+[
+  {
+    "title": "Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/",
+    "slug": "home",
+    "hasImages": true,
+    "imageCount": 11,
+    "contentSections": 7
+  },
+  {
+    "title": "About Us — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/about-us",
+    "slug": "about-us",
+    "hasImages": true,
+    "imageCount": 11,
+    "contentSections": 26
+  },
+  {
+    "title": "Our Mission — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/our-mission",
+    "slug": "our-mission",
+    "hasImages": true,
+    "imageCount": 27,
+    "contentSections": 108
+  },
+  {
+    "title": "Projects — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/projects",
+    "slug": "projects",
+    "hasImages": true,
+    "imageCount": 25,
+    "contentSections": 14
+  },
+  {
+    "title": "Projects — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/gallery",
+    "slug": "gallery",
+    "hasImages": true,
+    "imageCount": 7,
+    "contentSections": 4
+  },
+  {
+    "title": "Progress — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/progress",
+    "slug": "progress",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 21
+  },
+  {
+    "title": "News + Updates — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates",
+    "slug": "newsupdates",
+    "hasImages": true,
+    "imageCount": 41,
+    "contentSections": 20
+  },
+  {
+    "title": "Honor and Memory — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/honor-and-memory",
+    "slug": "honor-and-memory",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 18
+  },
+  {
+    "title": "Contact Us — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/get-involved",
+    "slug": "get-involved",
+    "hasImages": true,
+    "imageCount": 5,
+    "contentSections": 11
+  },
+  {
+    "title": "Make a Donation — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/make-a-donation",
+    "slug": "make-a-donation",
+    "hasImages": true,
+    "imageCount": 4,
+    "contentSections": 15
+  },
+  {
+    "title": "Projects — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/gallery-1",
+    "slug": "gallery-1",
+    "hasImages": true,
+    "imageCount": 7,
+    "contentSections": 5
+  },
+  {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/global-images-2",
+    "slug": "global-images-2",
+    "hasImages": true,
+    "imageCount": 149,
+    "contentSections": 1
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalone",
+    "slug": "goalone",
+    "hasImages": true,
+    "imageCount": 21,
+    "contentSections": 3
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goaltwo",
+    "slug": "goaltwo",
+    "hasImages": true,
+    "imageCount": 13,
+    "contentSections": 6
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalthree",
+    "slug": "goalthree",
+    "hasImages": true,
+    "imageCount": 19,
+    "contentSections": 2
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalfour",
+    "slug": "goalfour",
+    "hasImages": true,
+    "imageCount": 19,
+    "contentSections": 4
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalfive",
+    "slug": "goalfive",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 3
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalsix",
+    "slug": "goalsix",
+    "hasImages": true,
+    "imageCount": 7,
+    "contentSections": 4
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalseven",
+    "slug": "goalseven",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 4
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goaleight",
+    "slug": "goaleight",
+    "hasImages": true,
+    "imageCount": 5,
+    "contentSections": 15
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goaltwelve",
+    "slug": "goaltwelve",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 6
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalnine",
+    "slug": "goalnine",
+    "hasImages": true,
+    "imageCount": 9,
+    "contentSections": 6
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goalten",
+    "slug": "goalten",
+    "hasImages": true,
+    "imageCount": 25,
+    "contentSections": 8
+  },
+  {
+    "title": "General 5 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/goaleleven",
+    "slug": "goaleleven",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 9
+  },
+  {
+    "title": "Gallery — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/gallery1",
+    "slug": "gallery1",
+    "hasImages": true,
+    "imageCount": 1001,
+    "contentSections": 4
+  },
+  {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/gallery2",
+    "slug": "gallery2",
+    "hasImages": true,
+    "imageCount": 283,
+    "contentSections": 2
+  },
+  {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/gallery3",
+    "slug": "gallery3",
+    "hasImages": true,
+    "imageCount": 279,
+    "contentSections": 2
+  },
+  {
+    "title": "Border fencing for Sir Edmund Hillary Memorial Museum and Elderly Care Center — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/kvbj1314lzxjg2v39di7yaakfrwj12",
+    "slug": "newsupdates-kvbj1314lzxjg2v39di7yaakfrwj12",
+    "hasImages": true,
+    "imageCount": 18,
+    "contentSections": 4
+  },
+  {
+    "title": "TPN COMMUNITY POND — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/tpn-community-pond",
+    "slug": "newsupdates-tpn-community-pond",
+    "hasImages": true,
+    "imageCount": 4,
+    "contentSections": 4
+  },
+  {
+    "title": "Batwa Farm has more progress! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-has-more-progress",
+    "slug": "newsupdates-batwa-farm-has-more-progress",
+    "hasImages": true,
+    "imageCount": 8,
+    "contentSections": 4
+  },
+  {
+    "title": "2024-25 Report and update from The Partners Nepal — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/2024-25-report-and-update-from-the-partners-nepal",
+    "slug": "newsupdates-2024-25-report-and-update-from-the-partners-nepal",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 7
+  },
+  {
+    "title": "Mushamba Moses provides a quick update on work at the farm! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/mushamba-moses-provides-a-quick-update-on-work-at-the-farm",
+    "slug": "newsupdates-mushamba-moses-provides-a-quick-update-on-work-at-the-farm",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 4
+  },
+  {
+    "title": "Batwa Farm at Matanda update May 4 2025 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/ixwmh2iwg985m8wn3ot44zaj79mhrw",
+    "slug": "newsupdates-ixwmh2iwg985m8wn3ot44zaj79mhrw",
+    "hasImages": true,
+    "imageCount": 15,
+    "contentSections": 4
+  },
+  {
+    "title": "Boundary Fencing Support to Elderly Care Center in Bung, Nepal — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/boundary-fencing-support-to-elderly-care-center-in-bung-nepal",
+    "slug": "newsupdates-boundary-fencing-support-to-elderly-care-center-in-bung-nepal",
+    "hasImages": true,
+    "imageCount": 5,
+    "contentSections": 7
+  },
+  {
+    "title": "Celebrating 100th Anniversary of the Tucson Rodeo — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/celebrating-100th-anniversary-of-the-tucson-rodeo",
+    "slug": "newsupdates-celebrating-100th-anniversary-of-the-tucson-rodeo",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 6
+  },
+  {
+    "title": "BROWN BEARS HIGH HIMALAYAN MOUNTAINS - INDIA — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/brown-bears-high-himalayan-mountains-india",
+    "slug": "newsupdates-brown-bears-high-himalayan-mountains-india",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 9
+  },
+  {
+    "title": "Base Camp For Veterans [BCI] Class 9 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/dkkqom8oy91vizdq7rqahoqb44pv83",
+    "slug": "newsupdates-dkkqom8oy91vizdq7rqahoqb44pv83",
+    "hasImages": true,
+    "imageCount": 24,
+    "contentSections": 9
+  },
+  {
+    "title": "The Partners Nepal December 2024 update — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/090yulae442siv55muydngpv6g5kk1",
+    "slug": "newsupdates-090yulae442siv55muydngpv6g5kk1",
+    "hasImages": true,
+    "imageCount": 5,
+    "contentSections": 6
+  },
+  {
+    "title": "BWINDI PLUS GIRLS PROJECT — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/bwindi-plus-girls-project",
+    "slug": "newsupdates-bwindi-plus-girls-project",
+    "hasImages": true,
+    "imageCount": 9,
+    "contentSections": 22
+  },
+  {
+    "title": "Batwa families are farming at Matanda! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-families-are-farming-at-matanda",
+    "slug": "newsupdates-batwa-families-are-farming-at-matanda",
+    "hasImages": true,
+    "imageCount": 12,
+    "contentSections": 8
+  },
+  {
+    "title": "Sir Edmund Hillary Memorial Museum and Elder Care Center — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/sir-edmund-hillary-memorial-museum-and-elder-care-center",
+    "slug": "newsupdates-sir-edmund-hillary-memorial-museum-and-elder-care-center",
+    "hasImages": true,
+    "imageCount": 13,
+    "contentSections": 8
+  },
+  {
+    "title": "TPN - One Day One Tree in Chheskam — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/tpn-one-day-one-tree-in-chheskam",
+    "slug": "newsupdates-tpn-one-day-one-tree-in-chheskam",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 7
+  },
+  {
+    "title": "The Partners Nepal Update September 2024 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/the-partners-nepal-update-september-2024",
+    "slug": "newsupdates-the-partners-nepal-update-september-2024",
+    "hasImages": true,
+    "imageCount": 23,
+    "contentSections": 46
+  },
+  {
+    "title": "Continued success at Batwa Farm at Matanda — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/continued-success-at-batwa-farm-at-matanda",
+    "slug": "newsupdates-continued-success-at-batwa-farm-at-matanda",
+    "hasImages": true,
+    "imageCount": 31,
+    "contentSections": 8
+  },
+  {
+    "title": "High Asia Habitat Fund  — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/high-asia-habitat-fund",
+    "slug": "newsupdates-high-asia-habitat-fund",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 11
+  },
+  {
+    "title": "Elderly Care Center in Bung, Nepal receives supplies — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/elderly-care-center-in-bung-nepal-receives-supplies",
+    "slug": "newsupdates-elderly-care-center-in-bung-nepal-receives-supplies",
+    "hasImages": true,
+    "imageCount": 8,
+    "contentSections": 27
+  },
+  {
+    "title": "BATWA FARM AT MATANDA HARVEST JULY AUGUST  2024 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-at-matanda-harvest-july-august-nbsp2024",
+    "slug": "newsupdates-batwa-farm-at-matanda-harvest-july-august-nbsp2024",
+    "hasImages": true,
+    "imageCount": 19,
+    "contentSections": 4
+  },
+  {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/global-images-1",
+    "slug": "global-images-1",
+    "hasImages": true,
+    "imageCount": 412,
+    "contentSections": 1
+  },
+  {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/global-images-3",
+    "slug": "global-images-3",
+    "hasImages": true,
+    "imageCount": 43,
+    "contentSections": 1
+  },
+  {
+    "title": "",
+    "url": "https://www.omotanicaringfoundation.com/s/TPN-News-Update-2024-2025-2.pdf",
+    "slug": "s-tpn-news-update-2024-2025-2.pdf",
+    "hasImages": false,
+    "imageCount": 0,
+    "contentSections": 4
+  },
+  {
+    "title": "",
+    "url": "https://www.omotanicaringfoundation.com/s/BOUNDARY-FENCING-SUPPORT-TO-SENIOR-CITIZENS-IN-BUNG-MARCH-2025.pdf",
+    "slug": "s-boundary-fencing-support-to-senior-citizens-in-bung-march-2025.pdf",
+    "hasImages": false,
+    "imageCount": 0,
+    "contentSections": 8
+  },
+  {
+    "title": "",
+    "url": "https://www.omotanicaringfoundation.com/s/TPNS-PROFILE-SEPTEMBER-2024-reduced.pdf",
+    "slug": "s-tpns-profile-september-2024-reduced.pdf",
+    "hasImages": false,
+    "imageCount": 0,
+    "contentSections": 9
+  },
+  {
+    "title": "The Partners Nepal — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/the-partners-nepal",
+    "slug": "newsupdates-the-partners-nepal",
+    "hasImages": true,
+    "imageCount": 4,
+    "contentSections": 6
+  },
+  {
+    "title": "RANDY HELM HORSEMANSHIP — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/randy-helm-horsemanship",
+    "slug": "newsupdates-randy-helm-horsemanship",
+    "hasImages": true,
+    "imageCount": 11,
+    "contentSections": 7
+  },
+  {
+    "title": "BATWA FARM AT MATANDA -           JUNE  2024 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-at-matanda-june-2024",
+    "slug": "newsupdates-batwa-farm-at-matanda-june-2024",
+    "hasImages": true,
+    "imageCount": 8,
+    "contentSections": 5
+  },
+  {
+    "title": "WOMEN IN GORILLA CONSERVATION  — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/women-in-gorilla-conservation",
+    "slug": "newsupdates-women-in-gorilla-conservation",
+    "hasImages": true,
+    "imageCount": 9,
+    "contentSections": 5
+  },
+  {
+    "title": "BASE CAMP FOR VETERANS CLASS 8 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/base-camp-for-veterans-class-8",
+    "slug": "newsupdates-base-camp-for-veterans-class-8",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 22
+  },
+  {
+    "title": "Farmhouse at Batwa Farm at Matanda — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/farmhouse-at-batwa-farm-at-matanda",
+    "slug": "newsupdates-farmhouse-at-batwa-farm-at-matanda",
+    "hasImages": true,
+    "imageCount": 17,
+    "contentSections": 7
+  },
+  {
+    "title": "BASE CAMP FOR VETERANS REUNION — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/base-camp-for-veterans-reunion",
+    "slug": "newsupdates-base-camp-for-veterans-reunion",
+    "hasImages": true,
+    "imageCount": 71,
+    "contentSections": 10
+  },
+  {
+    "title": "Women in Gorilla Conservation - next steps! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/women-in-gorilla-conservation-next-steps",
+    "slug": "newsupdates-women-in-gorilla-conservation-next-steps",
+    "hasImages": true,
+    "imageCount": 10,
+    "contentSections": 7
+  },
+  {
+    "title": "Batwa Farm yields 1.67 tonnes of maize flour — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-yields-167-tonnes-of-maize-flour",
+    "slug": "newsupdates-batwa-farm-yields-167-tonnes-of-maize-flour",
+    "hasImages": true,
+    "imageCount": 17,
+    "contentSections": 6
+  },
+  {
+    "title": "BATWA FARM AT MATANDA APRIL 15 2024  — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-at-matanda-april-15-2024nbsp",
+    "slug": "newsupdates-batwa-farm-at-matanda-april-15-2024nbsp",
+    "hasImages": true,
+    "imageCount": 25,
+    "contentSections": 6
+  },
+  {
+    "title": "THE PARTNERS NEPAL — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/the-partners",
+    "slug": "newsupdates-the-partners",
+    "hasImages": true,
+    "imageCount": 59,
+    "contentSections": 13
+  },
+  {
+    "title": "RANDY HELM HORSEMANSHIP — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/nas9k9z0jb1e8xgi5slhtcvqyfmof6",
+    "slug": "newsupdates-nas9k9z0jb1e8xgi5slhtcvqyfmof6",
+    "hasImages": true,
+    "imageCount": 17,
+    "contentSections": 12
+  },
+  {
+    "title": "BASE CAMP FOR VETERANS and RANDY HELM HORSEMANSHIP  — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/ghtxvzaaml6jppt57i8pm6xa7kqwy5",
+    "slug": "newsupdates-ghtxvzaaml6jppt57i8pm6xa7kqwy5",
+    "hasImages": true,
+    "imageCount": 17,
+    "contentSections": 11
+  },
+  {
+    "title": "BATWA FARM AT MATANDA — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-at-matanda",
+    "slug": "newsupdates-batwa-farm-at-matanda",
+    "hasImages": true,
+    "imageCount": 23,
+    "contentSections": 8
+  },
+  {
+    "title": "US Funds for TPN — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/us-funds-for-tpn",
+    "slug": "newsupdates-us-funds-for-tpn",
+    "hasImages": true,
+    "imageCount": 9,
+    "contentSections": 4
+  },
+  {
+    "title": "Growing life — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/growing-life",
+    "slug": "newsupdates-growing-life",
+    "hasImages": true,
+    "imageCount": 7,
+    "contentSections": 4
+  },
+  {
+    "title": "CELEBRATING WORLD GORILLA DAY AND OUR PORTERS — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/celebrating-world-gorilla-day-and-our-porters",
+    "slug": "newsupdates-celebrating-world-gorilla-day-and-our-porters",
+    "hasImages": true,
+    "imageCount": 13,
+    "contentSections": 4
+  },
+  {
+    "title": "Distribution of flour and beans from first harvest — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/distribution-of-flour-and-beans-from-first-harvest",
+    "slug": "newsupdates-distribution-of-flour-and-beans-from-first-harvest",
+    "hasImages": true,
+    "imageCount": 19,
+    "contentSections": 8
+  },
+  {
+    "title": "Porter Project — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/poultry-projectnbsp-september-progress-report",
+    "slug": "newsupdates-poultry-projectnbsp-september-progress-report",
+    "hasImages": true,
+    "imageCount": 29,
+    "contentSections": 10
+  },
+  {
+    "title": "BATWA FARM AT MATANDA - SECOND PLANTING — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-at-matanda-second-planting",
+    "slug": "newsupdates-batwa-farm-at-matanda-second-planting",
+    "hasImages": true,
+    "imageCount": 37,
+    "contentSections": 6
+  },
+  {
+    "title": "HARVEST at the Batwa farm at Matanda — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/harvest-at-the-batwa-farm-at-matanda",
+    "slug": "newsupdates-harvest-at-the-batwa-farm-at-matanda",
+    "hasImages": true,
+    "imageCount": 45,
+    "contentSections": 7
+  },
+  {
+    "title": "SEED TO HARVEST — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/seed-to-harvest",
+    "slug": "newsupdates-seed-to-harvest",
+    "hasImages": true,
+    "imageCount": 13,
+    "contentSections": 8
+  },
+  {
+    "title": "BWINDI NYAMBISHAMBA PORTER CHICKEN AND EGG POULTRY PROJECT  — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/bwindi-nyambishamba-porter-chicken-and-egg-poultry-projectnbsp",
+    "slug": "newsupdates-bwindi-nyambishamba-porter-chicken-and-egg-poultry-projectnbsp",
+    "hasImages": true,
+    "imageCount": 27,
+    "contentSections": 4
+  },
+  {
+    "title": "Plants grow with sun and rain — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/plants-grow-with-sun-and-rain",
+    "slug": "newsupdates-plants-grow-with-sun-and-rain",
+    "hasImages": true,
+    "imageCount": 7,
+    "contentSections": 4
+  },
+  {
+    "title": "Bees for honey and chickens for eggs! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/bees-for-honey-and-chickens-for-eggs",
+    "slug": "newsupdates-bees-for-honey-and-chickens-for-eggs",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 55
+  },
+  {
+    "title": "From seeds to vibrant plants for food! — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/seeds-to-vibrant-plants-for-food",
+    "slug": "newsupdates-seeds-to-vibrant-plants-for-food",
+    "hasImages": true,
+    "imageCount": 5,
+    "contentSections": 18
+  },
+  {
+    "title": "BATWA FARM PROJECT [at Matanda] PREPARES LAND FOR PLANTING — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-project-in-matanda-near-kihihi-1",
+    "slug": "newsupdates-batwa-farm-project-in-matanda-near-kihihi-1",
+    "hasImages": true,
+    "imageCount": 15,
+    "contentSections": 10
+  },
+  {
+    "title": "Borneo Rainforest and Gayana Marine Reserve  - October 2022 — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/in5dwfs9rok6h5t1yopm6eeq6r7kdj",
+    "slug": "newsupdates-in5dwfs9rok6h5t1yopm6eeq6r7kdj",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 9
+  },
+  {
+    "title": "BATWA FARM PROJECT IN MATANDA NEAR KIHIHI — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-project-in-matanda-near-kihihi",
+    "slug": "newsupdates-batwa-farm-project-in-matanda-near-kihihi",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 11
+  },
+  {
+    "title": "PICC Photography Inspiring Children In Conservation — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/yrgwhj4rn6dye2edmlzf3o8n64l11c",
+    "slug": "newsupdates-yrgwhj4rn6dye2edmlzf3o8n64l11c",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 8
+  },
+  {
+    "title": "Batwa Farm Project at Kihihi, Uganda — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/batwa-farm-project-at-kihihi-uganda",
+    "slug": "newsupdates-batwa-farm-project-at-kihihi-uganda",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 13
+  },
+  {
+    "title": "Shaya Rafiki guesthouse and lodge — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/nki4sjd5mm7d605bs8eghspje3mchg",
+    "slug": "newsupdates-nki4sjd5mm7d605bs8eghspje3mchg",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 10
+  },
+  {
+    "title": "Feed the children and their minds — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/feed-the-children-and-their-minds",
+    "slug": "newsupdates-feed-the-children-and-their-minds",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 8
+  },
+  {
+    "title": "STUDENT PHOTOGRAPHERS: THE ADVENTURE BEGINS — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/student-photographers-the-adventure-begins",
+    "slug": "newsupdates-student-photographers-the-adventure-begins",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 6
+  },
+  {
+    "title": "Feed the children and the families — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/feed-the-children-and-the-families",
+    "slug": "newsupdates-feed-the-children-and-the-families",
+    "hasImages": true,
+    "imageCount": 1,
+    "contentSections": 4
+  },
+  {
+    "title": "August 15th Update — Omotani CARING Foundation",
+    "url": "https://www.omotanicaringfoundation.com/newsupdates/blog-post-title-one-gxwbb",
+    "slug": "newsupdates-blog-post-title-one-gxwbb",
+    "hasImages": true,
+    "imageCount": 3,
+    "contentSections": 16
+  }
+]

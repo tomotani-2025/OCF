@@ -1,0 +1,74 @@
+{
+  "metadata": {
+    "title": "General 5 — Omotani CARING Foundation",
+    "description": "",
+    "ogTitle": "General 5 — Omotani CARING Foundation",
+    "ogDescription": "",
+    "ogImage": ""
+  },
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "Goal Twelve:  High Asia Habitat Fund"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "The Omotani Caring Foundation is pleased to become a supporter of the High Asia Habitat Fund.  The founder of HAHF, Behzad Larry, is committed to the conservation of the snow leopards and other wildlife in the region.  HAHF is also supporting the training of local people to help them and their cattle coexist with wildlife in the remote regions of the high Himalayan mountains."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Current study and exploration is being planned and conducted to determine whether brown bears can become a valued natural resource for future tourism and conservation."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Plans have been made to travel directly to the Ladakh [and possibly the Kargill] region of India, with Voygr Expeditions,  to observe and learn how to provide additional meaningful support for these projects."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "https://highasiafund.org"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "https://voygr.com/"
+    }
+  ],
+  "images": [
+    {
+      "original": "//images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601417917277-QALVW1G6C8D9RIDFFNGR/OCF1-B.png?format=1500w",
+      "local": "images/general/ocf1-b.png",
+      "alt": "Omotani CARING Foundation",
+      "type": "img"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/03e76b0a-80a5-46bd-aed5-a8c451593c46/Goal12.jpg",
+      "local": "images/general/goal12.jpg",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/03e76b0a-80a5-46bd-aed5-a8c451593c46/Goal12.jpg?format=2500w",
+      "local": "images/general/goal12.jpg",
+      "alt": "",
+      "type": "srcset"
+    }
+  ],
+  "galleryItems": [],
+  "links": [
+    {
+      "text": "https://highasiafund.org",
+      "href": "https://highasiafund.org",
+      "isInternal": false
+    },
+    {
+      "text": "https://voygr.com/",
+      "href": "https://voygr.com/",
+      "isInternal": false
+    }
+  ]
+}

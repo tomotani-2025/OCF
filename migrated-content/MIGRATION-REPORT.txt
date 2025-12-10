@@ -1,0 +1,156 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║        OMOTANI CARING FOUNDATION - SITE MIGRATION REPORT         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📅 Scraped: 2025-12-09T07:59:10.461Z
+🌐 Source: https://www.omotanicaringfoundation.com
+
+📊 STATISTICS
+─────────────────────────────────────────
+  Pages scraped:     88
+  Images downloaded: 2974
+  Failed URLs:       25
+
+📁 OUTPUT STRUCTURE
+─────────────────────────────────────────
+  C:\Users\Todd\OneDrive\Documents\OmotaniCaringFoundation-Website\migrated-content/
+  ├── data/
+  │   ├── site-metadata.json    (site-wide metadata)
+  │   ├── sitemap.json          (all pages summary)
+  │   ├── all-pages.json        (complete page data)
+  │   └── image-manifest.json   (image URL mappings)
+  ├── content/
+  │   └── [page-slug]/
+  │       ├── content.json      (structured content)
+  │       ├── content.md        (markdown version)
+  │       └── raw.html          (original HTML)
+  └── images/
+      ├── gallery/              (gallery images)
+      ├── heroes/               (hero/banner images)
+      ├── projects/             (project images)
+      ├── branding/             (logos, icons)
+      └── general/              (other images)
+
+📄 PAGES SCRAPED
+─────────────────────────────────────────
+  ✓ home                           (11 images)
+  ✓ about-us                       (11 images)
+  ✓ our-mission                    (27 images)
+  ✓ projects                       (25 images)
+  ✓ gallery                        (7 images)
+  ✓ progress                       (1 images)
+  ✓ newsupdates                    (41 images)
+  ✓ honor-and-memory               (1 images)
+  ✓ get-involved                   (5 images)
+  ✓ make-a-donation                (4 images)
+  ✓ gallery-1                      (7 images)
+  ✓ global-images-2                (149 images)
+  ✓ goalone                        (21 images)
+  ✓ goaltwo                        (13 images)
+  ✓ goalthree                      (19 images)
+  ✓ goalfour                       (19 images)
+  ✓ goalfive                       (3 images)
+  ✓ goalsix                        (7 images)
+  ✓ goalseven                      (3 images)
+  ✓ goaleight                      (5 images)
+  ✓ goaltwelve                     (3 images)
+  ✓ goalnine                       (9 images)
+  ✓ goalten                        (25 images)
+  ✓ goaleleven                     (3 images)
+  ✓ gallery1                       (1001 images)
+  ✓ gallery2                       (283 images)
+  ✓ gallery3                       (279 images)
+  ✓ newsupdates-kvbj1314lzxjg2v39di7yaakfrwj12 (18 images)
+  ✓ newsupdates-tpn-community-pond (4 images)
+  ✓ newsupdates-batwa-farm-has-more-progress (8 images)
+  ✓ newsupdates-2024-25-report-and-update-from-the-partners-nepal (3 images)
+  ✓ newsupdates-mushamba-moses-provides-a-quick-update-on-work-at-the-farm (1 images)
+  ✓ newsupdates-ixwmh2iwg985m8wn3ot44zaj79mhrw (15 images)
+  ✓ newsupdates-boundary-fencing-support-to-elderly-care-center-in-bung-nepal (5 images)
+  ✓ newsupdates-celebrating-100th-anniversary-of-the-tucson-rodeo (3 images)
+  ✓ newsupdates-brown-bears-high-himalayan-mountains-india (3 images)
+  ✓ newsupdates-dkkqom8oy91vizdq7rqahoqb44pv83 (24 images)
+  ✓ newsupdates-090yulae442siv55muydngpv6g5kk1 (5 images)
+  ✓ newsupdates-bwindi-plus-girls-project (9 images)
+  ✓ newsupdates-batwa-families-are-farming-at-matanda (12 images)
+  ✓ newsupdates-sir-edmund-hillary-memorial-museum-and-elder-care-center (13 images)
+  ✓ newsupdates-tpn-one-day-one-tree-in-chheskam (3 images)
+  ✓ newsupdates-the-partners-nepal-update-september-2024 (23 images)
+  ✓ newsupdates-continued-success-at-batwa-farm-at-matanda (31 images)
+  ✓ newsupdates-high-asia-habitat-fund (3 images)
+  ✓ newsupdates-elderly-care-center-in-bung-nepal-receives-supplies (8 images)
+  ✓ newsupdates-batwa-farm-at-matanda-harvest-july-august-nbsp2024 (19 images)
+  ✓ global-images-1                (412 images)
+  ✓ global-images-3                (43 images)
+  ✓ s-tpn-news-update-2024-2025-2.pdf (0 images)
+  ✓ s-boundary-fencing-support-to-senior-citizens-in-bung-march-2025.pdf (0 images)
+  ✓ s-tpns-profile-september-2024-reduced.pdf (0 images)
+  ✓ newsupdates-the-partners-nepal (4 images)
+  ✓ newsupdates-randy-helm-horsemanship (11 images)
+  ✓ newsupdates-batwa-farm-at-matanda-june-2024 (8 images)
+  ✓ newsupdates-women-in-gorilla-conservation (9 images)
+  ✓ newsupdates-base-camp-for-veterans-class-8 (1 images)
+  ✓ newsupdates-farmhouse-at-batwa-farm-at-matanda (17 images)
+  ✓ newsupdates-base-camp-for-veterans-reunion (71 images)
+  ✓ newsupdates-women-in-gorilla-conservation-next-steps (10 images)
+  ✓ newsupdates-batwa-farm-yields-167-tonnes-of-maize-flour (17 images)
+  ✓ newsupdates-batwa-farm-at-matanda-april-15-2024nbsp (25 images)
+  ✓ newsupdates-the-partners       (59 images)
+  ✓ newsupdates-nas9k9z0jb1e8xgi5slhtcvqyfmof6 (17 images)
+  ✓ newsupdates-ghtxvzaaml6jppt57i8pm6xa7kqwy5 (17 images)
+  ✓ newsupdates-batwa-farm-at-matanda (23 images)
+  ✓ newsupdates-us-funds-for-tpn   (9 images)
+  ✓ newsupdates-growing-life       (7 images)
+  ✓ newsupdates-celebrating-world-gorilla-day-and-our-porters (13 images)
+  ✓ newsupdates-distribution-of-flour-and-beans-from-first-harvest (19 images)
+  ✓ newsupdates-poultry-projectnbsp-september-progress-report (29 images)
+  ✓ newsupdates-batwa-farm-at-matanda-second-planting (37 images)
+  ✓ newsupdates-harvest-at-the-batwa-farm-at-matanda (45 images)
+  ✓ newsupdates-seed-to-harvest    (13 images)
+  ✓ newsupdates-bwindi-nyambishamba-porter-chicken-and-egg-poultry-projectnbsp (27 images)
+  ✓ newsupdates-plants-grow-with-sun-and-rain (7 images)
+  ✓ newsupdates-bees-for-honey-and-chickens-for-eggs (3 images)
+  ✓ newsupdates-seeds-to-vibrant-plants-for-food (5 images)
+  ✓ newsupdates-batwa-farm-project-in-matanda-near-kihihi-1 (15 images)
+  ✓ newsupdates-in5dwfs9rok6h5t1yopm6eeq6r7kdj (3 images)
+  ✓ newsupdates-batwa-farm-project-in-matanda-near-kihihi (1 images)
+  ✓ newsupdates-yrgwhj4rn6dye2edmlzf3o8n64l11c (3 images)
+  ✓ newsupdates-batwa-farm-project-at-kihihi-uganda (3 images)
+  ✓ newsupdates-nki4sjd5mm7d605bs8eghspje3mchg (1 images)
+  ✓ newsupdates-feed-the-children-and-their-minds (1 images)
+  ✓ newsupdates-student-photographers-the-adventure-begins (1 images)
+  ✓ newsupdates-feed-the-children-and-the-families (1 images)
+  ✓ newsupdates-blog-post-title-one-gxwbb (3 images)
+
+
+⚠️  FAILED URLS
+─────────────────────────────────────────
+  ✗ https://www.omotanicaringfoundation.com/about
+  ✗ https://www.omotanicaringfoundation.com/global-images
+  ✗ https://www.omotanicaringfoundation.com/news-updates
+  ✗ https://www.omotanicaringfoundation.com/news
+  ✗ https://www.omotanicaringfoundation.com/honor-memory
+  ✗ https://www.omotanicaringfoundation.com/contact
+  ✗ https://www.omotanicaringfoundation.com/contact-us
+  ✗ https://www.omotanicaringfoundation.com/donate
+  ✗ https://www.omotanicaringfoundation.com/batwa-farm
+  ✗ https://www.omotanicaringfoundation.com/batwa-farms
+  ✗ https://www.omotanicaringfoundation.com/porters-at-bwindi
+  ✗ https://www.omotanicaringfoundation.com/porters
+  ✗ https://www.omotanicaringfoundation.com/health
+  ✗ https://www.omotanicaringfoundation.com/technology
+  ✗ https://www.omotanicaringfoundation.com/fresh-water
+  ✗ https://www.omotanicaringfoundation.com/education
+  ✗ https://www.omotanicaringfoundation.com/donor-requests
+  ✗ https://www.omotanicaringfoundation.com/partners-nepal
+  ✗ https://www.omotanicaringfoundation.com/the-partners-nepal
+  ✗ https://www.omotanicaringfoundation.com/women-in-gorilla-conservation
+  ✗ https://www.omotanicaringfoundation.com/base-camp-for-veterans
+  ✗ https://www.omotanicaringfoundation.com/randy-helm-horsemanship
+  ✗ https://www.omotanicaringfoundation.com/high-asia-habitat-fund
+  ✗ https://www.omotanicaringfoundation.com/gallery-2
+  ✗ https://www.omotanicaringfoundation.com/gallery-3
+
+
+🎉 Migration data ready for use!

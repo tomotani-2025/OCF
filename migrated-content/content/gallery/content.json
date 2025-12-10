@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "title": "Projects — Omotani CARING Foundation",
+    "description": "",
+    "ogTitle": "Projects — Omotani CARING Foundation",
+    "ogDescription": "",
+    "ogImage": ""
+  },
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "Image Gallery"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Gallery 12017-2024"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Gallery 2"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Gallery 3"
+    }
+  ],
+  "images": [
+    {
+      "original": "//images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601417917277-QALVW1G6C8D9RIDFFNGR/OCF1-B.png?format=1500w",
+      "local": "images/general/ocf1-b.png",
+      "alt": "Omotani CARING Foundation",
+      "type": "img"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601326081786-69F5XH4BOL2RLPA6CNG6/IMG_0049.jpeg",
+      "local": "images/general/img_0049.jpg",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601326081786-69F5XH4BOL2RLPA6CNG6/IMG_0049.jpeg?format=2500w",
+      "local": "images/general/img_0049.jpg",
+      "alt": "",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/f32a2c09-7b02-474b-bc3a-78511fb9c35f/OCF+GALLERY+2024+-+55+of+81.jpeg",
+      "local": "images/general/ocf+gallery+2024+-+55+of+81.jpg",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/f32a2c09-7b02-474b-bc3a-78511fb9c35f/OCF+GALLERY+2024+-+55+of+81.jpeg?format=2500w",
+      "local": "images/general/ocf+gallery+2024+-+55+of+81.jpg",
+      "alt": "",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1613348909159-HFH2TGUVSO3DWU6XKW8E/food-health.jpg",
+      "local": "images/general/food-health.jpg",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1613348909159-HFH2TGUVSO3DWU6XKW8E/food-health.jpg?format=2500w",
+      "local": "images/general/food-health.jpg",
+      "alt": "",
+      "type": "srcset"
+    }
+  ],
+  "galleryItems": [],
+  "links": [
+    {
+      "text": "Gallery 1",
+      "href": "https://www.omotanicaringfoundation.com/gallery1",
+      "isInternal": true
+    },
+    {
+      "text": "Gallery 2",
+      "href": "https://www.omotanicaringfoundation.com/gallery2",
+      "isInternal": true
+    },
+    {
+      "text": "Gallery 3",
+      "href": "https://www.omotanicaringfoundation.com/gallery3",
+      "isInternal": true
+    }
+  ]
+}

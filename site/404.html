@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found — Omotani Caring Foundation</title>
+    <meta name="description" content="The page you're looking for could not be found.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="images/ocf1-b.png" alt="Omotani Caring Foundation">
+            </a>
+            <nav class="main-nav">
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="mission.html">Our Mission</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="news.html">News + Updates</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="get-involved.html">Get Involved</a></li>
+                    <li><a href="donate.html" class="btn btn-donate">Donate</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="error-page">
+            <div class="container">
+                <div class="error-content">
+                    <h1>404</h1>
+                    <h2>Page Not Found</h2>
+                    <p>Sorry, the page you're looking for doesn't exist or has been moved.</p>
+                    <div class="error-links">
+                        <a href="index.html" class="btn btn-primary">Go Home</a>
+                        <a href="projects.html" class="btn btn-outline">View Projects</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <img src="images/ocf1-b.png" alt="Omotani Caring Foundation" class="footer-logo">
+                    <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
+                    <p><strong>EIN:</strong> 85-2581703</p>
+                </div>
+                <div class="footer-nav">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="mission.html">Our Mission</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="news.html">News + Updates</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="donate.html">Donate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact</h4>
+                    <p>For inquiries about our projects or how to get involved, please visit our <a href="get-involved.html">Get Involved</a> page.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Omotani Caring Foundation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+
+    <style>
+        .error-page {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--spacing-xxl) 0;
+        }
+
+        .error-content h1 {
+            font-size: 8rem;
+            color: var(--color-primary);
+            margin-bottom: 0;
+            line-height: 1;
+        }
+
+        .error-content h2 {
+            font-size: 2rem;
+            color: var(--color-text);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .error-content p {
+            font-size: 1.1rem;
+            color: var(--color-text-light);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .error-links {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .error-content h1 {
+                font-size: 5rem;
+            }
+
+            .error-content h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</body>
+</html>

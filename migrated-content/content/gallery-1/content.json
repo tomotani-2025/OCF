@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "title": "Projects — Omotani CARING Foundation",
+    "description": "",
+    "ogTitle": "Projects — Omotani CARING Foundation",
+    "ogDescription": "",
+    "ogImage": ""
+  },
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "Global Images"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Global Images Gallery 1"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Global Images Gallery 2"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Global Images Gallery 3"
+    },
+    {
+      "type": "paragraph",
+      "text": "As we explore our world the wildlife and the people of our global village inform and shape our lives. We share our stories with photos that speak volumes. We live on an amazing planet called Earth. Seek out the adventures that await in every region and take the opportunity to meet the children and families who care for their home lands……",
+      "html": "As we explore our world the wildlife and the people of our global village inform and shape our lives. <br>We share our stories with photos that speak volumes. <br>We live on an amazing planet called Earth. <br>Seek out the adventures that await in every region and take the opportunity to meet the children and families who care for their home lands……"
+    }
+  ],
+  "images": [
+    {
+      "original": "//images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601417917277-QALVW1G6C8D9RIDFFNGR/OCF1-B.png?format=1500w",
+      "local": "images/general/ocf1-b.png",
+      "alt": "Omotani CARING Foundation",
+      "type": "img"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/75105526-e61b-4252-a664-d7a6dee21d64/orangutan-borneo-1024x683.jpg",
+      "local": "images/general/orangutan-borneo-1024x683.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/75105526-e61b-4252-a664-d7a6dee21d64/orangutan-borneo-1024x683.jpg?format=2500w",
+      "local": "images/general/orangutan-borneo-1024x683.webp",
+      "alt": "",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/dfc0bcd0-8ce0-409a-8600-f624db93ff56/IMGP5069.jpeg",
+      "local": "images/general/imgp5069.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/dfc0bcd0-8ce0-409a-8600-f624db93ff56/IMGP5069.jpeg?format=2500w",
+      "local": "images/general/imgp5069.webp",
+      "alt": "",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/c3e855ff-ab75-43ec-8b04-c99736f46168/IMG_1366+2.jpeg",
+      "local": "images/general/img_1366+2.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/c3e855ff-ab75-43ec-8b04-c99736f46168/IMG_1366+2.jpeg?format=2500w",
+      "local": "images/general/img_1366+2.webp",
+      "alt": "",
+      "type": "srcset"
+    }
+  ],
+  "galleryItems": [],
+  "links": [
+    {
+      "text": "Global Images Gallery 1",
+      "href": "https://www.omotanicaringfoundation.com/global-images-1",
+      "isInternal": true
+    },
+    {
+      "text": "Global Images Gallery 2",
+      "href": "https://www.omotanicaringfoundation.com/global-images-2",
+      "isInternal": true
+    },
+    {
+      "text": "Global Images Gallery 3",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    }
+  ]
+}

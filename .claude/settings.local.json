@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(node scraper.js:*)",
+      "Bash(dir c:UsersToddOneDriveDocumentsOmotaniCaringFoundation-Websitemigrated-content /s /b)",
+      "Bash(dir c:UsersToddOneDriveDocumentsOmotaniCaringFoundation-Websitemigrated-contentimages /s /b)",
+      "Bash(powershell -Command:*)",
+      "Bash(timeout:*)",
+      "Bash(node:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "metadata": {
+    "title": "Gallery 1 — Omotani CARING Foundation",
+    "description": "",
+    "ogTitle": "Gallery 1 — Omotani CARING Foundation",
+    "ogDescription": "",
+    "ogImage": ""
+  },
+  "sections": [
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Global Images 3"
+    }
+  ],
+  "images": [
+    {
+      "original": "//images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601417917277-QALVW1G6C8D9RIDFFNGR/OCF1-B.png?format=1500w",
+      "local": "images/general/ocf1-b.png",
+      "alt": "Omotani CARING Foundation",
+      "type": "img"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847323266-72NWHRF1QFUTULW9BR18/20140301_Trade-151_0124-copy.jpg",
+      "local": "images/general/20140301_trade-151_0124-copy.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847323266-72NWHRF1QFUTULW9BR18/20140301_Trade-151_0124-copy.jpg?format=2500w",
+      "local": "images/general/20140301_trade-151_0124-copy.webp",
+      "alt": "20140301_Trade-151_0124-copy.jpg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847322796-4GQWUIJZ69E1XBVGEYUY/Large+JPG-20140228_Trade+151_0046.jpg",
+      "local": "images/general/large+jpg-20140228_trade+151_0046.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847322796-4GQWUIJZ69E1XBVGEYUY/Large+JPG-20140228_Trade+151_0046.jpg?format=2500w",
+      "local": "images/general/large+jpg-20140228_trade+151_0046.webp",
+      "alt": "Large JPG-20140228_Trade 151_0046.jpg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847321447-1IJTU4ZDFUYJYXJTERFM/Large+JPG-Aro+Ha_0010.jpg",
+      "local": "images/general/large+jpg-aro+ha_0010.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5ec321c2af33de48734cc929/1589847321447-1IJTU4ZDFUYJYXJTERFM/Large+JPG-Aro+Ha_0010.jpg?format=2500w",
+      "local": "images/general/large+jpg-aro+ha_0010.webp",
+      "alt": "Large JPG-Aro Ha_0010.jpg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/10409dc9-090f-44c1-bdce-3722f659834e/IMG_5613.jpeg",
+      "local": "images/general/img_5613.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/10409dc9-090f-44c1-bdce-3722f659834e/IMG_5613.jpeg?format=2500w",
+      "local": "images/general/img_5613.webp",
+      "alt": "IMG_5613.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/00fb3e77-bb25-495f-9996-c746482e6f0c/IMG_5589.jpeg",
+      "local": "images/general/img_5589.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/00fb3e77-bb25-495f-9996-c746482e6f0c/IMG_5589.jpeg?format=2500w",
+      "local": "images/general/img_5589.webp",
+      "alt": "IMG_5589.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/771e43a8-a085-4fb3-b400-91b10282af21/IMG_4513.jpeg",
+      "local": "images/general/img_4513.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/771e43a8-a085-4fb3-b400-91b10282af21/IMG_4513.jpeg?format=2500w",
+      "local": "images/general/img_4513.webp",
+      "alt": "IMG_4513.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/2696e892-c18d-4feb-b205-1ba7b999e9e7/IMG_5267.jpeg",
+      "local": "images/general/img_5267.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/2696e892-c18d-4feb-b205-1ba7b999e9e7/IMG_5267.jpeg?format=2500w",
+      "local": "images/general/img_5267.webp",
+      "alt": "IMG_5267.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/57eb10e9-75e2-4cbc-aec1-88320ce70dea/IMG_5264.jpeg",
+      "local": "images/general/img_5264.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/57eb10e9-75e2-4cbc-aec1-88320ce70dea/IMG_5264.jpeg?format=2500w",
+      "local": "images/general/img_5264.webp",
+      "alt": "IMG_5264.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/6ec1366e-1c2b-4957-a91e-0d11f819cb72/IMG_5265.jpeg",
+      "local": "images/general/img_5265.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/6ec1366e-1c2b-4957-a91e-0d11f819cb72/IMG_5265.jpeg?format=2500w",
+      "local": "images/general/img_5265.webp",
+      "alt": "IMG_5265.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/03927bfa-22ea-4ab1-92e9-264bea170a5f/IMG_5070.jpeg",
+      "local": "images/general/img_5070.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/03927bfa-22ea-4ab1-92e9-264bea170a5f/IMG_5070.jpeg?format=2500w",
+      "local": "images/general/img_5070.webp",
+      "alt": "IMG_5070.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/d55d2cad-caa9-41c9-9d24-6b9a206c703f/IMG_4892.jpeg",
+      "local": "images/general/img_4892.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/d55d2cad-caa9-41c9-9d24-6b9a206c703f/IMG_4892.jpeg?format=2500w",
+      "local": "images/general/img_4892.webp",
+      "alt": "IMG_4892.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/cbff67b5-0196-465a-8ae5-f4f5af49857e/IMG_5475.jpeg",
+      "local": "images/general/img_5475.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/cbff67b5-0196-465a-8ae5-f4f5af49857e/IMG_5475.jpeg?format=2500w",
+      "local": "images/general/img_5475.webp",
+      "alt": "IMG_5475.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/70dda890-78f9-4fa6-9652-c1f69e3cf2bc/IMG_5504.jpeg",
+      "local": "images/general/img_5504.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/70dda890-78f9-4fa6-9652-c1f69e3cf2bc/IMG_5504.jpeg?format=2500w",
+      "local": "images/general/img_5504.webp",
+      "alt": "IMG_5504.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1694922d-9be8-40e1-a1f7-692d152afd37/IMG_2064.jpeg",
+      "local": "images/general/img_2064.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1694922d-9be8-40e1-a1f7-692d152afd37/IMG_2064.jpeg?format=2500w",
+      "local": "images/general/img_2064.webp",
+      "alt": "IMG_2064.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/db554689-d287-4257-bbad-e17b05dd12bc/IMG_1982.jpeg",
+      "local": "images/general/img_1982.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/db554689-d287-4257-bbad-e17b05dd12bc/IMG_1982.jpeg?format=2500w",
+      "local": "images/general/img_1982.webp",
+      "alt": "IMG_1982.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/3446e3b2-8ab5-449b-a145-1c64a8a8cbda/_DSC0889.JPG",
+      "local": "images/general/_dsc0889.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/3446e3b2-8ab5-449b-a145-1c64a8a8cbda/_DSC0889.JPG?format=2500w",
+      "local": "images/general/_dsc0889.webp",
+      "alt": "_DSC0889.JPG",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/39efaf11-c5cd-42cf-8c61-5a248366f35f/DSC00421.JPG",
+      "local": "images/general/dsc00421.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/39efaf11-c5cd-42cf-8c61-5a248366f35f/DSC00421.JPG?format=2500w",
+      "local": "images/general/dsc00421.webp",
+      "alt": "DSC00421.JPG",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/d4cb6a41-5dc4-4ad9-a507-28ae0c516add/DSC00106.jpg",
+      "local": "images/general/dsc00106.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/d4cb6a41-5dc4-4ad9-a507-28ae0c516add/DSC00106.jpg?format=2500w",
+      "local": "images/general/dsc00106.webp",
+      "alt": "DSC00106.jpg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/54163987-fb33-463d-bf89-604df6c314b0/DSC02140.jpeg",
+      "local": "images/general/dsc02140.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/54163987-fb33-463d-bf89-604df6c314b0/DSC02140.jpeg?format=2500w",
+      "local": "images/general/dsc02140.webp",
+      "alt": "DSC02140.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/cb1354a9-b695-46f5-8ff7-abfc4b4cf5e8/20251009_063018.jpeg",
+      "local": "images/general/20251009_063018.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/cb1354a9-b695-46f5-8ff7-abfc4b4cf5e8/20251009_063018.jpeg?format=2500w",
+      "local": "images/general/20251009_063018.webp",
+      "alt": "20251009_063018.jpeg",
+      "type": "srcset"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/a031702a-8b0b-4e61-8d37-5d05182d0f36/20251009_063015.jpeg",
+      "local": "images/general/20251009_063015.webp",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/a031702a-8b0b-4e61-8d37-5d05182d0f36/20251009_063015.jpeg?format=2500w",
+      "local": "images/general/20251009_063015.webp",
+      "alt": "20251009_063015.jpeg",
+      "type": "srcset"
+    }
+  ],
+  "galleryItems": [],
+  "links": [
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    },
+    {
+      "text": "View fullsize",
+      "href": "https://www.omotanicaringfoundation.com/global-images-3",
+      "isInternal": true
+    }
+  ]
+}

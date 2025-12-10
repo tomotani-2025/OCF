@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "title": "General 5 — Omotani CARING Foundation",
+    "description": "",
+    "ogTitle": "General 5 — Omotani CARING Foundation",
+    "ogDescription": "",
+    "ogImage": ""
+  },
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "Goal Seven:  Donor Requests"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "DREAMS AND VISIONS = $ UNLIMITED"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Donors who wish to submit a specific request to the OMOTANI CARING FOUNDATION in support of a project or initiative that is meaningful and personal are encouraged to submit a description of the proposal and potential level of funding."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Requests and project proposals that are consistent with the mission, goals and values of the foundation will be approved."
+    }
+  ],
+  "images": [
+    {
+      "original": "//images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1601417917277-QALVW1G6C8D9RIDFFNGR/OCF1-B.png?format=1500w",
+      "local": "images/general/ocf1-b.png",
+      "alt": "Omotani CARING Foundation",
+      "type": "img"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/3025c817-6b80-4f56-800d-757d005a0e46/LINDA+MERCYjpeg.jpg",
+      "local": "images/general/linda+mercyjpeg.jpg",
+      "alt": "",
+      "type": "squarespace-data"
+    },
+    {
+      "original": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/3025c817-6b80-4f56-800d-757d005a0e46/LINDA+MERCYjpeg.jpg?format=2500w",
+      "local": "images/general/linda+mercyjpeg.jpg",
+      "alt": "",
+      "type": "srcset"
+    }
+  ],
+  "galleryItems": [],
+  "links": []
+}
