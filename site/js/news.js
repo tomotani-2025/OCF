@@ -57,7 +57,7 @@
 
 class NewsCMS {
     constructor(options = {}) {
-        this.dataUrl = options.dataUrl || 'data/news-posts.json';
+        this.dataUrl = options.dataUrl || 'data/news-posts.json?v=2';
         this.containerSelector = options.containerSelector || '.news-grid';
         this.filterSelector = options.filterSelector || '.news-filter-links';
         this.sortSelector = options.sortSelector || '.news-sort-select';

@@ -14,7 +14,7 @@
 
 class BlogPost {
     constructor() {
-        this.dataUrl = 'data/news-posts.json';
+        this.dataUrl = 'data/news-posts.json?v=2';
         this.posts = [];
         this.currentPost = null;
         this.currentIndex = -1;
