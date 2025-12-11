@@ -41,6 +41,7 @@ class BlogPost {
             this.render();
             this.setupNavigation();
             this.setupCarousel();
+            this.setupFullscreen();
         } catch (error) {
             console.error('Failed to load post:', error);
             this.showError('Unable to load post');
@@ -304,7 +305,12 @@ class BlogPost {
                 </div>
                 <div class="post-image-caption">
                     <span class="caption-text">${this.images[0].alt || ''}</span>
-                    <span class="caption-count">${formatNumber(1)}/${formatNumber(totalImages)}</span>
+                    <span class="caption-count">(${formatNumber(1)}/${formatNumber(totalImages)})</span>
+                    <button class="caption-fullscreen" aria-label="View fullscreen" title="View fullscreen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
                 </div>
             `;
 
@@ -419,7 +425,7 @@ class BlogPost {
         }
         if (captionCount) {
             const formatNumber = (num) => num.toString().padStart(2, '0');
-            captionCount.textContent = `${formatNumber(index + 1)}/${formatNumber(this.images.length)}`;
+            captionCount.textContent = `(${formatNumber(index + 1)}/${formatNumber(this.images.length)})`;
         }
 
         // Update arrow states
@@ -460,6 +466,139 @@ class BlogPost {
                 nextLink.removeAttribute('href');
             }
         }
+    }
+
+    setupFullscreen() {
+        if (this.images.length === 0) return;
+
+        // Create lightbox if it doesn't exist
+        let lightbox = document.querySelector('.image-lightbox');
+        if (!lightbox) {
+            lightbox = document.createElement('div');
+            lightbox.className = 'image-lightbox';
+            lightbox.innerHTML = `
+                <button class="lightbox-close" aria-label="Close fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+                <button class="lightbox-nav lightbox-prev" aria-label="Previous image">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 1L1 7L7 13" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M1 7H17" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="lightbox-content">
+                    <img src="" alt="">
+                </div>
+                <button class="lightbox-nav lightbox-next" aria-label="Next image">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 1L17 7L11 13" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 7H1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="lightbox-caption"></div>
+            `;
+            document.body.appendChild(lightbox);
+        }
+
+        const fullscreenBtn = document.querySelector('.caption-fullscreen');
+        const closeBtn = lightbox.querySelector('.lightbox-close');
+        const prevBtn = lightbox.querySelector('.lightbox-prev');
+        const nextBtn = lightbox.querySelector('.lightbox-next');
+        const lightboxImg = lightbox.querySelector('.lightbox-content img');
+        const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+
+        // Open lightbox
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                this.openLightbox();
+            });
+        }
+
+        // Close lightbox
+        closeBtn.addEventListener('click', () => this.closeLightbox());
+
+        // Click outside to close
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                this.closeLightbox();
+            }
+        });
+
+        // Navigation
+        prevBtn.addEventListener('click', () => this.lightboxNavigate(-1));
+        nextBtn.addEventListener('click', () => this.lightboxNavigate(1));
+
+        // Keyboard navigation in lightbox
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+
+            if (e.key === 'Escape') {
+                this.closeLightbox();
+            } else if (e.key === 'ArrowLeft') {
+                this.lightboxNavigate(-1);
+            } else if (e.key === 'ArrowRight') {
+                this.lightboxNavigate(1);
+            }
+        });
+
+        // Hide nav buttons if only one image
+        if (this.images.length <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+    }
+
+    openLightbox() {
+        const lightbox = document.querySelector('.image-lightbox');
+        const lightboxImg = lightbox.querySelector('.lightbox-content img');
+        const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+
+        const currentImage = this.images[this.currentImageIndex];
+        lightboxImg.src = currentImage.src;
+        lightboxImg.alt = currentImage.alt || '';
+        lightboxCaption.textContent = currentImage.alt || '';
+
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        this.updateLightboxNav();
+    }
+
+    closeLightbox() {
+        const lightbox = document.querySelector('.image-lightbox');
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    lightboxNavigate(direction) {
+        const newIndex = this.currentImageIndex + direction;
+        if (newIndex >= 0 && newIndex < this.images.length) {
+            this.currentImageIndex = newIndex;
+            this.goToImage(newIndex);
+
+            const lightbox = document.querySelector('.image-lightbox');
+            const lightboxImg = lightbox.querySelector('.lightbox-content img');
+            const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+
+            const currentImage = this.images[this.currentImageIndex];
+            lightboxImg.src = currentImage.src;
+            lightboxImg.alt = currentImage.alt || '';
+            lightboxCaption.textContent = currentImage.alt || '';
+
+            this.updateLightboxNav();
+        }
+    }
+
+    updateLightboxNav() {
+        const lightbox = document.querySelector('.image-lightbox');
+        const prevBtn = lightbox.querySelector('.lightbox-prev');
+        const nextBtn = lightbox.querySelector('.lightbox-next');
+
+        prevBtn.classList.toggle('disabled', this.currentImageIndex === 0);
+        nextBtn.classList.toggle('disabled', this.currentImageIndex === this.images.length - 1);
     }
 
     showError(message) {
