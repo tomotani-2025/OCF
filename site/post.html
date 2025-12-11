@@ -134,7 +134,7 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/post.js?v=5"></script>
+    <script src="js/post.js?v=7"></script>
 
     <style>
         /* Post Page Styles */
@@ -157,7 +157,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 60px;
+            gap: 48px;
             max-width: 976px;
             width: 100%;
         }
@@ -398,7 +398,7 @@
             flex-direction: column;
             align-items: flex-start;
             width: 100%;
-            gap: 8px;
+            gap: 4px;
         }
 
         .post-date {
@@ -413,21 +413,25 @@
         .post-author {
             width: 100%;
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 400;
             line-height: 125%;
             letter-spacing: -0.02em;
             text-align: left;
             color: #31110F;
         }
 
+        .post-author .author-name {
+            font-weight: 500;
+        }
+
         /* Content */
         .post-content {
             width: 100%;
             min-height: 200px;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 400;
-            line-height: 109%;
-            letter-spacing: -0.05em;
+            line-height: 140%;
+            letter-spacing: -0.02em;
             color: #31110F;
         }
 
@@ -802,12 +806,24 @@
         .lightbox-caption {
             position: absolute;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
             color: #FFFFFF;
             font-size: 14px;
-            text-align: center;
-            max-width: 80%;
+            text-align: left;
+        }
+
+        .lightbox-count {
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .lightbox-text {
+            flex: 1;
         }
     </style>
 </body>

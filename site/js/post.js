@@ -134,10 +134,10 @@ class BlogPost {
 
         this.renderImages();
 
-        // Author
+        // Author - "by" regular weight, author name medium weight
         const authorEl = document.querySelector('.post-author');
         if (authorEl) {
-            authorEl.textContent = `By ${post.author}`;
+            authorEl.innerHTML = `by <span class="author-name">${post.author}</span>`;
         }
 
         // Date
@@ -304,8 +304,8 @@ class BlogPost {
                     </button>
                 </div>
                 <div class="post-image-caption">
+                    <span class="caption-count">${formatNumber(1)}/${formatNumber(totalImages)}</span>
                     <span class="caption-text">${this.images[0].alt || ''}</span>
-                    <span class="caption-count">(${formatNumber(1)}/${formatNumber(totalImages)})</span>
                     <button class="caption-fullscreen" aria-label="View fullscreen" title="View fullscreen">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
@@ -320,6 +320,10 @@ class BlogPost {
             if (this.images.length <= 1) {
                 const arrows = imageContainer.querySelectorAll('.carousel-arrow');
                 arrows.forEach(arrow => arrow.style.display = 'none');
+            } else {
+                // Hide prev arrow initially (at first image)
+                const prevArrow = imageContainer.querySelector('.carousel-prev');
+                if (prevArrow) prevArrow.style.display = 'none';
             }
         }
 
@@ -425,14 +429,18 @@ class BlogPost {
         }
         if (captionCount) {
             const formatNumber = (num) => num.toString().padStart(2, '0');
-            captionCount.textContent = `(${formatNumber(index + 1)}/${formatNumber(this.images.length)})`;
+            captionCount.textContent = `${formatNumber(index + 1)}/${formatNumber(this.images.length)}`;
         }
 
-        // Update arrow states
+        // Update arrow states - hide arrows when at start/end
         const prevBtn = document.querySelector('.carousel-prev');
         const nextBtn = document.querySelector('.carousel-next');
-        if (prevBtn) prevBtn.classList.toggle('disabled', index === 0);
-        if (nextBtn) nextBtn.classList.toggle('disabled', index === this.images.length - 1);
+        if (prevBtn) {
+            prevBtn.style.display = index === 0 ? 'none' : 'flex';
+        }
+        if (nextBtn) {
+            nextBtn.style.display = index === this.images.length - 1 ? 'none' : 'flex';
+        }
     }
 
     setupNavigation() {
@@ -498,7 +506,10 @@ class BlogPost {
                         <path d="M17 7H1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
-                <div class="lightbox-caption"></div>
+                <div class="lightbox-caption">
+                    <span class="lightbox-count"></span>
+                    <span class="lightbox-text"></span>
+                </div>
             `;
             document.body.appendChild(lightbox);
         }
@@ -554,12 +565,17 @@ class BlogPost {
     openLightbox() {
         const lightbox = document.querySelector('.image-lightbox');
         const lightboxImg = lightbox.querySelector('.lightbox-content img');
-        const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+        const lightboxCount = lightbox.querySelector('.lightbox-count');
+        const lightboxText = lightbox.querySelector('.lightbox-text');
 
         const currentImage = this.images[this.currentImageIndex];
         lightboxImg.src = currentImage.src;
         lightboxImg.alt = currentImage.alt || '';
-        lightboxCaption.textContent = currentImage.alt || '';
+
+        // Update count and caption text
+        const formatNumber = (num) => num.toString().padStart(2, '0');
+        lightboxCount.textContent = `${formatNumber(this.currentImageIndex + 1)}/${formatNumber(this.images.length)}`;
+        lightboxText.textContent = currentImage.alt || '';
 
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -581,12 +597,17 @@ class BlogPost {
 
             const lightbox = document.querySelector('.image-lightbox');
             const lightboxImg = lightbox.querySelector('.lightbox-content img');
-            const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+            const lightboxCount = lightbox.querySelector('.lightbox-count');
+            const lightboxText = lightbox.querySelector('.lightbox-text');
 
             const currentImage = this.images[this.currentImageIndex];
             lightboxImg.src = currentImage.src;
             lightboxImg.alt = currentImage.alt || '';
-            lightboxCaption.textContent = currentImage.alt || '';
+
+            // Update count and caption text
+            const formatNumber = (num) => num.toString().padStart(2, '0');
+            lightboxCount.textContent = `${formatNumber(this.currentImageIndex + 1)}/${formatNumber(this.images.length)}`;
+            lightboxText.textContent = currentImage.alt || '';
 
             this.updateLightboxNav();
         }
@@ -597,8 +618,9 @@ class BlogPost {
         const prevBtn = lightbox.querySelector('.lightbox-prev');
         const nextBtn = lightbox.querySelector('.lightbox-next');
 
-        prevBtn.classList.toggle('disabled', this.currentImageIndex === 0);
-        nextBtn.classList.toggle('disabled', this.currentImageIndex === this.images.length - 1);
+        // Hide arrows when at start/end instead of just disabling
+        prevBtn.style.display = this.currentImageIndex === 0 ? 'none' : 'flex';
+        nextBtn.style.display = this.currentImageIndex === this.images.length - 1 ? 'none' : 'flex';
     }
 
     showError(message) {
