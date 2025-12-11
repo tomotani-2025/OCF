@@ -73,6 +73,16 @@
                     <p>Loading...</p>
                 </div>
 
+                <!-- Videos Container -->
+                <div class="post-videos" hidden>
+                    <!-- Video embeds will be added here -->
+                </div>
+
+                <!-- PDFs Container -->
+                <div class="post-pdfs" hidden>
+                    <!-- PDF links will be added here -->
+                </div>
+
                 <!-- Previous/Next Navigation -->
                 <div class="post-navigation">
                     <a href="#" class="nav-prev">
@@ -443,6 +453,120 @@
         .post-error a {
             color: #EF3A4F;
             text-decoration: underline;
+        }
+
+        /* Videos Section */
+        .post-videos {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .post-videos[hidden] {
+            display: none;
+        }
+
+        .post-video-item {
+            width: 100%;
+        }
+
+        .post-video-embed {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #000;
+        }
+
+        .post-video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .post-video-caption {
+            font-size: 14px;
+            font-weight: 500;
+            color: #31110F;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        /* PDFs Section */
+        .post-pdfs {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .post-pdfs[hidden] {
+            display: none;
+        }
+
+        .post-pdf-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            background: #F7F4EB;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #31110F;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .post-pdf-link:hover {
+            background: #EDE4D2;
+            transform: translateY(-2px);
+        }
+
+        .post-pdf-icon {
+            width: 48px;
+            height: 48px;
+            background: #EF3A4F;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .post-pdf-icon svg {
+            width: 24px;
+            height: 24px;
+            color: #FFFFFF;
+        }
+
+        .post-pdf-info {
+            flex: 1;
+        }
+
+        .post-pdf-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            color: #31110F;
+        }
+
+        .post-pdf-description {
+            font-size: 14px;
+            font-weight: 400;
+            color: #666;
+            margin: 0;
+        }
+
+        .post-pdf-download {
+            font-size: 14px;
+            font-weight: 500;
+            color: #EF3A4F;
+            flex-shrink: 0;
         }
 
         /* Responsive */

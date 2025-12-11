@@ -3,7 +3,11 @@
  *
  * This script handles loading and displaying individual blog posts.
  * Posts are loaded based on the 'id' URL parameter.
- * Supports image carousels for posts with multiple images.
+ *
+ * Supports:
+ * - Image carousels for posts with multiple images
+ * - YouTube and Vimeo video embeds
+ * - PDF document links
  *
  * Usage: post.html?id=post-id-here
  */
@@ -146,6 +150,101 @@ class BlogPost {
         if (contentEl) {
             contentEl.innerHTML = this.formatContent(post.content);
         }
+
+        // Videos
+        this.renderVideos(post);
+
+        // PDFs
+        this.renderPDFs(post);
+    }
+
+    // Get video embed URL from various formats
+    getVideoEmbedUrl(url) {
+        if (!url) return null;
+
+        // YouTube
+        const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (youtubeMatch) {
+            return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+        }
+
+        // Vimeo
+        const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        if (vimeoMatch) {
+            return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+        }
+
+        return null;
+    }
+
+    renderVideos(post) {
+        const videosContainer = document.querySelector('.post-videos');
+        if (!videosContainer) return;
+
+        // Check for videos array
+        if (!post.videos || !Array.isArray(post.videos) || post.videos.length === 0) {
+            videosContainer.hidden = true;
+            return;
+        }
+
+        const videosHtml = post.videos.map(video => {
+            const embedUrl = video.embedUrl || this.getVideoEmbedUrl(video.url);
+            if (!embedUrl) return '';
+
+            return `
+                <div class="post-video-item">
+                    <div class="post-video-embed">
+                        <iframe
+                            src="${embedUrl}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                    ${video.caption ? `<p class="post-video-caption">${video.caption}</p>` : ''}
+                </div>
+            `;
+        }).filter(html => html).join('');
+
+        if (videosHtml) {
+            videosContainer.innerHTML = videosHtml;
+            videosContainer.hidden = false;
+        } else {
+            videosContainer.hidden = true;
+        }
+    }
+
+    renderPDFs(post) {
+        const pdfsContainer = document.querySelector('.post-pdfs');
+        if (!pdfsContainer) return;
+
+        // Check for pdfs array
+        if (!post.pdfs || !Array.isArray(post.pdfs) || post.pdfs.length === 0) {
+            pdfsContainer.hidden = true;
+            return;
+        }
+
+        const pdfsHtml = post.pdfs.map(pdf => `
+            <a href="${pdf.url}" target="_blank" rel="noopener" class="post-pdf-link">
+                <div class="post-pdf-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <div class="post-pdf-info">
+                    <p class="post-pdf-title">${pdf.title}</p>
+                    ${pdf.description ? `<p class="post-pdf-description">${pdf.description}</p>` : ''}
+                </div>
+                <span class="post-pdf-download">Download PDF</span>
+            </a>
+        `).join('');
+
+        pdfsContainer.innerHTML = pdfsHtml;
+        pdfsContainer.hidden = false;
     }
 
     renderImages() {

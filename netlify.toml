@@ -65,6 +65,12 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
+# Allow post.html with query parameters
+[[redirects]]
+  from = "/post.html"
+  to = "/post.html"
+  status = 200
+
 # 404 page
 [[redirects]]
   from = "/*"
