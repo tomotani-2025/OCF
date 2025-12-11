@@ -1,0 +1,90 @@
+{
+  "categories": [
+    { "id": "all", "label": "All Photos" },
+    { "id": "uganda", "label": "Uganda" },
+    { "id": "nepal", "label": "Nepal" },
+    { "id": "usa", "label": "USA" }
+  ],
+  "images": [
+    {
+      "id": "1",
+      "src": "images/batwa+visit+farm+ocf.jpg",
+      "alt": "Batwa families visiting the farm",
+      "caption": "Batwa Farms at Matanda",
+      "category": "uganda",
+      "order": 1
+    },
+    {
+      "id": "2",
+      "src": "images/porters+in+field.jpg",
+      "alt": "Porters in the field",
+      "caption": "Porters at Bwindi",
+      "category": "uganda",
+      "order": 2
+    },
+    {
+      "id": "3",
+      "src": "images/womengorilla.png",
+      "alt": "Women in Gorilla Conservation",
+      "caption": "Women in Gorilla Conservation",
+      "category": "uganda",
+      "order": 3
+    },
+    {
+      "id": "4",
+      "src": "images/group+farm.jpg",
+      "alt": "Group at the farm",
+      "caption": "Community Farming Initiative",
+      "category": "uganda",
+      "order": 4
+    },
+    {
+      "id": "5",
+      "src": "images/african+safari+july+19+and+20++2006+012.jpg",
+      "alt": "African Safari",
+      "caption": "Wildlife Conservation",
+      "category": "uganda",
+      "order": 5
+    },
+    {
+      "id": "6",
+      "src": "images/tpn.jpg",
+      "alt": "The Partners Nepal",
+      "caption": "The Partners Nepal",
+      "category": "nepal",
+      "order": 6
+    },
+    {
+      "id": "7",
+      "src": "images/goal12.jpg",
+      "alt": "High Asia Habitat Fund",
+      "caption": "High Asia Habitat Fund",
+      "category": "nepal",
+      "order": 7
+    },
+    {
+      "id": "8",
+      "src": "images/dsc03015.jpg",
+      "alt": "Nepal community",
+      "caption": "Nepal Community",
+      "category": "nepal",
+      "order": 8
+    },
+    {
+      "id": "9",
+      "src": "images/img_8308.jpg",
+      "alt": "Base Camp for Veterans",
+      "caption": "Base Camp for Veterans",
+      "category": "usa",
+      "order": 9
+    },
+    {
+      "id": "10",
+      "src": "images/randyhelm.jpg",
+      "alt": "Randy Helm Horsemanship",
+      "caption": "Randy Helm Horsemanship",
+      "category": "usa",
+      "order": 10
+    }
+  ]
+}

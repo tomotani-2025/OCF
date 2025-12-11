@@ -1,0 +1,125 @@
+{
+  "goals": [
+    {
+      "id": "1",
+      "title": "Goal One: Batwa Farm at Matanda [Kihihi] Uganda",
+      "link": "goalone.html",
+      "bars": [
+        { "label": "Raised $34k", "value": 34000, "color": "#e85a71" },
+        { "label": "Phase 1 $27k", "value": 27000, "color": "#000000" },
+        { "label": "Goal $54k", "value": 54000, "color": "#666666" }
+      ],
+      "order": 1
+    },
+    {
+      "id": "2",
+      "title": "Goal Two: Porters at Bwindi",
+      "link": "goaltwo.html",
+      "bars": [
+        { "label": "Raised $3.8k", "value": 3800, "color": "#e85a71" },
+        { "label": "Goal $5k", "value": 5000, "color": "#000000" }
+      ],
+      "order": 2
+    },
+    {
+      "id": "3",
+      "title": "Goal Three: Health",
+      "link": "goalthree.html",
+      "bars": [
+        { "label": "Raised $6.1k", "value": 6100, "color": "#e85a71" },
+        { "label": "Goal $10k", "value": 10000, "color": "#000000" }
+      ],
+      "order": 3
+    },
+    {
+      "id": "4",
+      "title": "Goal Four: Technology",
+      "link": "goalfour.html",
+      "bars": [
+        { "label": "Raised $3.5k", "value": 3500, "color": "#e85a71" },
+        { "label": "Goal $5k", "value": 5000, "color": "#000000" }
+      ],
+      "order": 4
+    },
+    {
+      "id": "5",
+      "title": "Goal Five: Fresh Water",
+      "link": "goalfive.html",
+      "bars": [
+        { "label": "Raised $1.1k", "value": 1140, "color": "#e85a71" },
+        { "label": "Goal $5k", "value": 5000, "color": "#000000" }
+      ],
+      "order": 5
+    },
+    {
+      "id": "6",
+      "title": "Goal Six: Education",
+      "link": "goalsix.html",
+      "bars": [
+        { "label": "Raised $7k", "value": 6950, "color": "#e85a71" },
+        { "label": "Goal $5k", "value": 5000, "color": "#000000" }
+      ],
+      "order": 6
+    },
+    {
+      "id": "7",
+      "title": "Goal Seven: Dreams & Visions",
+      "link": "goalseven.html",
+      "bars": [
+        { "label": "Raised $18.3k", "value": 18306, "color": "#e85a71" },
+        { "label": "Goal $30k", "value": 30000, "color": "#000000" }
+      ],
+      "order": 7
+    },
+    {
+      "id": "8",
+      "title": "Goal Eight: The Partners Nepal",
+      "link": "goaleight.html",
+      "bars": [
+        { "label": "Raised $23k", "value": 23000, "color": "#e85a71" },
+        { "label": "Goal $20k", "value": 20000, "color": "#000000" }
+      ],
+      "order": 8
+    },
+    {
+      "id": "9",
+      "title": "Goal Nine: Women In Gorilla Conservation",
+      "link": "goalnine.html",
+      "bars": [
+        { "label": "Raised $1.2k", "value": 1200, "color": "#e85a71" },
+        { "label": "Goal $5k", "value": 5000, "color": "#000000" }
+      ],
+      "order": 9
+    },
+    {
+      "id": "10",
+      "title": "Goal Ten: Base Camp for Veterans",
+      "link": "goalten.html",
+      "bars": [
+        { "label": "Raised $31k", "value": 31000, "color": "#e85a71" },
+        { "label": "Goal $25k", "value": 25000, "color": "#000000" }
+      ],
+      "order": 10
+    },
+    {
+      "id": "11",
+      "title": "Goal Eleven: Randy Helm Horsemanship",
+      "link": "goaleleven.html",
+      "bars": [
+        { "label": "Raised $7k", "value": 7000, "color": "#e85a71" },
+        { "label": "Goal $10k", "value": 10000, "color": "#000000" }
+      ],
+      "order": 11
+    },
+    {
+      "id": "12",
+      "title": "Goal Twelve: High Asia Habitat Fund",
+      "link": "goaltwelve.html",
+      "bars": [
+        { "label": "Raised $67k", "value": 67218, "color": "#e85a71" },
+        { "label": "Goal $60k", "value": 60000, "color": "#000000" }
+      ],
+      "order": 12
+    }
+  ]
+}

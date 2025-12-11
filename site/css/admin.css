@@ -1032,9 +1032,425 @@
     background: #d42e40;
 }
 
-.delete-modal-content .json-instructions {
-    margin-top: 24px;
-    text-align: left;
+/* File Upload Styles */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #F7F4EB;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #31110F;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-upload-btn:hover {
+    background: #EDE4D2;
+    border-color: rgba(49, 17, 15, 0.3);
+}
+
+.file-input:focus + .file-upload-btn {
+    border-color: #EF3A4F;
+    box-shadow: 0 0 0 3px rgba(239, 58, 79, 0.1);
+}
+
+.file-name {
+    font-size: 13px;
+    color: #666;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Publishing Modal */
+.publishing-modal-content {
+    max-width: 350px;
+    padding: 48px 40px;
+    text-align: center;
+}
+
+.publishing-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.publishing-spinner {
+    width: 60px;
+    height: 60px;
+    color: #EF3A4F;
+}
+
+.publishing-spinner svg {
+    width: 100%;
+    height: 100%;
+}
+
+.publishing-status {
+    font-size: 16px;
+    font-weight: 500;
+    color: #31110F;
+    margin: 0;
+}
+
+.publishing-status.success {
+    color: #22c55e;
+}
+
+.publishing-status.error {
+    color: #EF3A4F;
+}
+
+/* Admin Tabs */
+.admin-tabs {
+    display: flex;
+    gap: 4px;
+    background: #FFFFFF;
+    padding: 4px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+}
+
+.admin-tab {
+    flex: 1;
+    padding: 14px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #31110F;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-tab:hover {
+    background: #F7F4EB;
+}
+
+.admin-tab.active {
+    background: #EF3A4F;
+    color: #FFFFFF;
+}
+
+/* Tab Content */
+.tab-content {
+    display: block;
+}
+
+.tab-content[hidden] {
+    display: none;
+}
+
+/* Admin Gallery Grid */
+.admin-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.admin-gallery-item {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: grab;
+    background: #F7F4EB;
+}
+
+.admin-gallery-item:active {
+    cursor: grabbing;
+}
+
+.admin-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+
+.admin-gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.admin-gallery-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.8));
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px;
+}
+
+.admin-gallery-item:hover .admin-gallery-item-overlay {
+    opacity: 1;
+}
+
+.admin-gallery-item-caption {
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-gallery-item-category {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.admin-gallery-item-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.admin-gallery-item-actions button {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-gallery-item-actions .btn-edit {
+    background: rgba(255, 255, 255, 0.9);
+    color: #31110F;
+}
+
+.admin-gallery-item-actions .btn-edit:hover {
+    background: #FFFFFF;
+}
+
+.admin-gallery-item-actions .btn-delete {
+    background: rgba(239, 58, 79, 0.9);
+    color: #FFFFFF;
+}
+
+.admin-gallery-item-actions .btn-delete:hover {
+    background: #EF3A4F;
+}
+
+.admin-gallery-item.dragging {
+    opacity: 0.5;
+    transform: scale(1.05);
+}
+
+.admin-gallery-item.drag-over {
+    outline: 2px dashed #EF3A4F;
+    outline-offset: 2px;
+}
+
+/* Gallery Editor Modal */
+.gallery-editor-content {
+    max-width: 600px;
+    padding: 32px;
+}
+
+.gallery-editor-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 24px 0;
+}
+
+.loading-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+/* Progress Goals List */
+.progress-goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.progress-goal-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #F7F4EB;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.progress-goal-card:active {
+    cursor: grabbing;
+}
+
+.progress-goal-card:hover {
+    background: #EDE4D2;
+}
+
+.progress-goal-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.progress-goal-card.drag-over {
+    outline: 2px dashed #EF3A4F;
+    outline-offset: 2px;
+}
+
+.progress-goal-drag-handle {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.progress-goal-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.progress-goal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 8px 0;
+}
+
+.progress-goal-bars-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bar-preview {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #FFFFFF;
+}
+
+.progress-goal-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Progress Editor Modal */
+.progress-editor-content {
+    max-width: 650px;
+    padding: 32px;
+}
+
+.progress-editor-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 24px 0;
+}
+
+.progress-editor-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 8px 0;
+}
+
+.progress-bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.progress-bar-item {
+    background: #F7F4EB;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.progress-bar-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.progress-bar-item-number {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+}
+
+.form-row.three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.color-input-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.color-input-wrapper input[type="color"] {
+    width: 44px;
+    height: 44px;
+    padding: 2px;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.color-input-wrapper input[type="text"] {
+    flex: 1;
+    min-width: 0;
 }
 
 /* Responsive */
