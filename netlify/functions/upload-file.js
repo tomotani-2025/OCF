@@ -12,7 +12,7 @@ const https = require('https');
 // Environment variables (set in Netlify dashboard)
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO || 'omotani/omotani-caring-foundation';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'master';
 
 // Max file sizes (in bytes)
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
