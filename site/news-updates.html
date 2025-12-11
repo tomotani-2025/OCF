@@ -198,6 +198,7 @@
         }
 
         .filter-link {
+            position: relative;
             font-size: 13px;
             font-weight: 400;
             line-height: 95%;
@@ -208,6 +209,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            padding-bottom: 10px;
         }
 
         .filter-link:hover,
@@ -215,12 +217,29 @@
             color: #EF3A4F;
         }
 
+        /* Red underline for active filter */
+        .filter-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #EF3A4F;
+            z-index: 1;
+        }
+
+        .filter-text {
+            display: inline;
+        }
+
         .filter-count {
-            display: inline-flex;
+            display: none;
             align-items: center;
             justify-content: center;
-            width: 16px;
+            min-width: 16px;
             height: 16px;
+            padding: 0 4px;
             background: rgba(239, 58, 79, 0.3);
             border-radius: 8px;
             font-size: 10px;
@@ -228,10 +247,16 @@
             color: #EF3A4F;
         }
 
+        /* Show count badge only on active/highlighted filter */
+        .filter-link.active .filter-count {
+            display: inline-flex;
+        }
+
         .filter-divider {
             width: 100%;
             height: 2px;
             background: #FFFFFF;
+            margin-top: 0;
         }
 
         .sort-by {
@@ -353,6 +378,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            flex: 1;
         }
 
         .card-text h2 {
@@ -374,6 +400,7 @@
             line-height: 140%;
             color: #000000;
             margin: 0;
+            height: 60px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -384,6 +411,7 @@
             width: 100%;
             height: 1px;
             background: #F5E4AF;
+            margin-top: auto;
         }
 
         .card-footer {
@@ -420,6 +448,7 @@
         .read-more svg {
             width: 30px;
             height: 26px;
+            transform: rotate(-45deg);
         }
 
         /* Pagination */
