@@ -2,11 +2,11 @@
  * News CMS System for Omotani Caring Foundation
  *
  * HOW TO ADD A NEW NEWS POST:
- * 1. Open site/data/news-posts.json
- * 2. Add a new entry at the TOP of the "posts" array
- * 3. Fill in all required fields (see example below)
+ * 1. Use the admin page at site/admin.html to create posts easily
+ * 2. Or manually edit site/data/news-posts.json
+ * 3. Add a new entry at the TOP of the "posts" array
  *
- * Example new post:
+ * BASIC POST (required fields):
  * {
  *   "id": "unique-post-id-2025",
  *   "title": "Your Post Title Here",
@@ -14,10 +14,44 @@
  *   "year": 2025,
  *   "category": "Batwa",  // Options: Batwa, Bwindi, Nepal, Base Camp For Veterans
  *   "author": "Les Omotani",
- *   "image": "images/your-image.jpg",
+ *   "image": "images/news/your-image.jpg",
  *   "imageAlt": "Description of image",
  *   "summary": "A brief 1-2 sentence summary.",
  *   "content": "Full content of the post"
+ * }
+ *
+ * RICH MEDIA POST (optional fields for carousels, videos, PDFs):
+ * {
+ *   "id": "post-with-rich-media-2025",
+ *   "title": "Post With Rich Media",
+ *   "date": "2025-03-15",
+ *   "year": 2025,
+ *   "category": "Nepal",
+ *   "author": "Les Omotani",
+ *   "image": "images/news/main-image.jpg",       // First/main image (for card display)
+ *   "imageAlt": "Main image description",
+ *   "images": [                                   // OPTIONAL: Multiple images for carousel
+ *     { "src": "images/news/image1.jpg", "alt": "Caption for image 1" },
+ *     { "src": "images/news/image2.jpg", "alt": "Caption for image 2" },
+ *     { "src": "images/news/image3.jpg", "alt": "Caption for image 3" }
+ *   ],
+ *   "videos": [                                   // OPTIONAL: YouTube or Vimeo videos
+ *     {
+ *       "type": "youtube",
+ *       "url": "https://www.youtube.com/watch?v=VIDEO_ID",
+ *       "embedUrl": "https://www.youtube.com/embed/VIDEO_ID",
+ *       "caption": "Optional video caption"
+ *     }
+ *   ],
+ *   "pdfs": [                                     // OPTIONAL: PDF document links
+ *     {
+ *       "url": "https://www.omotanicaringfoundation.com/s/document.pdf",
+ *       "title": "Document Title",
+ *       "description": "Optional description"
+ *     }
+ *   ],
+ *   "summary": "Brief summary for card display.",
+ *   "content": "Full post content with paragraphs separated by double newlines."
  * }
  */
 
@@ -143,12 +177,10 @@ class NewsCMS {
             </div>
         `;
 
-        // Make entire card clickable
+        // Make entire card clickable - navigate to post page
         article.addEventListener('click', (e) => {
-            // Don't navigate if clicking on a link (let the link handle it)
-            if (e.target.tagName === 'A' || e.target.closest('a')) {
-                return;
-            }
+            e.preventDefault();
+            e.stopPropagation();
             window.location.href = `post.html?id=${post.id}`;
         });
 
