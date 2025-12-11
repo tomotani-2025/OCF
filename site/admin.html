@@ -43,6 +43,15 @@
     <main>
         <section class="admin-section">
             <div class="admin-container">
+                <!-- Admin Tabs -->
+                <div class="admin-tabs">
+                    <button type="button" class="admin-tab active" data-tab="posts">Manage Posts</button>
+                    <button type="button" class="admin-tab" data-tab="gallery">Manage Gallery</button>
+                    <button type="button" class="admin-tab" data-tab="progress">Progress Charts</button>
+                </div>
+
+                <!-- Posts Tab -->
+                <div id="posts-tab" class="tab-content active">
                 <!-- Posts Dashboard -->
                 <div id="posts-dashboard" class="dashboard-view">
                     <div class="admin-header">
@@ -169,7 +178,7 @@
                         <!-- Image Carousel -->
                         <div class="form-section">
                             <h2>Images</h2>
-                            <p class="form-help">Add one or more images. Multiple images will display as a carousel. Images should be placed in the <code>images/news/</code> folder.</p>
+                            <p class="form-help">Upload images or enter URLs. Multiple images will display as a carousel.</p>
 
                             <div id="images-container" class="media-container">
                                 <!-- Image items will be added here -->
@@ -218,7 +227,7 @@
                         <!-- PDFs -->
                         <div class="form-section">
                             <h2>PDF Documents</h2>
-                            <p class="form-help">Add links to PDF documents. They will appear as downloadable links.</p>
+                            <p class="form-help">Upload PDFs or enter URLs. They will appear as downloadable links.</p>
 
                             <div id="pdfs-container" class="media-container">
                                 <!-- PDF items will be added here -->
@@ -236,7 +245,7 @@
                         <div class="form-actions">
                             <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
                             <button type="button" id="preview-btn" class="btn btn-outline">Preview</button>
-                            <button type="submit" id="save-btn" class="btn btn-primary">Save Post</button>
+                            <button type="submit" id="save-btn" class="btn btn-primary">Publish Post</button>
                         </div>
                     </form>
                 </div>
@@ -252,21 +261,20 @@
                     </div>
                 </div>
 
-                <!-- JSON Output Modal -->
-                <div id="json-modal" class="modal" hidden>
+                <!-- Publishing Modal -->
+                <div id="publishing-modal" class="modal" hidden>
                     <div class="modal-backdrop"></div>
-                    <div class="modal-content json-modal-content">
-                        <button type="button" class="modal-close" aria-label="Close">&times;</button>
-                        <div class="json-output-inner">
-                            <h2 id="json-modal-title">Post JSON</h2>
-                            <div id="json-instructions" class="json-instructions">
-                                <!-- Instructions will be set dynamically -->
+                    <div class="modal-content publishing-modal-content">
+                        <div class="publishing-inner">
+                            <div id="publishing-spinner" class="publishing-spinner">
+                                <svg viewBox="0 0 50 50">
+                                    <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+                                        <animate attributeName="stroke-dasharray" values="1,150;90,150;90,150" dur="1.5s" repeatCount="indefinite"/>
+                                        <animate attributeName="stroke-dashoffset" values="0;-35;-124" dur="1.5s" repeatCount="indefinite"/>
+                                    </circle>
+                                </svg>
                             </div>
-                            <div class="json-actions">
-                                <button type="button" id="copy-json-btn" class="btn btn-primary">Copy to Clipboard</button>
-                                <button type="button" id="download-full-json-btn" class="btn btn-outline">Download Full news-posts.json</button>
-                            </div>
-                            <pre id="json-code"><code></code></pre>
+                            <p id="publishing-status" class="publishing-status">Publishing...</p>
                         </div>
                     </div>
                 </div>
@@ -281,12 +289,196 @@
                             <button type="button" id="cancel-delete-btn" class="btn btn-outline">Cancel</button>
                             <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete Post</button>
                         </div>
-                        <div id="delete-instructions" class="json-instructions" hidden>
-                            <p>To complete the deletion, remove this post from <code>data/news-posts.json</code>.</p>
-                            <button type="button" id="download-after-delete-btn" class="btn btn-primary">Download Updated news-posts.json</button>
-                        </div>
                     </div>
                 </div>
+                </div><!-- End Posts Tab -->
+
+                <!-- Gallery Tab -->
+                <div id="gallery-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>Manage Gallery</h1>
+                        <p>Add, edit, arrange, or delete gallery images.</p>
+                    </div>
+
+                    <!-- Gallery Actions -->
+                    <div class="dashboard-actions">
+                        <button type="button" id="add-gallery-image-btn" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add Image
+                        </button>
+                        <div class="dashboard-filter">
+                            <select id="gallery-filter-category">
+                                <option value="all">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Grid -->
+                    <div id="gallery-grid" class="admin-gallery-grid">
+                        <!-- Gallery items will be loaded here -->
+                        <div class="loading-message">Loading gallery...</div>
+                    </div>
+
+                    <!-- Gallery Image Editor Modal -->
+                    <div id="gallery-editor-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content gallery-editor-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="gallery-editor-title">Add Gallery Image</h2>
+                            <form id="gallery-image-form">
+                                <input type="hidden" id="gallery-image-id" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="gallery-image-file">Upload Image</label>
+                                        <div class="file-upload-wrapper">
+                                            <input type="file" id="gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                            <div class="file-upload-btn">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <span>Choose File</span>
+                                            </div>
+                                            <span class="file-name" id="gallery-file-name">No file chosen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="gallery-image-src">Image Path (or enter URL)</label>
+                                        <input type="text" id="gallery-image-src" placeholder="images/gallery/photo.jpg">
+                                    </div>
+                                    <div class="image-preview" id="gallery-image-preview">
+                                        <span class="image-preview-placeholder">Image preview</span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="gallery-image-caption">Caption *</label>
+                                        <input type="text" id="gallery-image-caption" required placeholder="Image caption">
+                                    </div>
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="gallery-image-alt">Alt Text</label>
+                                        <input type="text" id="gallery-image-alt" placeholder="Describe the image">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gallery-image-category">Category *</label>
+                                        <select id="gallery-image-category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="uganda">Uganda</option>
+                                            <option value="nepal">Nepal</option>
+                                            <option value="usa">USA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-gallery-edit" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Image</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Delete Gallery Image Modal -->
+                    <div id="delete-gallery-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Image?</h2>
+                            <p id="delete-gallery-title">Are you sure you want to delete this image?</p>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-gallery-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-gallery-delete" class="btn btn-danger">Delete Image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Gallery Tab -->
+
+                <!-- Progress Tab -->
+                <div id="progress-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>Progress Charts</h1>
+                        <p>Edit fundraising goals and progress for the Progress page.</p>
+                    </div>
+
+                    <!-- Progress Actions -->
+                    <div class="dashboard-actions">
+                        <button type="button" id="add-progress-goal-btn" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add Goal
+                        </button>
+                        <button type="button" id="save-all-progress-btn" class="btn btn-outline">
+                            Save All Changes
+                        </button>
+                    </div>
+
+                    <!-- Progress Goals List -->
+                    <div id="progress-goals-list" class="progress-goals-list">
+                        <!-- Goals will be loaded here -->
+                        <div class="loading-message">Loading goals...</div>
+                    </div>
+
+                    <!-- Progress Goal Editor Modal -->
+                    <div id="progress-editor-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content progress-editor-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="progress-editor-title">Edit Goal</h2>
+                            <form id="progress-goal-form">
+                                <input type="hidden" id="progress-goal-id" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="progress-goal-title">Goal Title *</label>
+                                        <input type="text" id="progress-goal-title" required placeholder="Goal One: Batwa Farm at Matanda">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="progress-goal-link">Link (page URL)</label>
+                                        <input type="text" id="progress-goal-link" placeholder="goalone.html">
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3>Chart Bars</h3>
+                                    <p class="form-help">Add bars to show on the chart (e.g., "Raised", "Goal", "Phase 1").</p>
+                                    <div id="progress-bars-container" class="progress-bars-container">
+                                        <!-- Bars will be added here -->
+                                    </div>
+                                    <button type="button" id="add-progress-bar-btn" class="btn btn-outline add-media-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        Add Bar
+                                    </button>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-progress-edit" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Goal</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Delete Progress Goal Modal -->
+                    <div id="delete-progress-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Goal?</h2>
+                            <p id="delete-progress-title">Are you sure you want to delete this goal?</p>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-progress-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-progress-delete" class="btn btn-danger">Delete Goal</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Progress Tab -->
             </div>
         </section>
     </main>
@@ -305,7 +497,7 @@
                 <p><strong>EIN:</strong> 85-2581703</p>
             </div>
             <div class="footer-column">
-                <a href="mailto:info@omotanicaringfoundation.org">info@omotanicaringfoundation.org</a>
+                <a href="mailto:info@omotanicaringfoundation.org" style="font-weight: 600;">info@omotanicaringfoundation.org</a><br>
                 <p>8337 N Lee Trevino Drive<br>Tucson, Arizona, USA 85742</p>
             </div>
             <div class="footer-column">
