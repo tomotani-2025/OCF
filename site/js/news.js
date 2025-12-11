@@ -143,6 +143,15 @@ class NewsCMS {
             </div>
         `;
 
+        // Make entire card clickable
+        article.addEventListener('click', (e) => {
+            // Don't navigate if clicking on a link (let the link handle it)
+            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                return;
+            }
+            window.location.href = `post.html?id=${post.id}`;
+        });
+
         return article;
     }
 
