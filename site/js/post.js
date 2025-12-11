@@ -263,7 +263,16 @@ class BlogPost {
             // Format image number with leading zero
             const formatNumber = (num) => num.toString().padStart(2, '0');
 
-            // Create carousel HTML
+            // Generate pagination dots HTML
+            const paginationHTML = this.images.length > 1 ? `
+                <div class="post-image-pagination visible">
+                    ${this.images.map((_, idx) => `
+                        <span class="pagination-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            // Create carousel HTML with pagination inside
             const carouselHTML = `
                 <div class="carousel-wrapper">
                     <button class="carousel-arrow carousel-prev" aria-label="Previous image">
@@ -290,6 +299,7 @@ class BlogPost {
                             <path d="M17 7H1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
+                    ${paginationHTML}
                 </div>
                 <div class="post-image-caption">
                     <span class="caption-number">${formatNumber(1)}</span>
@@ -306,13 +316,12 @@ class BlogPost {
             }
         }
 
-        // Render pagination dots
+        // Legacy: Remove external pagination container if it exists (no longer used)
         if (paginationContainer) {
+            paginationContainer.classList.remove('visible');
+            paginationContainer.innerHTML = '';
             if (this.images.length > 1) {
-                paginationContainer.classList.add('visible');
-                paginationContainer.innerHTML = this.images.map((_, idx) => `
-                    <span class="pagination-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>
-                `).join('');
+                // Pagination is now rendered inside carousel-wrapper
             } else {
                 paginationContainer.classList.remove('visible');
             }
