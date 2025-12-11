@@ -103,34 +103,29 @@
     },
     {
       "id": "tpn-community-pond-2025",
-      "title": "TPN COMMUNITY POND",
+      "title": "TPN Community Pond",
       "date": "2025-09-05",
       "year": 2025,
       "category": "Nepal",
       "author": "Les Omotani",
       "image": "images/news/img_5738-3.jpeg",
       "imageAlt": "TPN COMMUNITY POND",
-      "summary": "The Partners Nepal have completed the important conservation and restoration of the community pond for Chisapani, Solukhumbu, Nepal.   The OCF is supportive of the work of TPN in rural communities in the high mountain regions of Nepal.",
-      "content": "The Partners Nepal have completed the important conservation and restoration of the community pond for Chisapani, Solukhumbu, Nepal.   The OCF is supportive of the work of TPN in rural communities in the high mountain regions of Nepal.",
-      "originalImage": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1757010666512-68Q62QUVSOQXRZ5JHRI9/IMG_5738+3.jpeg?format=original",
-      "originalLink": "/newsupdates/tpn-community-pond",
       "images": [
         {
           "src": "images/news/img_5738-3.jpeg",
-          "alt": "TPN COMMUNITY POND",
-          "originalUrl": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1757010666512-68Q62QUVSOQXRZ5JHRI9/IMG_5738+3.jpeg?format=original"
+          "alt": "TPN COMMUNITY POND"
         },
         {
           "src": "images/news/img_5737-3.jpeg",
-          "alt": "TPN COMMUNITY POND",
-          "originalUrl": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1757010662221-DWBOI20EXRY7306LERP8/IMG_5737+3.jpeg"
+          "alt": "TPN COMMUNITY POND"
         },
         {
           "src": "images/news/img_5736-3.jpeg",
-          "alt": "TPN COMMUNITY POND",
-          "originalUrl": "https://images.squarespace-cdn.com/content/v1/5f7206794543797205d2ac32/1757010671434-0IQZ6NBYAE6DKF3Q122J/IMG_5736+3.jpeg"
+          "alt": "TPN COMMUNITY POND"
         }
-      ]
+      ],
+      "summary": "The Partners Nepal have completed the important conservation and restoration of the community pond for Chisapani, Solukhumbu, Nepal.   The OCF is supportive of the work of TPN in rural communities in the high mountain regions of Nepal.",
+      "content": "The Partners Nepal have completed the important conservation and restoration of the community pond for Chisapani, Solukhumbu, Nepal.   The OCF is supportive of the work of TPN in rural communities in the high mountain regions of Nepal."
     },
     {
       "id": "batwa-farm-has-more-progress-2025",
