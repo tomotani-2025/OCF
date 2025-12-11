@@ -262,8 +262,9 @@ class BlogPost {
 
             // Format image number with leading zero
             const formatNumber = (num) => num.toString().padStart(2, '0');
+            const totalImages = this.images.length;
 
-            // Generate pagination dots HTML
+            // Generate pagination dots HTML - inside carousel-images for proper positioning
             const paginationHTML = this.images.length > 1 ? `
                 <div class="post-image-pagination visible">
                     ${this.images.map((_, idx) => `
@@ -272,7 +273,7 @@ class BlogPost {
                 </div>
             ` : '';
 
-            // Create carousel HTML with pagination inside
+            // Create carousel HTML with pagination inside carousel-images
             const carouselHTML = `
                 <div class="carousel-wrapper">
                     <button class="carousel-arrow carousel-prev" aria-label="Previous image">
@@ -292,6 +293,7 @@ class BlogPost {
                                 onerror="this.onerror=null; this.src='${img.originalUrl || img.src}';"
                             >
                         `).join('')}
+                        ${paginationHTML}
                     </div>
                     <button class="carousel-arrow carousel-next" aria-label="Next image">
                         <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -299,11 +301,10 @@ class BlogPost {
                             <path d="M17 7H1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                    ${paginationHTML}
                 </div>
                 <div class="post-image-caption">
-                    <span class="caption-number">${formatNumber(1)}</span>
                     <span class="caption-text">${this.images[0].alt || ''}</span>
+                    <span class="caption-count">${formatNumber(1)}/${formatNumber(totalImages)}</span>
                 </div>
             `;
 
@@ -410,14 +411,15 @@ class BlogPost {
             dot.classList.toggle('active', i === index);
         });
 
-        // Update caption with image number
-        const captionNumber = document.querySelector('.caption-number');
+        // Update caption with image text and count
         const captionText = document.querySelector('.caption-text');
-        if (captionNumber) {
-            captionNumber.textContent = (index + 1).toString().padStart(2, '0');
-        }
+        const captionCount = document.querySelector('.caption-count');
         if (captionText && this.images[index]) {
             captionText.textContent = this.images[index].alt || '';
+        }
+        if (captionCount) {
+            const formatNumber = (num) => num.toString().padStart(2, '0');
+            captionCount.textContent = `${formatNumber(index + 1)}/${formatNumber(this.images.length)}`;
         }
 
         // Update arrow states

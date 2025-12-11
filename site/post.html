@@ -43,9 +43,13 @@
         <!-- Post Section -->
         <section class="post-section">
             <div class="post-container">
-                <!-- Category Badge -->
-                <div class="post-category-badge">
-                    <span class="category-text">Loading...</span>
+                <!-- Author / Date / Category Header -->
+                <div class="post-meta">
+                    <span class="post-date">Loading...</span>
+                    <span class="post-author">By Les Omotani</span>
+                    <div class="post-category-badge">
+                        <span class="category-text">Loading...</span>
+                    </div>
                 </div>
 
                 <!-- Title -->
@@ -57,15 +61,9 @@
                     <p class="post-image-caption"></p>
                 </div>
 
-                <!-- Image Pagination Dots (for multiple images) -->
+                <!-- Image Pagination Dots (for multiple images) - legacy, now rendered in JS -->
                 <div class="post-image-pagination">
                     <span class="pagination-dot active"></span>
-                </div>
-
-                <!-- Author / Date -->
-                <div class="post-meta">
-                    <span class="post-author">By Les Omotani</span>
-                    <span class="post-date">Loading...</span>
                 </div>
 
                 <!-- Content -->
@@ -152,32 +150,43 @@
             align-items: center;
             padding: 160px 70px 70px;
             min-height: 100vh;
-            background: linear-gradient(180deg, #F7F4EB 40%, #FFFFFF 40%);
+            background: linear-gradient(360deg, #FFFFFF 60%, #F7F4EB 60%);
         }
 
         .post-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: 60px;
             max-width: 976px;
+            width: 100%;
+        }
+
+        /* Author / Date / Category Header */
+        .post-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
             width: 100%;
         }
 
         /* Category Badge - pill shape matching card styling */
         .post-category-badge {
             display: inline-flex;
-            justify-content: center;
+            flex-direction: row;
+            justify-content: space-between;
             align-items: center;
-            padding: 4px 12px;
+            padding: 2px 8px;
+            gap: 8px;
             background: rgba(239, 58, 79, 0.3);
             border: none;
             border-radius: 16px;
         }
 
         .category-text {
-            font-size: 10px;
-            font-weight: 400;
+            font-size: 12px;
+            font-weight: 500;
             line-height: 100%;
             color: #EF3A4F;
         }
@@ -185,10 +194,10 @@
         /* Title */
         .post-title {
             width: 100%;
-            font-size: 48px;
+            font-size: 50px;
             font-weight: 600;
             line-height: 95%;
-            text-align: center;
+            text-align: left;
             letter-spacing: -0.05em;
             color: #31110F;
             margin: 0;
@@ -212,7 +221,7 @@
         .carousel-images {
             position: relative;
             width: 100%;
-            max-height: 549px;
+            height: 549px;
             overflow: hidden;
             border-radius: 4px;
         }
@@ -224,21 +233,24 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center center;
             border-radius: 4px;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
         }
 
         .carousel-images .post-image.active {
-            position: relative;
             opacity: 1;
+            pointer-events: auto;
         }
 
         /* Fallback for single image without carousel */
         .post-image-container > .post-image {
             width: 100%;
-            max-height: 549px;
+            height: 549px;
             object-fit: cover;
+            object-position: center center;
             border-radius: 4px;
             display: block;
         }
@@ -291,22 +303,15 @@
             right: 16px;
         }
 
-        /* Caption with image number */
+        /* Caption with image number and count */
         .post-image-caption {
             display: flex;
-            align-items: baseline;
-            gap: 12px;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
             width: 100%;
-            margin: 0;
-            min-height: 20px;
-        }
-
-        .caption-number {
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1;
-            color: #31110F;
-            min-width: 24px;
+            height: 20px;
         }
 
         .caption-text {
@@ -315,9 +320,19 @@
             line-height: 135%;
             letter-spacing: -0.02em;
             color: #31110F;
+            flex: 1;
         }
 
-        /* Image Pagination Dots - positioned inside image */
+        .caption-count {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 135%;
+            letter-spacing: -0.02em;
+            color: #31110F;
+            text-align: right;
+        }
+
+        /* Image Pagination Dots - positioned inside carousel-images */
         .post-image-pagination {
             display: none; /* Hidden by default, shown when multiple images */
             position: absolute;
@@ -328,7 +343,7 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            z-index: 10;
+            z-index: 15;
         }
 
         .post-image-pagination.visible {
@@ -342,6 +357,7 @@
             background: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .pagination-dot:hover {
@@ -353,29 +369,29 @@
             background: #FFFFFF;
         }
 
-        /* Author / Date */
+        /* Author / Date - column layout per specs */
         .post-meta {
             display: flex;
-            flex-direction: row;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: flex-start;
             width: 100%;
-            gap: 32px;
-        }
-
-        .post-author {
-            flex: 1;
-            font-size: 18px;
-            font-weight: 500;
-            line-height: 135%;
-            letter-spacing: -0.02em;
-            color: #31110F;
+            gap: 8px;
         }
 
         .post-date {
+            width: 100%;
             font-size: 18px;
             font-weight: 500;
-            line-height: 135%;
+            line-height: 125%;
+            letter-spacing: -0.02em;
+            color: #312121;
+        }
+
+        .post-author {
+            width: 100%;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 125%;
             letter-spacing: -0.02em;
             text-align: right;
             color: #31110F;
