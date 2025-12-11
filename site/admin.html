@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css?v=2">
+    <link rel="stylesheet" href="css/admin.css?v=3">
 </head>
 <body class="admin-page">
     <header class="site-header">
@@ -51,7 +51,7 @@
                 </div>
 
                 <!-- Posts Tab -->
-                <div id="posts-tab" class="tab-content active">
+                <div id="posts-tab" class="tab-content">
                 <!-- Posts Dashboard -->
                 <div id="posts-dashboard" class="dashboard-view">
                     <div class="admin-header">
@@ -265,6 +265,7 @@
                 <div id="publishing-modal" class="modal" hidden>
                     <div class="modal-backdrop"></div>
                     <div class="modal-content publishing-modal-content">
+                        <button type="button" id="publishing-close-btn" class="modal-close publishing-close" hidden aria-label="Close">&times;</button>
                         <div class="publishing-inner">
                             <div id="publishing-spinner" class="publishing-spinner">
                                 <svg viewBox="0 0 50 50">
@@ -272,6 +273,18 @@
                                         <animate attributeName="stroke-dasharray" values="1,150;90,150;90,150" dur="1.5s" repeatCount="indefinite"/>
                                         <animate attributeName="stroke-dashoffset" values="0;-35;-124" dur="1.5s" repeatCount="indefinite"/>
                                     </circle>
+                                </svg>
+                            </div>
+                            <div id="publishing-success-icon" class="publishing-success-icon" hidden>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <div id="publishing-error-icon" class="publishing-error-icon" hidden>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
                                 </svg>
                             </div>
                             <p id="publishing-status" class="publishing-status">Publishing...</p>
@@ -515,6 +528,6 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/admin.js?v=2"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 </html>

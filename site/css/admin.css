@@ -1126,38 +1126,72 @@
     color: #EF3A4F;
 }
 
-/* Admin Tabs */
+.publishing-success-icon,
+.publishing-error-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.publishing-success-icon svg {
+    width: 100%;
+    height: 100%;
+    color: #22c55e;
+}
+
+.publishing-error-icon svg {
+    width: 100%;
+    height: 100%;
+    color: #EF3A4F;
+}
+
+.publishing-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+
+/* Admin Tabs - Clean Underlined Pivots */
 .admin-tabs {
     display: flex;
-    gap: 4px;
-    background: #FFFFFF;
-    padding: 4px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 24px;
+    gap: 32px;
+    border-bottom: 1px solid rgba(49, 17, 15, 0.15);
+    margin-bottom: 32px;
 }
 
 .admin-tab {
-    flex: 1;
-    padding: 14px 24px;
+    position: relative;
+    padding: 12px 4px;
     background: transparent;
     border: none;
-    border-radius: 6px;
     font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 15px;
     font-weight: 500;
-    color: #31110F;
+    color: rgba(49, 17, 15, 0.5);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: color 0.2s;
 }
 
 .admin-tab:hover {
-    background: #F7F4EB;
+    color: #31110F;
 }
 
 .admin-tab.active {
+    color: #31110F;
+}
+
+.admin-tab::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+.admin-tab.active::after {
     background: #EF3A4F;
-    color: #FFFFFF;
 }
 
 /* Tab Content */

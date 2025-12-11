@@ -860,24 +860,48 @@ class AdminDashboard {
     showPublishingModal(message) {
         this.publishingModal.hidden = false;
         document.body.style.overflow = 'hidden';
+
+        // Reset modal state
+        const spinnerEl = document.getElementById('publishing-spinner');
+        const successIcon = document.getElementById('publishing-success-icon');
+        const errorIcon = document.getElementById('publishing-error-icon');
+        const closeBtn = document.getElementById('publishing-close-btn');
+
+        spinnerEl.hidden = false;
+        successIcon.hidden = true;
+        errorIcon.hidden = true;
+        closeBtn.hidden = true;
+
         this.updatePublishingStatus(message);
     }
 
     updatePublishingStatus(message, success = false, error = false) {
         const statusEl = document.getElementById('publishing-status');
         const spinnerEl = document.getElementById('publishing-spinner');
+        const successIcon = document.getElementById('publishing-success-icon');
+        const errorIcon = document.getElementById('publishing-error-icon');
+        const closeBtn = document.getElementById('publishing-close-btn');
 
         statusEl.textContent = message;
 
         if (success) {
             statusEl.className = 'publishing-status success';
             spinnerEl.hidden = true;
+            successIcon.hidden = false;
+            errorIcon.hidden = true;
+            closeBtn.hidden = true;
         } else if (error) {
             statusEl.className = 'publishing-status error';
             spinnerEl.hidden = true;
+            successIcon.hidden = true;
+            errorIcon.hidden = false;
+            closeBtn.hidden = false; // Show close button on error
         } else {
             statusEl.className = 'publishing-status';
             spinnerEl.hidden = false;
+            successIcon.hidden = true;
+            errorIcon.hidden = true;
+            closeBtn.hidden = true;
         }
     }
 
@@ -1978,21 +2002,40 @@ class ProgressManager {
 
 function setupTabs() {
     const tabs = document.querySelectorAll('.admin-tab');
-    const postsTab = document.getElementById('posts-tab');
-    const galleryTab = document.getElementById('gallery-tab');
-    const progressTab = document.getElementById('progress-tab');
+    const tabContents = {
+        posts: document.getElementById('posts-tab'),
+        gallery: document.getElementById('gallery-tab'),
+        progress: document.getElementById('progress-tab')
+    };
 
+    function showTab(tabName) {
+        // Update tab buttons
+        tabs.forEach(t => {
+            if (t.dataset.tab === tabName) {
+                t.classList.add('active');
+            } else {
+                t.classList.remove('active');
+            }
+        });
+
+        // Update tab contents
+        Object.keys(tabContents).forEach(key => {
+            if (tabContents[key]) {
+                tabContents[key].hidden = key !== tabName;
+            }
+        });
+    }
+
+    // Set up click handlers
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-
-            const targetTab = tab.dataset.tab;
-            postsTab.hidden = targetTab !== 'posts';
-            galleryTab.hidden = targetTab !== 'gallery';
-            progressTab.hidden = targetTab !== 'progress';
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            showTab(tab.dataset.tab);
         });
     });
+
+    // Initialize: show posts tab by default
+    showTab('posts');
 }
 
 
