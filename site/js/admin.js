@@ -1,24 +1,35 @@
 /**
- * Admin Post Creator for Omotani Caring Foundation
+ * Admin Dashboard for Omotani Caring Foundation
  *
- * Handles the creation of new blog posts with:
- * - Image carousel support
- * - YouTube/Vimeo video embedding
- * - PDF document links
- * - Live preview
- * - JSON generation
+ * Features:
+ * - View all posts in a table
+ * - Create new posts
+ * - Edit existing posts
+ * - Delete posts
+ * - Search and filter posts
+ * - Export full JSON file
  */
 
-class PostCreator {
+class AdminDashboard {
     constructor() {
+        this.dataUrl = 'data/news-posts.json?v=' + Date.now();
+        this.posts = [];
+        this.filteredPosts = [];
+        this.editingPostId = null;
+        this.deletePostId = null;
+
+        // DOM Elements
+        this.dashboard = document.getElementById('posts-dashboard');
+        this.editor = document.getElementById('post-editor');
         this.form = document.getElementById('post-form');
         this.imagesContainer = document.getElementById('images-container');
         this.videosContainer = document.getElementById('videos-container');
         this.pdfsContainer = document.getElementById('pdfs-container');
         this.previewModal = document.getElementById('preview-modal');
         this.previewContainer = document.getElementById('preview-container');
-        this.jsonOutput = document.getElementById('json-output');
+        this.jsonModal = document.getElementById('json-modal');
         this.jsonCode = document.querySelector('#json-code code');
+        this.deleteModal = document.getElementById('delete-modal');
 
         this.imageCount = 0;
         this.videoCount = 0;
@@ -27,39 +38,285 @@ class PostCreator {
         this.init();
     }
 
-    init() {
-        // Set default date to today
-        const dateInput = document.getElementById('post-date');
-        if (dateInput) {
-            dateInput.value = new Date().toISOString().split('T')[0];
+    async init() {
+        await this.loadPosts();
+        this.renderPostsTable();
+        this.setupEventListeners();
+    }
+
+    // ========================================
+    // Data Loading
+    // ========================================
+
+    async loadPosts() {
+        try {
+            const response = await fetch(this.dataUrl);
+            if (!response.ok) throw new Error('Failed to load posts');
+            const data = await response.json();
+            this.posts = data.posts || [];
+            this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            this.filteredPosts = [...this.posts];
+        } catch (error) {
+            console.error('Error loading posts:', error);
+            this.posts = [];
+            this.filteredPosts = [];
         }
+    }
 
-        // Add first image field by default
-        this.addImage();
+    // ========================================
+    // Event Listeners
+    // ========================================
 
-        // Event listeners
+    setupEventListeners() {
+        // Dashboard actions
+        document.getElementById('create-new-btn').addEventListener('click', () => this.showEditor());
+        document.getElementById('search-posts').addEventListener('input', (e) => this.filterPosts(e.target.value));
+        document.getElementById('filter-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
+
+        // Editor actions
+        document.getElementById('back-to-dashboard').addEventListener('click', () => this.showDashboard());
+        document.getElementById('cancel-btn').addEventListener('click', () => this.showDashboard());
+        document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
         document.getElementById('add-image-btn').addEventListener('click', () => this.addImage());
         document.getElementById('add-video-btn').addEventListener('click', () => this.addVideo());
         document.getElementById('add-pdf-btn').addEventListener('click', () => this.addPdf());
-        document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
-        document.getElementById('copy-json-btn').addEventListener('click', () => this.copyJson());
-        document.getElementById('download-json-btn').addEventListener('click', () => this.downloadJson());
+        this.form.addEventListener('submit', (e) => this.savePost(e));
 
-        this.form.addEventListener('submit', (e) => this.generateJson(e));
+        // Modal actions
+        document.getElementById('copy-json-btn').addEventListener('click', () => this.copyJson());
+        document.getElementById('download-full-json-btn').addEventListener('click', () => this.downloadFullJson());
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => this.closeDeleteModal());
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => this.confirmDelete());
+        document.getElementById('download-after-delete-btn')?.addEventListener('click', () => this.downloadFullJson());
 
         // Modal close handlers
-        document.querySelector('.modal-close').addEventListener('click', () => this.closePreview());
-        document.querySelector('.modal-backdrop').addEventListener('click', () => this.closePreview());
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => this.closeAllModals());
+        });
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', () => this.closeAllModals());
+        });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.closePreview();
+            if (e.key === 'Escape') this.closeAllModals();
         });
     }
 
     // ========================================
-    // Image Management
+    // Dashboard View
     // ========================================
 
-    addImage() {
+    showDashboard() {
+        this.editor.hidden = true;
+        this.dashboard.hidden = false;
+        this.editingPostId = null;
+        this.resetForm();
+    }
+
+    renderPostsTable() {
+        const tbody = document.getElementById('posts-table-body');
+        const countText = document.getElementById('posts-count-text');
+
+        if (this.filteredPosts.length === 0) {
+            tbody.innerHTML = `
+                <tr class="loading-row">
+                    <td colspan="5">No posts found</td>
+                </tr>
+            `;
+            countText.textContent = '0 posts';
+            return;
+        }
+
+        tbody.innerHTML = this.filteredPosts.map(post => {
+            const hasImages = post.image || (post.images && post.images.length > 0);
+            const hasVideos = post.videos && post.videos.length > 0;
+            const hasPdfs = post.pdfs && post.pdfs.length > 0;
+            const hasFeaturedVideo = post.featuredVideo;
+
+            return `
+                <tr data-id="${post.id}">
+                    <td class="col-date">${this.formatDateShort(post.date)}</td>
+                    <td class="col-title">
+                        <a href="post.html?id=${post.id}" target="_blank" class="post-table-title">${post.title}</a>
+                        <span class="post-table-summary">${post.summary || ''}</span>
+                    </td>
+                    <td class="col-category">
+                        <span class="category-badge">${post.category}</span>
+                    </td>
+                    <td class="col-media">
+                        <div class="media-icons">
+                            <span class="media-icon ${hasImages ? 'has-media' : ''}" title="${hasImages ? 'Has images' : 'No images'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                            </span>
+                            <span class="media-icon ${hasVideos || hasFeaturedVideo ? 'has-media' : ''}" title="${hasVideos || hasFeaturedVideo ? 'Has videos' : 'No videos'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="23 7 16 12 23 17 23 7"/>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                                </svg>
+                            </span>
+                            <span class="media-icon ${hasPdfs ? 'has-media' : ''}" title="${hasPdfs ? 'Has PDFs' : 'No PDFs'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="col-actions">
+                        <div class="action-buttons">
+                            <button class="btn-action btn-edit" data-action="edit" data-id="${post.id}">Edit</button>
+                            <button class="btn-action btn-delete" data-action="delete" data-id="${post.id}">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Add click handlers
+        tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', () => this.editPost(btn.dataset.id));
+        });
+        tbody.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showDeleteModal(btn.dataset.id));
+        });
+
+        countText.textContent = `${this.filteredPosts.length} post${this.filteredPosts.length !== 1 ? 's' : ''}`;
+    }
+
+    filterPosts(searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        const categoryFilter = document.getElementById('filter-category').value;
+
+        this.filteredPosts = this.posts.filter(post => {
+            const matchesSearch = !term ||
+                post.title.toLowerCase().includes(term) ||
+                (post.summary && post.summary.toLowerCase().includes(term)) ||
+                (post.content && post.content.toLowerCase().includes(term));
+
+            const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
+
+            return matchesSearch && matchesCategory;
+        });
+
+        this.renderPostsTable();
+    }
+
+    filterByCategory(category) {
+        const searchTerm = document.getElementById('search-posts').value;
+        this.filterPosts(searchTerm);
+    }
+
+    formatDateShort(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    // ========================================
+    // Editor View
+    // ========================================
+
+    showEditor(postId = null) {
+        this.dashboard.hidden = true;
+        this.editor.hidden = false;
+        this.editingPostId = postId;
+
+        const title = document.getElementById('editor-title');
+        const subtitle = document.getElementById('editor-subtitle');
+        const saveBtn = document.getElementById('save-btn');
+
+        if (postId) {
+            title.textContent = 'Edit Post';
+            subtitle.textContent = 'Make changes to the post. Save to see the updated JSON.';
+            saveBtn.textContent = 'Update Post';
+            this.loadPostIntoForm(postId);
+        } else {
+            title.textContent = 'Create New Post';
+            subtitle.textContent = 'Fill out the form below. Save to generate the JSON.';
+            saveBtn.textContent = 'Save Post';
+            this.resetForm();
+            this.addImage(); // Add one empty image field by default
+        }
+    }
+
+    editPost(postId) {
+        this.showEditor(postId);
+    }
+
+    loadPostIntoForm(postId) {
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        document.getElementById('edit-post-id').value = postId;
+        document.getElementById('post-title').value = post.title || '';
+        document.getElementById('post-date').value = post.date || '';
+        document.getElementById('post-category').value = post.category || '';
+        document.getElementById('post-author').value = post.author || 'Les Omotani';
+        document.getElementById('post-summary').value = post.summary || '';
+        document.getElementById('post-content').value = post.content || '';
+
+        // Featured video
+        const featuredVideoInput = document.getElementById('featured-video-url');
+        if (featuredVideoInput) {
+            if (post.featuredVideo) {
+                featuredVideoInput.value = typeof post.featuredVideo === 'string'
+                    ? post.featuredVideo
+                    : post.featuredVideo.url || '';
+            } else {
+                featuredVideoInput.value = '';
+            }
+        }
+
+        // Load images
+        this.imagesContainer.innerHTML = '';
+        this.imageCount = 0;
+        const images = post.images || (post.image ? [{ src: post.image, alt: post.imageAlt || '' }] : []);
+        if (images.length > 0) {
+            images.forEach(img => this.addImage(img.src, img.alt));
+        } else {
+            this.addImage();
+        }
+
+        // Load videos
+        this.videosContainer.innerHTML = '';
+        this.videoCount = 0;
+        if (post.videos && post.videos.length > 0) {
+            post.videos.forEach(video => this.addVideo(video.url, video.caption));
+        }
+
+        // Load PDFs
+        this.pdfsContainer.innerHTML = '';
+        this.pdfCount = 0;
+        if (post.pdfs && post.pdfs.length > 0) {
+            post.pdfs.forEach(pdf => this.addPdf(pdf.url, pdf.title, pdf.description));
+        }
+    }
+
+    resetForm() {
+        this.form.reset();
+        document.getElementById('edit-post-id').value = '';
+        document.getElementById('post-author').value = 'Les Omotani';
+        document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+
+        this.imagesContainer.innerHTML = '';
+        this.videosContainer.innerHTML = '';
+        this.pdfsContainer.innerHTML = '';
+        this.imageCount = 0;
+        this.videoCount = 0;
+        this.pdfCount = 0;
+    }
+
+    // ========================================
+    // Media Management
+    // ========================================
+
+    addImage(src = '', alt = '') {
         this.imageCount++;
         const index = this.imageCount;
 
@@ -75,25 +332,24 @@ class PostCreator {
                 <div class="form-group">
                     <label for="image-src-${index}">Image Path *</label>
                     <input type="text" id="image-src-${index}" name="image-src-${index}"
-                           placeholder="images/news/filename.jpg"
+                           placeholder="images/news/filename.jpg" value="${src}"
                            data-preview-target="image-preview-${index}">
                 </div>
                 <div class="image-preview" id="image-preview-${index}">
-                    <span class="image-preview-placeholder">Image preview</span>
+                    ${src ? `<img src="${src}" alt="Preview" onerror="this.parentElement.innerHTML='<span class=\\'image-preview-placeholder\\'>Image not found</span>'">` : '<span class="image-preview-placeholder">Image preview</span>'}
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="image-alt-${index}">Alt Text / Caption</label>
                     <input type="text" id="image-alt-${index}" name="image-alt-${index}"
-                           placeholder="Describe the image">
+                           placeholder="Describe the image" value="${alt}">
                 </div>
             </div>
         `;
 
         this.imagesContainer.appendChild(imageItem);
 
-        // Add event listeners
         const removeBtn = imageItem.querySelector('[data-action="remove-image"]');
         removeBtn.addEventListener('click', () => this.removeMediaItem(imageItem, 'image'));
 
@@ -101,25 +357,10 @@ class PostCreator {
         srcInput.addEventListener('input', (e) => this.updateImagePreview(e.target));
     }
 
-    updateImagePreview(input) {
-        const previewId = input.dataset.previewTarget;
-        const preview = document.getElementById(previewId);
-        const src = input.value.trim();
-
-        if (src) {
-            preview.innerHTML = `<img src="${src}" alt="Preview" onerror="this.parentElement.innerHTML='<span class=\\'image-preview-placeholder\\'>Image not found</span>'">`;
-        } else {
-            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
-        }
-    }
-
-    // ========================================
-    // Video Management
-    // ========================================
-
-    addVideo() {
+    addVideo(url = '', caption = '') {
         this.videoCount++;
         const index = this.videoCount;
+        const embedUrl = this.getVideoEmbedUrl(url);
 
         const videoItem = document.createElement('div');
         videoItem.className = 'media-item';
@@ -133,33 +374,97 @@ class PostCreator {
                 <div class="form-group">
                     <label for="video-url-${index}">Video URL *</label>
                     <input type="url" id="video-url-${index}" name="video-url-${index}"
-                           placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
+                           placeholder="https://www.youtube.com/watch?v=..." value="${url}"
                            data-preview-target="video-preview-${index}">
-                    <small style="color: #666; font-size: 12px; margin-top: 4px;">Supports YouTube and Vimeo links</small>
+                    <small style="color: #666; font-size: 12px; margin-top: 4px;">YouTube or Vimeo</small>
                 </div>
                 <div class="video-preview" id="video-preview-${index}">
-                    <div class="video-preview-placeholder">
-                        <span>Video preview</span>
-                    </div>
+                    ${embedUrl ? `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>` : '<div class="video-preview-placeholder"><span>Video preview</span></div>'}
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="video-caption-${index}">Caption (optional)</label>
                     <input type="text" id="video-caption-${index}" name="video-caption-${index}"
-                           placeholder="Video caption or description">
+                           placeholder="Video caption" value="${caption}">
                 </div>
             </div>
         `;
 
         this.videosContainer.appendChild(videoItem);
 
-        // Add event listeners
         const removeBtn = videoItem.querySelector('[data-action="remove-video"]');
         removeBtn.addEventListener('click', () => this.removeMediaItem(videoItem, 'video'));
 
         const urlInput = videoItem.querySelector(`#video-url-${index}`);
         urlInput.addEventListener('input', (e) => this.updateVideoPreview(e.target));
+    }
+
+    addPdf(url = '', title = '', description = '') {
+        this.pdfCount++;
+        const index = this.pdfCount;
+
+        const pdfItem = document.createElement('div');
+        pdfItem.className = 'media-item';
+        pdfItem.dataset.index = index;
+        pdfItem.innerHTML = `
+            <div class="media-item-header">
+                <span class="media-item-number">PDF ${index}</span>
+                <button type="button" class="media-item-remove" data-action="remove-pdf">Remove</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pdf-url-${index}">PDF URL *</label>
+                    <input type="url" id="pdf-url-${index}" name="pdf-url-${index}"
+                           placeholder="https://www.omotanicaringfoundation.com/s/document.pdf" value="${url}">
+                </div>
+            </div>
+            <div class="form-row two-col">
+                <div class="form-group">
+                    <label for="pdf-title-${index}">Title *</label>
+                    <input type="text" id="pdf-title-${index}" name="pdf-title-${index}"
+                           placeholder="Document title" value="${title}">
+                </div>
+                <div class="form-group">
+                    <label for="pdf-description-${index}">Description (optional)</label>
+                    <input type="text" id="pdf-description-${index}" name="pdf-description-${index}"
+                           placeholder="Brief description" value="${description}">
+                </div>
+            </div>
+        `;
+
+        this.pdfsContainer.appendChild(pdfItem);
+
+        const removeBtn = pdfItem.querySelector('[data-action="remove-pdf"]');
+        removeBtn.addEventListener('click', () => this.removeMediaItem(pdfItem, 'pdf'));
+    }
+
+    removeMediaItem(item, type) {
+        item.remove();
+        this.renumberItems(type);
+    }
+
+    renumberItems(type) {
+        const container = type === 'image' ? this.imagesContainer :
+                         type === 'video' ? this.videosContainer : this.pdfsContainer;
+        const items = container.querySelectorAll('.media-item');
+
+        items.forEach((item, idx) => {
+            item.querySelector('.media-item-number').textContent =
+                `${type.charAt(0).toUpperCase() + type.slice(1)} ${idx + 1}`;
+        });
+    }
+
+    updateImagePreview(input) {
+        const previewId = input.dataset.previewTarget;
+        const preview = document.getElementById(previewId);
+        const src = input.value.trim();
+
+        if (src) {
+            preview.innerHTML = `<img src="${src}" alt="Preview" onerror="this.parentElement.innerHTML='<span class=\\'image-preview-placeholder\\'>Image not found</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
     }
 
     updateVideoPreview(input) {
@@ -177,19 +482,10 @@ class PostCreator {
 
     getVideoEmbedUrl(url) {
         if (!url) return null;
-
-        // YouTube
         const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-        if (youtubeMatch) {
-            return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-        }
-
-        // Vimeo
+        if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
         const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-        if (vimeoMatch) {
-            return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-        }
-
+        if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
         return null;
     }
 
@@ -201,75 +497,11 @@ class PostCreator {
     }
 
     // ========================================
-    // PDF Management
-    // ========================================
-
-    addPdf() {
-        this.pdfCount++;
-        const index = this.pdfCount;
-
-        const pdfItem = document.createElement('div');
-        pdfItem.className = 'media-item';
-        pdfItem.dataset.index = index;
-        pdfItem.innerHTML = `
-            <div class="media-item-header">
-                <span class="media-item-number">PDF ${index}</span>
-                <button type="button" class="media-item-remove" data-action="remove-pdf">Remove</button>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="pdf-url-${index}">PDF URL *</label>
-                    <input type="url" id="pdf-url-${index}" name="pdf-url-${index}"
-                           placeholder="https://www.omotanicaringfoundation.com/s/document.pdf">
-                </div>
-            </div>
-            <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="pdf-title-${index}">Title *</label>
-                    <input type="text" id="pdf-title-${index}" name="pdf-title-${index}"
-                           placeholder="Document title">
-                </div>
-                <div class="form-group">
-                    <label for="pdf-description-${index}">Description (optional)</label>
-                    <input type="text" id="pdf-description-${index}" name="pdf-description-${index}"
-                           placeholder="Brief description">
-                </div>
-            </div>
-        `;
-
-        this.pdfsContainer.appendChild(pdfItem);
-
-        // Add event listeners
-        const removeBtn = pdfItem.querySelector('[data-action="remove-pdf"]');
-        removeBtn.addEventListener('click', () => this.removeMediaItem(pdfItem, 'pdf'));
-    }
-
-    // ========================================
-    // Common Media Functions
-    // ========================================
-
-    removeMediaItem(item, type) {
-        item.remove();
-        this.renumberItems(type);
-    }
-
-    renumberItems(type) {
-        const container = type === 'image' ? this.imagesContainer :
-                         type === 'video' ? this.videosContainer : this.pdfsContainer;
-        const items = container.querySelectorAll('.media-item');
-
-        items.forEach((item, idx) => {
-            const number = idx + 1;
-            item.querySelector('.media-item-number').textContent =
-                `${type.charAt(0).toUpperCase() + type.slice(1)} ${number}`;
-        });
-    }
-
-    // ========================================
     // Data Collection
     // ========================================
 
     collectFormData() {
+        const editId = document.getElementById('edit-post-id').value;
         const title = document.getElementById('post-title').value.trim();
         const date = document.getElementById('post-date').value;
         const category = document.getElementById('post-category').value;
@@ -277,12 +509,12 @@ class PostCreator {
         const summary = document.getElementById('post-summary').value.trim();
         const content = document.getElementById('post-content').value.trim();
 
-        // Generate ID from title
-        const id = this.generateId(title, date);
+        // Generate ID
+        const id = editId || this.generateId(title, date);
 
         // Collect images
         const images = [];
-        this.imagesContainer.querySelectorAll('.media-item').forEach((item) => {
+        this.imagesContainer.querySelectorAll('.media-item').forEach(item => {
             const srcInput = item.querySelector('input[id^="image-src-"]');
             const altInput = item.querySelector('input[id^="image-alt-"]');
             if (srcInput && srcInput.value.trim()) {
@@ -293,9 +525,19 @@ class PostCreator {
             }
         });
 
+        // Featured video
+        const featuredVideoUrl = document.getElementById('featured-video-url')?.value.trim();
+        let featuredVideo = undefined;
+        if (featuredVideoUrl) {
+            featuredVideo = {
+                url: featuredVideoUrl,
+                embedUrl: this.getVideoEmbedUrl(featuredVideoUrl)
+            };
+        }
+
         // Collect videos
         const videos = [];
-        this.videosContainer.querySelectorAll('.media-item').forEach((item) => {
+        this.videosContainer.querySelectorAll('.media-item').forEach(item => {
             const urlInput = item.querySelector('input[id^="video-url-"]');
             const captionInput = item.querySelector('input[id^="video-caption-"]');
             if (urlInput && urlInput.value.trim()) {
@@ -311,7 +553,7 @@ class PostCreator {
 
         // Collect PDFs
         const pdfs = [];
-        this.pdfsContainer.querySelectorAll('.media-item').forEach((item) => {
+        this.pdfsContainer.querySelectorAll('.media-item').forEach(item => {
             const urlInput = item.querySelector('input[id^="pdf-url-"]');
             const titleInput = item.querySelector('input[id^="pdf-title-"]');
             const descInput = item.querySelector('input[id^="pdf-description-"]');
@@ -331,11 +573,10 @@ class PostCreator {
             year: new Date(date).getFullYear(),
             category,
             author,
-            // Legacy single image field (first image for backwards compatibility)
             image: images.length > 0 ? images[0].src : '',
             imageAlt: images.length > 0 ? images[0].alt : '',
-            // New multi-media fields
             images: images.length > 1 ? images : undefined,
+            featuredVideo: featuredVideo,
             videos: videos.length > 0 ? videos : undefined,
             pdfs: pdfs.length > 0 ? pdfs : undefined,
             summary,
@@ -355,6 +596,156 @@ class PostCreator {
     }
 
     // ========================================
+    // Save Post
+    // ========================================
+
+    savePost(e) {
+        e.preventDefault();
+
+        const title = document.getElementById('post-title').value.trim();
+        const date = document.getElementById('post-date').value;
+        const category = document.getElementById('post-category').value;
+        const summary = document.getElementById('post-summary').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+
+        if (!title || !date || !category || !summary || !content) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        const postData = this.collectFormData();
+        const cleanData = this.cleanObject(postData);
+
+        // Update local posts array
+        if (this.editingPostId) {
+            const index = this.posts.findIndex(p => p.id === this.editingPostId);
+            if (index !== -1) {
+                this.posts[index] = cleanData;
+            }
+        } else {
+            this.posts.unshift(cleanData);
+        }
+
+        this.filteredPosts = [...this.posts];
+        this.showJsonModal(cleanData, this.editingPostId ? 'update' : 'create');
+    }
+
+    cleanObject(obj) {
+        const clean = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined && value !== '' && value !== null) {
+                if (Array.isArray(value) && value.length === 0) continue;
+                clean[key] = value;
+            }
+        }
+        return clean;
+    }
+
+    // ========================================
+    // JSON Modal
+    // ========================================
+
+    showJsonModal(postData, action) {
+        const modalTitle = document.getElementById('json-modal-title');
+        const instructions = document.getElementById('json-instructions');
+
+        if (action === 'create') {
+            modalTitle.textContent = 'New Post Created';
+            instructions.innerHTML = `
+                <p><strong>To add this post to your site:</strong></p>
+                <ol>
+                    <li>Click "Download Full news-posts.json" below</li>
+                    <li>Replace the file at <code>data/news-posts.json</code> with the downloaded file</li>
+                    <li>Commit and deploy the changes</li>
+                </ol>
+            `;
+        } else {
+            modalTitle.textContent = 'Post Updated';
+            instructions.innerHTML = `
+                <p><strong>To save your changes:</strong></p>
+                <ol>
+                    <li>Click "Download Full news-posts.json" below</li>
+                    <li>Replace the file at <code>data/news-posts.json</code> with the downloaded file</li>
+                    <li>Commit and deploy the changes</li>
+                </ol>
+            `;
+        }
+
+        const jsonString = JSON.stringify(postData, null, 2);
+        this.jsonCode.textContent = jsonString;
+
+        this.jsonModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+
+    copyJson() {
+        const jsonText = this.jsonCode.textContent;
+        navigator.clipboard.writeText(jsonText).then(() => {
+            const btn = document.getElementById('copy-json-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy. Please select and copy manually.');
+        });
+    }
+
+    downloadFullJson() {
+        const fullData = { posts: this.posts };
+        const jsonString = JSON.stringify(fullData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'news-posts.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // ========================================
+    // Delete Post
+    // ========================================
+
+    showDeleteModal(postId) {
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        this.deletePostId = postId;
+        document.getElementById('delete-post-title').textContent = `Are you sure you want to delete "${post.title}"?`;
+        document.getElementById('delete-instructions').hidden = true;
+        document.getElementById('confirm-delete-btn').hidden = false;
+
+        this.deleteModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeDeleteModal() {
+        this.deleteModal.hidden = true;
+        document.body.style.overflow = '';
+        this.deletePostId = null;
+    }
+
+    confirmDelete() {
+        if (!this.deletePostId) return;
+
+        const index = this.posts.findIndex(p => p.id === this.deletePostId);
+        if (index !== -1) {
+            this.posts.splice(index, 1);
+            this.filteredPosts = [...this.posts];
+            this.renderPostsTable();
+        }
+
+        // Show download instructions
+        document.getElementById('confirm-delete-btn').hidden = true;
+        document.getElementById('delete-instructions').hidden = false;
+        document.getElementById('delete-post-title').textContent = 'Post deleted from local data.';
+    }
+
+    // ========================================
     // Preview
     // ========================================
 
@@ -363,11 +754,6 @@ class PostCreator {
         this.renderPreview(data);
         this.previewModal.hidden = false;
         document.body.style.overflow = 'hidden';
-    }
-
-    closePreview() {
-        this.previewModal.hidden = true;
-        document.body.style.overflow = '';
     }
 
     renderPreview(data) {
@@ -391,58 +777,20 @@ class PostCreator {
                 .join('');
         };
 
-        // Build images/carousel HTML
         let imagesHtml = '';
         const allImages = data.images || (data.image ? [{ src: data.image, alt: data.imageAlt }] : []);
 
         if (allImages.length > 0) {
-            if (allImages.length === 1) {
-                imagesHtml = `
-                    <div class="preview-carousel">
-                        <div class="preview-carousel-images">
-                            <img src="${allImages[0].src}" alt="${allImages[0].alt || ''}" class="active">
-                        </div>
-                        ${allImages[0].alt ? `<p class="preview-carousel-caption">${allImages[0].alt}</p>` : ''}
+            imagesHtml = `
+                <div class="preview-carousel">
+                    <div class="preview-carousel-images">
+                        <img src="${allImages[0].src}" alt="${allImages[0].alt || ''}" class="active">
                     </div>
-                `;
-            } else {
-                const imagesMarkup = allImages.map((img, i) =>
-                    `<img src="${img.src}" alt="${img.alt || ''}" class="${i === 0 ? 'active' : ''}" data-index="${i}">`
-                ).join('');
-
-                const dotsMarkup = allImages.map((_, i) =>
-                    `<button type="button" class="${i === 0 ? 'active' : ''}" data-index="${i}"></button>`
-                ).join('');
-
-                imagesHtml = `
-                    <div class="preview-carousel" data-carousel>
-                        <div class="preview-carousel-images">
-                            ${imagesMarkup}
-                        </div>
-                        <div class="preview-carousel-nav">
-                            <button type="button" data-prev disabled>
-                                <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-                                    <path d="M7 1L1 7L7 13" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M1 7H17" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </button>
-                            <button type="button" data-next>
-                                <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-                                    <path d="M11 1L17 7L11 13" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M17 7H1" stroke="#31110F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="preview-carousel-dots">
-                            ${dotsMarkup}
-                        </div>
-                        <p class="preview-carousel-caption" data-caption>${allImages[0].alt || ''}</p>
-                    </div>
-                `;
-            }
+                    ${allImages[0].alt ? `<p class="preview-carousel-caption">${allImages[0].alt}</p>` : ''}
+                </div>
+            `;
         }
 
-        // Build videos HTML
         let videosHtml = '';
         if (data.videos && data.videos.length > 0) {
             videosHtml = `
@@ -459,7 +807,6 @@ class PostCreator {
             `;
         }
 
-        // Build PDFs HTML
         let pdfsHtml = '';
         if (data.pdfs && data.pdfs.length > 0) {
             pdfsHtml = `
@@ -470,9 +817,6 @@ class PostCreator {
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                     <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <polyline points="10 9 9 9 8 9"/>
                                 </svg>
                             </div>
                             <div class="preview-pdf-info">
@@ -499,127 +843,21 @@ class PostCreator {
             ${videosHtml}
             ${pdfsHtml}
         `;
-
-        // Initialize carousel if multiple images
-        if (allImages.length > 1) {
-            this.initPreviewCarousel();
-        }
-    }
-
-    initPreviewCarousel() {
-        const carousel = this.previewContainer.querySelector('[data-carousel]');
-        if (!carousel) return;
-
-        const images = carousel.querySelectorAll('.preview-carousel-images img');
-        const dots = carousel.querySelectorAll('.preview-carousel-dots button');
-        const prevBtn = carousel.querySelector('[data-prev]');
-        const nextBtn = carousel.querySelector('[data-next]');
-        const caption = carousel.querySelector('[data-caption]');
-        let currentIndex = 0;
-
-        const updateCarousel = (index) => {
-            images.forEach((img, i) => img.classList.toggle('active', i === index));
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-
-            prevBtn.disabled = index === 0;
-            nextBtn.disabled = index === images.length - 1;
-
-            if (caption) {
-                caption.textContent = images[index].alt || '';
-            }
-
-            currentIndex = index;
-        };
-
-        prevBtn.addEventListener('click', () => {
-            if (currentIndex > 0) updateCarousel(currentIndex - 1);
-        });
-
-        nextBtn.addEventListener('click', () => {
-            if (currentIndex < images.length - 1) updateCarousel(currentIndex + 1);
-        });
-
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => updateCarousel(i));
-        });
     }
 
     // ========================================
-    // JSON Generation
+    // Modal Management
     // ========================================
 
-    generateJson(e) {
-        e.preventDefault();
-
-        // Validate required fields
-        const title = document.getElementById('post-title').value.trim();
-        const date = document.getElementById('post-date').value;
-        const category = document.getElementById('post-category').value;
-        const summary = document.getElementById('post-summary').value.trim();
-        const content = document.getElementById('post-content').value.trim();
-
-        if (!title || !date || !category || !summary || !content) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        const data = this.collectFormData();
-
-        // Clean up undefined values for cleaner JSON
-        const cleanData = {};
-        for (const [key, value] of Object.entries(data)) {
-            if (value !== undefined && value !== '') {
-                cleanData[key] = value;
-            }
-        }
-
-        const jsonString = JSON.stringify(cleanData, null, 2);
-        this.jsonCode.textContent = jsonString;
-        this.jsonOutput.hidden = false;
-
-        // Scroll to JSON output
-        this.jsonOutput.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    copyJson() {
-        const jsonText = this.jsonCode.textContent;
-        navigator.clipboard.writeText(jsonText).then(() => {
-            const btn = document.getElementById('copy-json-btn');
-            const originalText = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(() => {
-                btn.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy. Please select and copy manually.');
-        });
-    }
-
-    downloadJson() {
-        const data = this.collectFormData();
-        const cleanData = {};
-        for (const [key, value] of Object.entries(data)) {
-            if (value !== undefined && value !== '') {
-                cleanData[key] = value;
-            }
-        }
-
-        const jsonString = JSON.stringify(cleanData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${data.id || 'post'}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    closeAllModals() {
+        this.previewModal.hidden = true;
+        this.jsonModal.hidden = true;
+        this.deleteModal.hidden = true;
+        document.body.style.overflow = '';
     }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new PostCreator();
+    new AdminDashboard();
 });

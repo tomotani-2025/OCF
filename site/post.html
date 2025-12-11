@@ -112,7 +112,7 @@
 
         <div class="footer-contact-info">
             <div class="footer-column">
-                <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
+                <p>The Omotani Caring Foundation is a <br>501(c)(3) USA charity.</p>
                 <p><strong>EIN:</strong> 85-2581703</p>
             </div>
             <div class="footer-column">
@@ -134,7 +134,7 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/post.js?v=7"></script>
+    <script src="js/post.js?v=9"></script>
 
     <style>
         /* Post Page Styles */
@@ -253,6 +253,26 @@
             object-position: center center;
             border-radius: 4px;
             display: block;
+        }
+
+        /* Featured Video - replaces image carousel when present */
+        .featured-video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .featured-video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* Carousel Arrows - positioned over the image, show on hover */
@@ -418,6 +438,7 @@
             letter-spacing: -0.02em;
             text-align: left;
             color: #31110F;
+            padding-bottom: 6px;
         }
 
         .post-author .author-name {
@@ -441,6 +462,16 @@
 
         .post-content p:last-child {
             margin-bottom: 0;
+        }
+
+        .post-content a {
+            color: #EF3A4F;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .post-content a:hover {
+            opacity: 0.7;
         }
 
         /* Previous/Next Navigation */
@@ -774,8 +805,8 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
+            width: 56px;
+            height: 56px;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid #FFFFFF;
             border-radius: 50%;
@@ -784,6 +815,11 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s, opacity 0.2s;
+        }
+
+        .lightbox-nav svg {
+            width: 24px;
+            height: 20px;
         }
 
         .lightbox-nav:hover {

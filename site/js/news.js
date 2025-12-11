@@ -50,6 +50,10 @@
  *       "description": "Optional description"
  *     }
  *   ],
+ *   "featuredVideo": {                             // OPTIONAL: Video as main media (replaces image carousel)
+ *     "url": "https://www.youtube.com/watch?v=VIDEO_ID",
+ *     "caption": "Optional video caption"
+ *   },
  *   "summary": "Brief summary for card display.",
  *   "content": "Full post content with paragraphs separated by double newlines."
  * }

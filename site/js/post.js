@@ -94,6 +94,11 @@ class BlogPost {
             .map(p => {
                 // Replace single newlines with <br>
                 p = p.replace(/\n/g, '<br>');
+                // Auto-link URLs (but not if already inside an anchor tag)
+                p = p.replace(
+                    /(?<!href=["'])((https?:\/\/)[^\s<]+)/gi,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                );
                 return `<p>${p}</p>`;
             })
             .join('');
@@ -251,6 +256,28 @@ class BlogPost {
     renderImages() {
         const imageContainer = document.querySelector('.post-image-container');
         const paginationContainer = document.querySelector('.post-image-pagination');
+        const post = this.currentPost;
+
+        // Check for featured video (replaces image carousel)
+        if (post.featuredVideo) {
+            const embedUrl = this.getVideoEmbedUrl(post.featuredVideo.url || post.featuredVideo);
+            if (embedUrl && imageContainer) {
+                imageContainer.style.display = 'flex';
+                imageContainer.innerHTML = `
+                    <div class="featured-video-wrapper">
+                        <iframe
+                            src="${embedUrl}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                    ${post.featuredVideo.caption ? `<div class="post-image-caption"><span class="caption-text">${post.featuredVideo.caption}</span></div>` : ''}
+                `;
+                if (paginationContainer) paginationContainer.classList.remove('visible');
+                return;
+            }
+        }
 
         if (this.images.length === 0) {
             if (imageContainer) imageContainer.style.display = 'none';

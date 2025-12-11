@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Create Post — Omotani CARING Foundation</title>
+    <title>Admin - Manage Posts — Omotani CARING Foundation</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="css/styles.css?v=2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css?v=1">
+    <link rel="stylesheet" href="css/admin.css?v=2">
 </head>
 <body class="admin-page">
     <header class="site-header">
@@ -43,119 +43,203 @@
     <main>
         <section class="admin-section">
             <div class="admin-container">
-                <div class="admin-header">
-                    <h1>Create New Post</h1>
-                    <p>Fill out the form below to create a new news post. The generated JSON will be displayed at the bottom for you to copy.</p>
+                <!-- Posts Dashboard -->
+                <div id="posts-dashboard" class="dashboard-view">
+                    <div class="admin-header">
+                        <h1>Manage Posts</h1>
+                        <p>View, edit, or delete existing posts, or create a new one.</p>
+                    </div>
+
+                    <!-- Dashboard Actions -->
+                    <div class="dashboard-actions">
+                        <button type="button" id="create-new-btn" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Create New Post
+                        </button>
+                        <div class="dashboard-search">
+                            <input type="text" id="search-posts" placeholder="Search posts...">
+                        </div>
+                        <div class="dashboard-filter">
+                            <select id="filter-category">
+                                <option value="all">All Categories</option>
+                                <option value="Batwa">Batwa</option>
+                                <option value="Bwindi">Bwindi</option>
+                                <option value="Nepal">Nepal</option>
+                                <option value="Base Camp For Veterans">Base Camp For Veterans</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Posts Table -->
+                    <div class="posts-table-wrapper">
+                        <table class="posts-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-date">Date</th>
+                                    <th class="col-title">Title</th>
+                                    <th class="col-category">Category</th>
+                                    <th class="col-media">Media</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="posts-table-body">
+                                <!-- Posts will be loaded here -->
+                                <tr class="loading-row">
+                                    <td colspan="5">Loading posts...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="posts-count">
+                        <span id="posts-count-text">Loading...</span>
+                    </div>
                 </div>
 
-                <form id="post-form" class="post-form">
-                    <!-- Basic Info -->
-                    <div class="form-section">
-                        <h2>Basic Information</h2>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="post-title">Title *</label>
-                                <input type="text" id="post-title" name="title" required placeholder="Enter post title">
-                            </div>
-                        </div>
-
-                        <div class="form-row two-col">
-                            <div class="form-group">
-                                <label for="post-date">Date *</label>
-                                <input type="date" id="post-date" name="date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="post-category">Category *</label>
-                                <select id="post-category" name="category" required>
-                                    <option value="">Select a category</option>
-                                    <option value="Batwa">Batwa</option>
-                                    <option value="Bwindi">Bwindi</option>
-                                    <option value="Nepal">Nepal</option>
-                                    <option value="Base Camp For Veterans">Base Camp For Veterans</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="post-author">Author</label>
-                                <input type="text" id="post-author" name="author" value="Les Omotani" placeholder="Author name">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="post-summary">Summary *</label>
-                                <textarea id="post-summary" name="summary" required placeholder="Brief summary of the post (1-2 sentences)" rows="3"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="post-content">Content *</label>
-                                <textarea id="post-content" name="content" required placeholder="Full post content. Use blank lines to separate paragraphs." rows="10"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Image Carousel -->
-                    <div class="form-section">
-                        <h2>Images</h2>
-                        <p class="form-help">Add one or more images. Multiple images will display as a carousel. Images should be placed in the <code>images/news/</code> folder.</p>
-
-                        <div id="images-container" class="media-container">
-                            <!-- Image items will be added here -->
-                        </div>
-
-                        <button type="button" id="add-image-btn" class="btn btn-outline add-media-btn">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <!-- Post Editor (hidden by default) -->
+                <div id="post-editor" class="editor-view" hidden>
+                    <div class="admin-header">
+                        <button type="button" id="back-to-dashboard" class="btn-back">
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M1 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Add Image
+                            Back to Posts
                         </button>
+                        <h1 id="editor-title">Create New Post</h1>
+                        <p id="editor-subtitle">Fill out the form below. Changes will be shown as JSON to copy into the data file.</p>
                     </div>
 
-                    <!-- Videos -->
-                    <div class="form-section">
-                        <h2>Videos</h2>
-                        <p class="form-help">Add YouTube or Vimeo video links. They will be embedded in the post.</p>
+                    <form id="post-form" class="post-form">
+                        <!-- Hidden field for edit mode -->
+                        <input type="hidden" id="edit-post-id" value="">
 
-                        <div id="videos-container" class="media-container">
-                            <!-- Video items will be added here -->
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <h2>Basic Information</h2>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="post-title">Title *</label>
+                                    <input type="text" id="post-title" name="title" required placeholder="Enter post title">
+                                </div>
+                            </div>
+
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="post-date">Date *</label>
+                                    <input type="date" id="post-date" name="date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="post-category">Category *</label>
+                                    <select id="post-category" name="category" required>
+                                        <option value="">Select a category</option>
+                                        <option value="Batwa">Batwa</option>
+                                        <option value="Bwindi">Bwindi</option>
+                                        <option value="Nepal">Nepal</option>
+                                        <option value="Base Camp For Veterans">Base Camp For Veterans</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="post-author">Author</label>
+                                    <input type="text" id="post-author" name="author" value="Les Omotani" placeholder="Author name">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="post-summary">Summary *</label>
+                                    <textarea id="post-summary" name="summary" required placeholder="Brief summary of the post (1-2 sentences)" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="post-content">Content *</label>
+                                    <textarea id="post-content" name="content" required placeholder="Full post content. Use blank lines to separate paragraphs." rows="10"></textarea>
+                                </div>
+                            </div>
                         </div>
 
-                        <button type="button" id="add-video-btn" class="btn btn-outline add-media-btn">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Add Video
-                        </button>
-                    </div>
+                        <!-- Image Carousel -->
+                        <div class="form-section">
+                            <h2>Images</h2>
+                            <p class="form-help">Add one or more images. Multiple images will display as a carousel. Images should be placed in the <code>images/news/</code> folder.</p>
 
-                    <!-- PDFs -->
-                    <div class="form-section">
-                        <h2>PDF Documents</h2>
-                        <p class="form-help">Add links to PDF documents. They will appear as downloadable links.</p>
+                            <div id="images-container" class="media-container">
+                                <!-- Image items will be added here -->
+                            </div>
 
-                        <div id="pdfs-container" class="media-container">
-                            <!-- PDF items will be added here -->
+                            <button type="button" id="add-image-btn" class="btn btn-outline add-media-btn">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Image
+                            </button>
                         </div>
 
-                        <button type="button" id="add-pdf-btn" class="btn btn-outline add-media-btn">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Add PDF
-                        </button>
-                    </div>
+                        <!-- Featured Video -->
+                        <div class="form-section">
+                            <h2>Featured Video (Optional)</h2>
+                            <p class="form-help">Add a featured YouTube or Vimeo video that replaces the image carousel at the top of the post.</p>
 
-                    <!-- Actions -->
-                    <div class="form-actions">
-                        <button type="button" id="preview-btn" class="btn btn-outline">Preview Post</button>
-                        <button type="submit" class="btn btn-primary">Generate JSON</button>
-                    </div>
-                </form>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="featured-video-url">Featured Video URL</label>
+                                    <input type="url" id="featured-video-url" name="featured-video-url"
+                                           placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
+                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">This video will appear at the top of the post instead of images</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Videos -->
+                        <div class="form-section">
+                            <h2>Additional Videos</h2>
+                            <p class="form-help">Add YouTube or Vimeo videos that appear in the post content.</p>
+
+                            <div id="videos-container" class="media-container">
+                                <!-- Video items will be added here -->
+                            </div>
+
+                            <button type="button" id="add-video-btn" class="btn btn-outline add-media-btn">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Video
+                            </button>
+                        </div>
+
+                        <!-- PDFs -->
+                        <div class="form-section">
+                            <h2>PDF Documents</h2>
+                            <p class="form-help">Add links to PDF documents. They will appear as downloadable links.</p>
+
+                            <div id="pdfs-container" class="media-container">
+                                <!-- PDF items will be added here -->
+                            </div>
+
+                            <button type="button" id="add-pdf-btn" class="btn btn-outline add-media-btn">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add PDF
+                            </button>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-actions">
+                            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+                            <button type="button" id="preview-btn" class="btn btn-outline">Preview</button>
+                            <button type="submit" id="save-btn" class="btn btn-primary">Save Post</button>
+                        </div>
+                    </form>
+                </div>
 
                 <!-- Preview Modal -->
                 <div id="preview-modal" class="modal" hidden>
@@ -168,15 +252,40 @@
                     </div>
                 </div>
 
-                <!-- JSON Output -->
-                <div id="json-output" class="json-output" hidden>
-                    <h2>Generated JSON</h2>
-                    <p class="form-help">Copy this JSON and add it to the beginning of the <code>posts</code> array in <code>data/news-posts.json</code></p>
-                    <div class="json-actions">
-                        <button type="button" id="copy-json-btn" class="btn btn-primary">Copy to Clipboard</button>
-                        <button type="button" id="download-json-btn" class="btn btn-outline">Download JSON</button>
+                <!-- JSON Output Modal -->
+                <div id="json-modal" class="modal" hidden>
+                    <div class="modal-backdrop"></div>
+                    <div class="modal-content json-modal-content">
+                        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                        <div class="json-output-inner">
+                            <h2 id="json-modal-title">Post JSON</h2>
+                            <div id="json-instructions" class="json-instructions">
+                                <!-- Instructions will be set dynamically -->
+                            </div>
+                            <div class="json-actions">
+                                <button type="button" id="copy-json-btn" class="btn btn-primary">Copy to Clipboard</button>
+                                <button type="button" id="download-full-json-btn" class="btn btn-outline">Download Full news-posts.json</button>
+                            </div>
+                            <pre id="json-code"><code></code></pre>
+                        </div>
                     </div>
-                    <pre id="json-code"><code></code></pre>
+                </div>
+
+                <!-- Delete Confirmation Modal -->
+                <div id="delete-modal" class="modal" hidden>
+                    <div class="modal-backdrop"></div>
+                    <div class="modal-content delete-modal-content">
+                        <h2>Delete Post?</h2>
+                        <p id="delete-post-title">Are you sure you want to delete this post?</p>
+                        <div class="delete-actions">
+                            <button type="button" id="cancel-delete-btn" class="btn btn-outline">Cancel</button>
+                            <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete Post</button>
+                        </div>
+                        <div id="delete-instructions" class="json-instructions" hidden>
+                            <p>To complete the deletion, remove this post from <code>data/news-posts.json</code>.</p>
+                            <button type="button" id="download-after-delete-btn" class="btn btn-primary">Download Updated news-posts.json</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -192,7 +301,7 @@
 
         <div class="footer-contact-info">
             <div class="footer-column">
-                <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
+                <p>The Omotani Caring Foundation is a <br>501(c)(3) USA charity.</p>
                 <p><strong>EIN:</strong> 85-2581703</p>
             </div>
             <div class="footer-column">
@@ -214,6 +323,6 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/admin.js?v=1"></script>
+    <script src="js/admin.js?v=2"></script>
 </body>
 </html>
