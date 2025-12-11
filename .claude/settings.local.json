@@ -13,7 +13,16 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(copy:*)",
+      "Bash(powershell -File:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"c:\\Users\\Todd\\OneDrive\\Documents\\OmotaniCaringFoundation-Website\\update-logos.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(powershell:*)",
+      "Bash(del \"c:\\Users\\Todd\\OneDrive\\Documents\\OmotaniCaringFoundation-Website\\update-footer.ps1\")",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []

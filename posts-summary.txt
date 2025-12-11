@@ -1,0 +1,15 @@
+Extracted 56 posts from Squarespace export
+
+Categories:
+  - Nepal: 14
+  - Batwa: 25
+  - Base Camp For Veterans: 7
+  - Bwindi: 8
+  - General: 2
+
+Years:
+  - 2025: 9
+  - 2024: 25
+  - 2023: 15
+  - 2022: 4
+  - 2021: 3

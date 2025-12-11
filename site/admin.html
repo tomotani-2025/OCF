@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Create Post — Omotani CARING Foundation</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/styles.css?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css?v=1">
+</head>
+<body class="admin-page">
+    <header class="site-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="images/logo/OCF-Badge-WhiteRed.svg" alt="Omotani CARING Foundation">
+            </a>
+            <nav class="main-nav">
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about-us.html">About Us</a></li>
+                    <li><a href="our-mission.html">Our Mission</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="progress.html">Progress</a></li>
+                    <li><a href="news-updates.html">News + Updates</a></li>
+                    <li><a href="honor-and-memory.html">Honor and Memory</a></li>
+                    <li><a href="global-images.html">Global Images</a></li>
+                    <li><a href="contact-us.html">Contact Us</a></li>
+                    <li><a href="make-a-donation.html" class="btn btn-donate">Donate Now</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <div class="admin-container">
+                <div class="admin-header">
+                    <h1>Create New Post</h1>
+                    <p>Fill out the form below to create a new news post. The generated JSON will be displayed at the bottom for you to copy.</p>
+                </div>
+
+                <form id="post-form" class="post-form">
+                    <!-- Basic Info -->
+                    <div class="form-section">
+                        <h2>Basic Information</h2>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="post-title">Title *</label>
+                                <input type="text" id="post-title" name="title" required placeholder="Enter post title">
+                            </div>
+                        </div>
+
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="post-date">Date *</label>
+                                <input type="date" id="post-date" name="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="post-category">Category *</label>
+                                <select id="post-category" name="category" required>
+                                    <option value="">Select a category</option>
+                                    <option value="Batwa">Batwa</option>
+                                    <option value="Bwindi">Bwindi</option>
+                                    <option value="Nepal">Nepal</option>
+                                    <option value="Base Camp For Veterans">Base Camp For Veterans</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="post-author">Author</label>
+                                <input type="text" id="post-author" name="author" value="Les Omotani" placeholder="Author name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="post-summary">Summary *</label>
+                                <textarea id="post-summary" name="summary" required placeholder="Brief summary of the post (1-2 sentences)" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="post-content">Content *</label>
+                                <textarea id="post-content" name="content" required placeholder="Full post content. Use blank lines to separate paragraphs." rows="10"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Carousel -->
+                    <div class="form-section">
+                        <h2>Images</h2>
+                        <p class="form-help">Add one or more images. Multiple images will display as a carousel. Images should be placed in the <code>images/news/</code> folder.</p>
+
+                        <div id="images-container" class="media-container">
+                            <!-- Image items will be added here -->
+                        </div>
+
+                        <button type="button" id="add-image-btn" class="btn btn-outline add-media-btn">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add Image
+                        </button>
+                    </div>
+
+                    <!-- Videos -->
+                    <div class="form-section">
+                        <h2>Videos</h2>
+                        <p class="form-help">Add YouTube or Vimeo video links. They will be embedded in the post.</p>
+
+                        <div id="videos-container" class="media-container">
+                            <!-- Video items will be added here -->
+                        </div>
+
+                        <button type="button" id="add-video-btn" class="btn btn-outline add-media-btn">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add Video
+                        </button>
+                    </div>
+
+                    <!-- PDFs -->
+                    <div class="form-section">
+                        <h2>PDF Documents</h2>
+                        <p class="form-help">Add links to PDF documents. They will appear as downloadable links.</p>
+
+                        <div id="pdfs-container" class="media-container">
+                            <!-- PDF items will be added here -->
+                        </div>
+
+                        <button type="button" id="add-pdf-btn" class="btn btn-outline add-media-btn">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add PDF
+                        </button>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <button type="button" id="preview-btn" class="btn btn-outline">Preview Post</button>
+                        <button type="submit" class="btn btn-primary">Generate JSON</button>
+                    </div>
+                </form>
+
+                <!-- Preview Modal -->
+                <div id="preview-modal" class="modal" hidden>
+                    <div class="modal-backdrop"></div>
+                    <div class="modal-content">
+                        <button type="button" class="modal-close" aria-label="Close preview">&times;</button>
+                        <div id="preview-container" class="preview-container">
+                            <!-- Preview will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JSON Output -->
+                <div id="json-output" class="json-output" hidden>
+                    <h2>Generated JSON</h2>
+                    <p class="form-help">Copy this JSON and add it to the beginning of the <code>posts</code> array in <code>data/news-posts.json</code></p>
+                    <div class="json-actions">
+                        <button type="button" id="copy-json-btn" class="btn btn-primary">Copy to Clipboard</button>
+                        <button type="button" id="download-json-btn" class="btn btn-outline">Download JSON</button>
+                    </div>
+                    <pre id="json-code"><code></code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-header">
+            <img src="images/logo/OCF-FullWordmark-BlackRed.svg" alt="Omotani Caring Foundation" class="footer-logo">
+        </div>
+
+        <p class="footer-subhead">Supporting charitable, educational, medical, conservation, scientific and humanitarian purposes.</p>
+
+        <div class="footer-contact-info">
+            <div class="footer-column">
+                <p>The Omotani Caring Foundation is a 501(c)(3) USA charity.</p>
+                <p><strong>EIN:</strong> 85-2581703</p>
+            </div>
+            <div class="footer-column">
+                <a href="mailto:info@omotanicaringfoundation.org">info@omotanicaringfoundation.org</a>
+                <p>8337 N Lee Trevino Drive<br>Tucson, Arizona, USA 85742</p>
+            </div>
+            <div class="footer-column">
+                <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://bsky.app" target="_blank" rel="noopener">Bluesky</a>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <span>Omotani Caring Foundation</span>
+            <span>&copy; 2025 All Rights Reserved</span>
+        </div>
+    </footer>
+
+    <script src="js/main.js?v=2"></script>
+    <script src="js/admin.js?v=1"></script>
+</body>
+</html>

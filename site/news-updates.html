@@ -110,7 +110,7 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/news.js?v=2"></script>
+    <script src="js/news.js?v=3"></script>
 
     <style>
         /* News Page Specific Styles */
@@ -264,7 +264,7 @@
         }
 
         /* News Card */
-        .news-card {
+        a.news-card {
             display: flex;
             flex-direction: column;
             background: #FFFFFF;
@@ -273,9 +273,11 @@
             max-width: 310px;
             cursor: pointer;
             transition: box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
         }
 
-        .news-card:hover {
+        a.news-card:hover {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
@@ -285,7 +287,6 @@
             width: 100%;
             aspect-ratio: 310/174;
             overflow: hidden;
-            cursor: pointer;
         }
 
         .card-header img {
@@ -296,7 +297,7 @@
             transition: transform 0.3s ease;
         }
 
-        .news-card:hover .card-header img {
+        a.news-card:hover .card-header img {
             transform: scale(1.05);
         }
 
@@ -367,12 +368,7 @@
             overflow: hidden;
         }
 
-        .card-title-link {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .card-title-link:hover h2 {
+        a.news-card:hover h2 {
             color: #EF3A4F;
         }
 

@@ -142,13 +142,14 @@ class NewsCMS {
     }
 
     createPostCard(post) {
-        const article = document.createElement('article');
-        article.className = 'news-card';
-        article.dataset.postId = post.id;
-        article.dataset.category = post.category;
+        const card = document.createElement('a');
+        card.className = 'news-card';
+        card.href = `post.html?id=${post.id}`;
+        card.dataset.postId = post.id;
+        card.dataset.category = post.category;
 
-        article.innerHTML = `
-            <a href="post.html?id=${post.id}" class="card-header">
+        card.innerHTML = `
+            <div class="card-header">
                 <img src="${post.image}" alt="${post.imageAlt}" loading="lazy">
                 <div class="card-date">
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -156,35 +157,28 @@ class NewsCMS {
                     </svg>
                     <span>${this.formatDate(post.date)}</span>
                 </div>
-            </a>
+            </div>
             <div class="card-body">
                 <span class="card-category">${post.category}</span>
                 <div class="card-text">
-                    <a href="post.html?id=${post.id}" class="card-title-link"><h2>${post.title}</h2></a>
+                    <h2>${post.title}</h2>
                     <p>${post.summary}</p>
                     <div class="card-divider"></div>
                 </div>
                 <div class="card-footer">
                     <span class="card-author">By ${post.author}</span>
-                    <a href="post.html?id=${post.id}" class="read-more">
+                    <span class="read-more">
                         <span>Read More</span>
                         <svg width="30" height="26" viewBox="0 0 30 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M18 6L26 13L18 20" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M4 13H26" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </a>
+                    </span>
                 </div>
             </div>
         `;
 
-        // Make entire card clickable - navigate to post page
-        article.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            window.location.href = `post.html?id=${post.id}`;
-        });
-
-        return article;
+        return card;
     }
 
     getPaginatedPosts() {
