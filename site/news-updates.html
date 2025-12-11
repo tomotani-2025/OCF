@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="css/styles.css?v=2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="news-page">
     <header class="site-header">
         <div class="container">
             <a href="index.html" class="logo">
@@ -40,42 +40,47 @@
     </header>
 
     <main>
-        <section class="page-header">
-            <div class="container">
+        <!-- Header Section -->
+        <section class="news-header-section">
+            <div class="news-header-content">
                 <h1>News + Updates</h1>
                 <p>Latest updates from our projects and communities.</p>
             </div>
         </section>
 
-        <section class="content-section">
-            <div class="container">
-                <!-- Year Filter Buttons -->
-                <div class="news-filter"></div>
+        <!-- Card Section -->
+        <section class="card-section">
+            <div class="card-content">
+                <!-- Filters + Sort -->
+                <div class="filters-sort-row">
+                    <div class="filters">
+                        <div class="news-filter-links">
+                            <!-- Filters populated by JS -->
+                        </div>
+                        <div class="filter-divider"></div>
+                    </div>
+                    <div class="sort-by">
+                        <label for="sort-select">Sort by:</label>
+                        <select id="sort-select" class="news-sort-select">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                        </select>
+                    </div>
+                </div>
 
-                <!-- News posts will be dynamically loaded here -->
+                <!-- News Grid -->
                 <div class="news-grid" data-cms="true">
                     <p class="loading-message">Loading news...</p>
                 </div>
-            </div>
-        </section>
 
-        <!-- CTA Section -->
-        <section class="cta-section section">
-            <div class="container">
-                <div class="cta-content">
-                    <h2>Stay Connected</h2>
-                    <p>Follow our projects and see the impact of your support.</p>
-                    <div class="cta-buttons">
-                        <a href="projects.html" class="btn btn-primary">View Projects</a>
-                        <a href="make-a-donation.html" class="btn btn-secondary">Make a Donation</a>
-                    </div>
-                </div>
+                <!-- Pagination -->
+                <div class="news-pagination"></div>
             </div>
         </section>
     </main>
 
-        <!-- Footer -->
-        <footer class="site-footer">
+    <!-- Footer -->
+    <footer class="site-footer">
         <div class="footer-header">
             <img src="images/logo/OCF-FullWordmark-BlackRed.svg" alt="Omotani Caring Foundation" class="footer-logo">
         </div>
@@ -106,119 +111,437 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/news.js"></script>
+    <script src="js/news.js?v=2"></script>
 
     <style>
+        /* News Page Specific Styles */
+        .news-page {
+            background: #F5E4AF;
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Header Section */
+        .news-header-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 70px 50px;
+            background: #1F0808;
+            min-height: 300px;
+        }
+
+        .news-header-content {
+            text-align: center;
+            max-width: 942px;
+        }
+
+        .news-header-section h1 {
+            font-size: 76px;
+            font-weight: 400;
+            line-height: 95%;
+            letter-spacing: -0.06em;
+            color: #F5E4AF;
+            margin: 0 0 20px 0;
+        }
+
+        .news-header-section p {
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            color: #F7F4EB;
+            margin: 0;
+        }
+
+        /* Card Section */
+        .card-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 70px;
+            background: #F7F4EB;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            max-width: 976px;
+            width: 100%;
+        }
+
+        /* Filters + Sort Row */
+        .filters-sort-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 16px;
+        }
+
+        .filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .news-filter-links {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 36px;
+            padding: 0 4px;
+        }
+
+        .filter-link {
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 95%;
+            letter-spacing: -0.03em;
+            color: #31110F;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-link:hover,
+        .filter-link.active {
+            color: #EF3A4F;
+        }
+
+        .filter-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(239, 58, 79, 0.3);
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #EF3A4F;
+        }
+
+        .filter-divider {
+            width: 100%;
+            height: 2px;
+            background: #FFFFFF;
+        }
+
+        .sort-by {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-by label {
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            color: #31110F;
+        }
+
+        .news-sort-select {
+            padding: 8px 20px;
+            background: #F2F2F2;
+            border: 2px solid #FFFFFF;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            color: #31110F;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23EF3A4F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* News Grid */
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: var(--spacing-xl);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            width: 100%;
         }
 
+        /* News Card */
         .news-card {
-            background: var(--color-white);
+            display: flex;
+            flex-direction: column;
+            background: #FFFFFF;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s, box-shadow 0.2s;
+            max-width: 310px;
         }
 
-        .news-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .news-image {
-            aspect-ratio: 16/9;
+        .card-header {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 310/174;
             overflow: hidden;
         }
 
-        .news-image img {
+        .card-header img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s;
+            filter: brightness(0.8);
+            transition: transform 0.3s ease;
         }
 
-        .news-card:hover .news-image img {
+        .news-card:hover .card-header img {
             transform: scale(1.05);
         }
 
-        .news-content {
-            padding: var(--spacing-lg);
+        .card-date {
+            position: absolute;
+            top: 9px;
+            right: 17px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 2px 4px;
+            gap: 6px;
+            background: rgba(31, 8, 8, 0.4);
+            backdrop-filter: blur(2px);
+            border-radius: 2px;
         }
 
-        .news-date {
-            display: inline-block;
-            background: var(--color-secondary);
-            color: var(--color-text);
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: var(--spacing-sm);
+        .card-date svg {
+            flex-shrink: 0;
         }
 
-        .news-content h2 {
-            font-size: 1.25rem;
-            margin-bottom: var(--spacing-sm);
-            color: var(--color-primary);
-            line-height: 1.4;
+        .card-date span {
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 140%;
+            color: #FFFFFF;
         }
 
-        .news-content p {
-            color: var(--color-text-light);
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 24px;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .card-category {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2px 8px;
+            background: rgba(239, 58, 79, 0.3);
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 100%;
+            color: #EF3A4F;
+        }
+
+        .card-text {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-text h2 {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            color: #000000;
             margin: 0;
-            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-text p {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 140%;
+            color: #000000;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-divider {
+            width: 100%;
+            height: 1px;
+            background: #F5E4AF;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .card-author {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 140%;
+            color: #000000;
+        }
+
+        .read-more {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #000000;
+        }
+
+        .read-more span {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+        }
+
+        .read-more svg {
+            width: 30px;
+            height: 26px;
+        }
+
+        /* Pagination */
+        .news-pagination {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 0;
+        }
+
+        .pagination-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 26px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: opacity 0.2s;
+        }
+
+        .pagination-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pagination-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 6px;
+            min-width: 27px;
+            height: 24px;
+            background: #FFFFFF;
+            border: none;
+            border-radius: 2px;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 135%;
+            letter-spacing: -0.02em;
+            color: #000000;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .pagination-page:hover {
+            background: #F5E4AF;
+        }
+
+        .pagination-page.active {
+            background: #EF3A4F;
+            color: #FFFFFF;
+        }
+
+        /* Loading & Error States */
+        .loading-message,
+        .no-posts,
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #31110F;
+            grid-column: 1 / -1;
+            font-size: 18px;
+        }
+
+        .error-message {
+            color: #EF3A4F;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .news-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .news-header-section h1 {
+                font-size: 56px;
+            }
+
+            .card-section {
+                padding: 50px 30px;
+            }
         }
 
         @media (max-width: 768px) {
             .news-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* News Filter Styles */
-        .news-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: var(--spacing-xl);
-            justify-content: center;
-        }
+            .news-card {
+                max-width: 100%;
+            }
 
-        .filter-btn {
-            padding: 0.5rem 1.25rem;
-            border: 2px solid var(--color-primary);
-            background: transparent;
-            color: var(--color-primary);
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+            .news-header-section {
+                padding: 50px 20px;
+            }
 
-        .filter-btn:hover {
-            background: var(--color-primary);
-            color: var(--color-white);
-        }
+            .news-header-section h1 {
+                font-size: 42px;
+            }
 
-        .filter-btn.active {
-            background: var(--color-primary);
-            color: var(--color-white);
-        }
+            .news-header-section p {
+                font-size: 18px;
+            }
 
-        .loading-message,
-        .no-posts,
-        .error-message {
-            text-align: center;
-            padding: var(--spacing-xl);
-            color: var(--color-text-light);
-            grid-column: 1 / -1;
-        }
+            .filters-sort-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .error-message {
-            color: #c0392b;
+            .news-filter-links {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .card-text h2 {
+                font-size: 24px;
+            }
         }
     </style>
 </body>
