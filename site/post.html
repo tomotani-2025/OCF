@@ -211,7 +211,7 @@
             border-radius: 4px;
         }
 
-        .post-image {
+        .carousel-images .post-image {
             width: 100%;
             max-height: 549px;
             object-fit: cover;
@@ -221,9 +221,18 @@
             transition: opacity 0.3s ease;
         }
 
-        .post-image.active {
+        .carousel-images .post-image.active {
             display: block;
             opacity: 1;
+        }
+
+        /* Fallback for single image without carousel */
+        .post-image-container > .post-image {
+            width: 100%;
+            max-height: 549px;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
         }
 
         /* Carousel Arrows */
