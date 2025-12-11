@@ -114,7 +114,7 @@ class NewsCMS {
         article.dataset.category = post.category;
 
         article.innerHTML = `
-            <div class="card-header">
+            <a href="post.html?id=${post.id}" class="card-header">
                 <img src="${post.image}" alt="${post.imageAlt}" loading="lazy">
                 <div class="card-date">
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,17 +122,17 @@ class NewsCMS {
                     </svg>
                     <span>${this.formatDate(post.date)}</span>
                 </div>
-            </div>
+            </a>
             <div class="card-body">
                 <span class="card-category">${post.category}</span>
                 <div class="card-text">
-                    <h2>${post.title}</h2>
+                    <a href="post.html?id=${post.id}" class="card-title-link"><h2>${post.title}</h2></a>
                     <p>${post.summary}</p>
                     <div class="card-divider"></div>
                 </div>
                 <div class="card-footer">
                     <span class="card-author">By ${post.author}</span>
-                    <a href="#" class="read-more">
+                    <a href="post.html?id=${post.id}" class="read-more">
                         <span>Read More</span>
                         <svg width="30" height="26" viewBox="0 0 30 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M18 6L26 13L18 20" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
