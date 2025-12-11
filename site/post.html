@@ -136,7 +136,7 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-    <script src="js/post.js?v=3"></script>
+    <script src="js/post.js?v=4"></script>
 
     <style>
         /* Post Page Styles */
@@ -204,16 +204,11 @@
 
         /* Carousel Wrapper */
         .carousel-wrapper {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 16px;
-            width: 100%;
             position: relative;
+            width: 100%;
         }
 
         .carousel-images {
-            flex: 1;
             position: relative;
             width: 100%;
             max-height: 549px;
@@ -222,17 +217,19 @@
         }
 
         .carousel-images .post-image {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-height: 549px;
+            height: 100%;
             object-fit: cover;
             border-radius: 4px;
-            display: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.5s ease-in-out;
         }
 
         .carousel-images .post-image.active {
-            display: block;
+            position: relative;
             opacity: 1;
         }
 
@@ -245,23 +242,26 @@
             display: block;
         }
 
-        /* Carousel Arrows */
+        /* Carousel Arrows - positioned over the image */
         .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 44px;
             height: 44px;
             background: #FFFFFF;
-            border: 2px solid #EF3A4F;
+            border: 2px solid #31110F;
             border-radius: 50%;
             cursor: pointer;
-            flex-shrink: 0;
             transition: background 0.2s, opacity 0.2s;
         }
 
         .carousel-arrow:hover {
-            background: rgba(239, 58, 79, 0.1);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .carousel-arrow.disabled {
@@ -274,22 +274,37 @@
         }
 
         .carousel-prev {
-            order: -1;
+            left: 16px;
         }
 
         .carousel-next {
-            order: 1;
+            right: 16px;
         }
 
+        /* Caption with image number */
         .post-image-caption {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
             width: 100%;
+            margin: 0;
+            min-height: 20px;
+        }
+
+        .caption-number {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1;
+            color: #31110F;
+            min-width: 24px;
+        }
+
+        .caption-text {
             font-size: 12px;
             font-weight: 500;
             line-height: 135%;
             letter-spacing: -0.02em;
             color: #31110F;
-            margin: 0;
-            min-height: 16px;
         }
 
         /* Image Pagination Dots */
@@ -622,17 +637,10 @@
                 justify-content: center;
             }
 
-            /* Carousel on mobile - arrows overlay the image */
-            .carousel-wrapper {
-                gap: 0;
-            }
-
+            /* Carousel on mobile */
             .carousel-arrow {
-                position: absolute;
-                z-index: 10;
                 width: 36px;
                 height: 36px;
-                background: rgba(255, 255, 255, 0.9);
             }
 
             .carousel-prev {
@@ -641,10 +649,6 @@
 
             .carousel-next {
                 right: 8px;
-            }
-
-            .carousel-images {
-                width: 100%;
             }
         }
     </style>

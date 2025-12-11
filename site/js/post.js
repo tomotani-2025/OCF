@@ -260,6 +260,9 @@ class BlogPost {
         if (imageContainer) {
             imageContainer.style.display = 'flex';
 
+            // Format image number with leading zero
+            const formatNumber = (num) => num.toString().padStart(2, '0');
+
             // Create carousel HTML
             const carouselHTML = `
                 <div class="carousel-wrapper">
@@ -288,7 +291,10 @@ class BlogPost {
                         </svg>
                     </button>
                 </div>
-                <p class="post-image-caption">${this.images[0].alt || ''}</p>
+                <div class="post-image-caption">
+                    <span class="caption-number">${formatNumber(1)}</span>
+                    <span class="caption-text">${this.images[0].alt || ''}</span>
+                </div>
             `;
 
             imageContainer.innerHTML = carouselHTML;
@@ -395,10 +401,14 @@ class BlogPost {
             dot.classList.toggle('active', i === index);
         });
 
-        // Update caption
-        const caption = document.querySelector('.post-image-caption');
-        if (caption && this.images[index]) {
-            caption.textContent = this.images[index].alt || '';
+        // Update caption with image number
+        const captionNumber = document.querySelector('.caption-number');
+        const captionText = document.querySelector('.caption-text');
+        if (captionNumber) {
+            captionNumber.textContent = (index + 1).toString().padStart(2, '0');
+        }
+        if (captionText && this.images[index]) {
+            captionText.textContent = this.images[index].alt || '';
         }
 
         // Update arrow states
