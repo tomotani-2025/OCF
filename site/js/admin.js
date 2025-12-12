@@ -1021,12 +1021,13 @@ class AdminDashboard {
     renderPreview(data) {
         const formatDate = (dateString) => {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            const day = date.getDate();
+            const suffix = day === 1 || day === 21 || day === 31 ? 'st' :
+                          day === 2 || day === 22 ? 'nd' :
+                          day === 3 || day === 23 ? 'rd' : 'th';
+            return `${months[date.getMonth()]} ${day}${suffix}, ${date.getFullYear()}`;
         };
 
         const formatContent = (content) => {
@@ -1110,21 +1111,23 @@ class AdminDashboard {
                                 <p class="preview-pdf-title">${pdf.title || 'PDF Document'}</p>
                                 ${pdf.description ? `<p class="preview-pdf-description">${pdf.description}</p>` : ''}
                             </div>
+                            <span class="preview-pdf-download">Download</span>
                         </a>
                     `).join('')}
                 </div>
             `;
         }
 
+        // Match post.html layout order: meta (date/author) -> category -> title -> media -> content
         this.previewContainer.innerHTML = `
+            <div class="preview-meta">
+                <span class="preview-date">${formatDate(data.date)}</span>
+                <span class="preview-author">By ${data.author}</span>
+            </div>
             <div class="preview-category-badge">${data.category || 'Category'}</div>
             <h1 class="preview-title">${data.title || 'Post Title'}</h1>
             ${featuredMediaHtml}
             ${imagesHtml}
-            <div class="preview-meta">
-                <span>By ${data.author}</span>
-                <span>${formatDate(data.date)}</span>
-            </div>
             <div class="preview-content">
                 ${formatContent(data.content)}
             </div>
