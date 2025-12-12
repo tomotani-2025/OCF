@@ -10,7 +10,9 @@
 
     <div>
         <label>Post ID: <input type="text" id="postId" value="feed-the-children-and-the-families-2021"></label>
+        <button onclick="checkPost()">Check Current Data</button>
     </div>
+    <div id="currentData" style="background:#f0f0f0; padding:10px; margin:10px 0; white-space:pre-wrap; font-family:monospace;"></div>
     <div>
         <label>Image Path: <input type="text" id="imagePath" value="images/news/feed-the-children-and-the-families-2021/img-20210908-wa0020.webp" size="80"></label>
     </div>
@@ -20,7 +22,32 @@
     <button onclick="fixPost()">Fix Post</button>
     <div id="result"></div>
 
+    <h3>Image Preview:</h3>
+    <img id="imagePreview" style="max-width:400px; border:1px solid #ccc;">
+
     <script>
+        async function checkPost() {
+            const postId = document.getElementById('postId').value;
+            const dataDiv = document.getElementById('currentData');
+
+            try {
+                const post = await postsAPI.getById(postId);
+                dataDiv.textContent = JSON.stringify({
+                    id: post.id,
+                    image: post.image,
+                    image_alt: post.image_alt,
+                    images: post.images
+                }, null, 2);
+
+                // Try to show the image
+                if (post.image) {
+                    document.getElementById('imagePreview').src = post.image;
+                }
+            } catch (error) {
+                dataDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
         async function fixPost() {
             const postId = document.getElementById('postId').value;
             const imagePath = document.getElementById('imagePath').value;
@@ -39,10 +66,19 @@
                 });
 
                 resultDiv.innerHTML = '<span style="color: green">✓ Post updated successfully!</span>';
+
+                // Update preview
+                document.getElementById('imagePreview').src = imagePath;
+
+                // Re-check data
+                checkPost();
             } catch (error) {
                 resultDiv.innerHTML = '<span style="color: red">Error: ' + error.message + '</span>';
             }
         }
+
+        // Auto-check on load
+        window.onload = checkPost;
     </script>
 </body>
 </html>
