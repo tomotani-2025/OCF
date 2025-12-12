@@ -49,7 +49,7 @@
 
         <section class="content-section">
             <div class="container">
-                <div class="progress-grid">
+                <div id="progress-grid" class="progress-grid">
                     <!-- Goal One: Raised $34k, Phase 1 $27k, Goal $54k -->
                     <article class="progress-card">
                         <div class="card-body">
@@ -868,8 +868,25 @@
                 font-size: 9px;
             }
         }
+
+        /* Loading and error states */
+        .loading-message,
+        .error-message,
+        .no-data {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #666666;
+            font-size: 16px;
+        }
+
+        .error-message {
+            color: #EF3A4F;
+        }
     </style>
 
     <script src="js/main.js?v=2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/progress-loader.js"></script>
 </body>
 </html>
