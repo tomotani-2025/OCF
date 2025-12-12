@@ -845,7 +845,7 @@ class AdminDashboard {
             this.updatePublishingStatus('Published successfully!', true);
 
             // Update local data
-            if (action === 'create') {
+            if (!this.editingPostId) {
                 this.posts.unshift(cleanData);
             } else {
                 const index = this.posts.findIndex(p => p.id === this.editingPostId);
