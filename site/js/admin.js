@@ -1039,32 +1039,57 @@ class AdminDashboard {
                 .join('');
         };
 
-        let imagesHtml = '';
-        const allImages = data.images || (data.image ? [{ src: data.image, alt: data.imageAlt }] : []);
-
-        if (allImages.length > 0) {
-            imagesHtml = `
-                <div class="preview-carousel">
-                    <div class="preview-carousel-images">
-                        <img src="${allImages[0].src}" alt="${allImages[0].alt || ''}" class="active">
+        // Check for featured video first
+        let featuredMediaHtml = '';
+        const featuredVideoUrl = data.featuredVideo?.url || data.featuredVideo;
+        if (featuredVideoUrl) {
+            const embedUrl = this.getVideoEmbedUrl(featuredVideoUrl);
+            if (embedUrl) {
+                featuredMediaHtml = `
+                    <div class="preview-featured-video">
+                        <div class="preview-video-embed">
+                            <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        ${data.featuredVideo?.caption ? `<p class="preview-video-caption">${data.featuredVideo.caption}</p>` : ''}
                     </div>
-                    ${allImages[0].alt ? `<p class="preview-carousel-caption">${allImages[0].alt}</p>` : ''}
-                </div>
-            `;
+                `;
+            }
+        }
+
+        // If no featured video, show images
+        let imagesHtml = '';
+        if (!featuredMediaHtml) {
+            const allImages = (data.images && data.images.length > 0)
+                ? data.images
+                : (data.image ? [{ src: data.image, alt: data.imageAlt }] : []);
+
+            if (allImages.length > 0 && allImages[0].src) {
+                imagesHtml = `
+                    <div class="preview-carousel">
+                        <div class="preview-carousel-images">
+                            <img src="${allImages[0].src}" alt="${allImages[0].alt || ''}" class="active">
+                        </div>
+                        ${allImages[0].alt ? `<p class="preview-carousel-caption">${allImages[0].alt}</p>` : ''}
+                    </div>
+                `;
+            }
         }
 
         let videosHtml = '';
         if (data.videos && data.videos.length > 0) {
             videosHtml = `
                 <div class="preview-videos">
-                    ${data.videos.map(video => `
-                        <div class="preview-video-item">
-                            <div class="preview-video-embed">
-                                <iframe src="${video.embedUrl}" frameborder="0" allowfullscreen></iframe>
+                    ${data.videos.map(video => {
+                        const embedUrl = video.embedUrl || this.getVideoEmbedUrl(video.url);
+                        return `
+                            <div class="preview-video-item">
+                                <div class="preview-video-embed">
+                                    <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                                ${video.caption ? `<p class="preview-video-caption">${video.caption}</p>` : ''}
                             </div>
-                            ${video.caption ? `<p class="preview-video-caption">${video.caption}</p>` : ''}
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             `;
         }
@@ -1082,7 +1107,7 @@ class AdminDashboard {
                                 </svg>
                             </div>
                             <div class="preview-pdf-info">
-                                <p class="preview-pdf-title">${pdf.title}</p>
+                                <p class="preview-pdf-title">${pdf.title || 'PDF Document'}</p>
                                 ${pdf.description ? `<p class="preview-pdf-description">${pdf.description}</p>` : ''}
                             </div>
                         </a>
@@ -1094,6 +1119,7 @@ class AdminDashboard {
         this.previewContainer.innerHTML = `
             <div class="preview-category-badge">${data.category || 'Category'}</div>
             <h1 class="preview-title">${data.title || 'Post Title'}</h1>
+            ${featuredMediaHtml}
             ${imagesHtml}
             <div class="preview-meta">
                 <span>By ${data.author}</span>
