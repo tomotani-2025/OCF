@@ -782,7 +782,7 @@
         .goal-marker {
             position: absolute;
             left: 0;
-            right: -40px;
+            right: 0;
             bottom: var(--marker-position, 50%);
             height: 3px;
             background: #312121;
@@ -792,7 +792,7 @@
         .goal-marker::after {
             content: attr(data-label);
             position: absolute;
-            right: 0;
+            left: calc(100% + 8px);
             top: 50%;
             transform: translateY(-50%);
             font-size: 10px;
