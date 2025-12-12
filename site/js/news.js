@@ -75,6 +75,16 @@ class NewsCMS {
         this.categories = ['Batwa', 'Bwindi', 'Nepal', 'Base Camp For Veterans'];
     }
 
+    // Generate YouTube thumbnail URL from video URL
+    getVideoThumbnail(url) {
+        if (!url) return null;
+        const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (youtubeMatch) {
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
+        }
+        return null;
+    }
+
     async init() {
         try {
             await this.loadPosts();
@@ -92,22 +102,33 @@ class NewsCMS {
         const dbPosts = await postsAPI.getAll();
 
         // Transform snake_case database fields to camelCase for template
-        this.posts = dbPosts.map(post => ({
-            id: post.id,
-            title: post.title,
-            date: post.date,
-            year: post.year,
-            category: post.category,
-            author: post.author,
-            image: post.image,
-            imageAlt: post.image_alt,
-            summary: post.summary,
-            content: post.content,
-            images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
-            videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
-            pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
-            featuredVideo: post.featured_video
-        }));
+        this.posts = dbPosts.map(post => {
+            const featuredVideo = post.featured_video;
+            let image = post.image;
+
+            // Auto-generate thumbnail from YouTube video if no image provided
+            if (!image && featuredVideo) {
+                const videoUrl = typeof featuredVideo === 'object' ? featuredVideo.url : featuredVideo;
+                image = this.getVideoThumbnail(videoUrl);
+            }
+
+            return {
+                id: post.id,
+                title: post.title,
+                date: post.date,
+                year: post.year,
+                category: post.category,
+                author: post.author,
+                image: image,
+                imageAlt: post.image_alt,
+                summary: post.summary,
+                content: post.content,
+                images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
+                videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
+                pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
+                featuredVideo: featuredVideo
+            };
+        });
 
         this.sortPosts();
         this.filteredPosts = [...this.posts];
