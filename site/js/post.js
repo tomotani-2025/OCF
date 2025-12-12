@@ -54,12 +54,27 @@ class BlogPost {
     }
 
     async loadPosts() {
-        const response = await fetch(this.dataUrl);
-        if (!response.ok) {
-            throw new Error(`Failed to load posts: ${response.status}`);
-        }
-        const data = await response.json();
-        this.posts = data.posts || [];
+        // Fetch posts from Supabase
+        const dbPosts = await postsAPI.getAll();
+
+        // Transform snake_case database fields to camelCase for template
+        this.posts = dbPosts.map(post => ({
+            id: post.id,
+            title: post.title,
+            date: post.date,
+            year: post.year,
+            category: post.category,
+            author: post.author,
+            image: post.image,
+            imageAlt: post.image_alt,
+            summary: post.summary,
+            content: post.content,
+            images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
+            videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
+            pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
+            featuredVideo: post.featured_video
+        }));
+
         // Sort by date (newest first)
         this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
     }

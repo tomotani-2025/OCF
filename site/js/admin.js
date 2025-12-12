@@ -53,10 +53,27 @@ class AdminDashboard {
 
     async loadPosts() {
         try {
-            const response = await fetch(this.dataUrl);
-            if (!response.ok) throw new Error('Failed to load posts');
-            const data = await response.json();
-            this.posts = data.posts || [];
+            // Fetch posts from Supabase
+            const dbPosts = await postsAPI.getAll();
+
+            // Transform snake_case database fields to camelCase for admin
+            this.posts = dbPosts.map(post => ({
+                id: post.id,
+                title: post.title,
+                date: post.date,
+                year: post.year,
+                category: post.category,
+                author: post.author,
+                image: post.image,
+                imageAlt: post.image_alt,
+                summary: post.summary,
+                content: post.content,
+                images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
+                videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
+                pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
+                featuredVideo: post.featured_video
+            }));
+
             this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
             this.filteredPosts = [...this.posts];
         } catch (error) {
@@ -613,6 +630,18 @@ class AdminDashboard {
         return null;
     }
 
+    getVideoThumbnail(url) {
+        if (!url) return null;
+        // YouTube thumbnail
+        const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (youtubeMatch) {
+            // maxresdefault is highest quality, falls back to hqdefault
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
+        }
+        // Vimeo requires API call, so we can't easily get thumbnail
+        return null;
+    }
+
     getVideoType(url) {
         if (!url) return null;
         if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
@@ -775,24 +804,41 @@ class AdminDashboard {
             // Clean up undefined values
             const cleanData = this.cleanObject(postData);
 
-            // Save post via API
+            // Save post directly to Supabase (instant update!)
             this.updatePublishingStatus('Publishing post...');
 
-            const action = this.editingPostId ? 'update' : 'create';
-            const response = await fetch(`${this.apiBase}/save-post`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: action,
-                    post: cleanData,
-                    postId: this.editingPostId
-                })
-            });
+            // Get featured video URL
+            const featuredVideoUrl = cleanData.featuredVideo?.url || cleanData.featuredVideo || null;
 
-            const result = await response.json();
+            // Auto-generate thumbnail from YouTube video if no image provided
+            let postImage = cleanData.image || null;
+            if (!postImage && featuredVideoUrl) {
+                postImage = this.getVideoThumbnail(featuredVideoUrl);
+            }
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to publish post');
+            // Transform camelCase to snake_case for database
+            const dbPost = {
+                title: cleanData.title,
+                date: cleanData.date,
+                year: cleanData.year || new Date(cleanData.date).getFullYear(),
+                category: cleanData.category,
+                author: cleanData.author || 'Les Omotani',
+                image: postImage,
+                image_alt: cleanData.imageAlt || cleanData.title || null,
+                summary: cleanData.summary,
+                content: cleanData.content,
+                images: JSON.stringify(cleanData.images || []),
+                videos: JSON.stringify(cleanData.videos || []),
+                pdfs: JSON.stringify(cleanData.pdfs || []),
+                featured_video: featuredVideoUrl
+            };
+
+            if (this.editingPostId) {
+                await postsAPI.update(this.editingPostId, dbPost);
+            } else {
+                // Include id only for new posts
+                dbPost.id = cleanData.id;
+                await postsAPI.create(dbPost);
             }
 
             // Success!
@@ -936,20 +982,8 @@ class AdminDashboard {
         this.showPublishingModal('Deleting post...');
 
         try {
-            const response = await fetch(`${this.apiBase}/save-post`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'delete',
-                    postId: this.deletePostId
-                })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to delete post');
-            }
+            // Delete directly from Supabase (instant!)
+            await postsAPI.delete(this.deletePostId);
 
             // Success!
             this.updatePublishingStatus('Post deleted successfully!', true);
@@ -1117,9 +1151,28 @@ class GalleryManager {
 
     async loadGallery() {
         try {
-            const response = await fetch(this.galleryUrl);
-            if (!response.ok) throw new Error('Failed to load gallery');
-            this.gallery = await response.json();
+            // Fetch from Supabase
+            const [images, categories] = await Promise.all([
+                galleryAPI.getImages(),
+                galleryAPI.getCategories()
+            ]);
+
+            // Transform snake_case to camelCase
+            this.gallery = {
+                categories: categories.map(cat => ({
+                    id: cat.id,
+                    label: cat.label,
+                    order: cat.sort_order
+                })),
+                images: images.map(img => ({
+                    id: img.id,
+                    src: img.src,
+                    alt: img.alt,
+                    caption: img.caption,
+                    category: img.category,
+                    order: img.sort_order
+                }))
+            };
             this.filteredImages = [...this.gallery.images];
             this.populateCategoryFilter();
         } catch (error) {
@@ -1289,16 +1342,11 @@ class GalleryManager {
         this.gallery.images = reorderedImages;
         this.filteredImages = [...reorderedImages];
 
-        // Save to server
+        // Save to Supabase - update sort_order for each image
         try {
-            await fetch(`${this.apiBase}/save-gallery`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'reorder',
-                    images: this.gallery.images
-                })
-            });
+            for (const img of reorderedImages) {
+                await galleryAPI.updateImage(img.id, { sort_order: img.order });
+            }
         } catch (error) {
             console.error('Failed to save reorder:', error);
         }
@@ -1438,30 +1486,34 @@ class GalleryManager {
 
             publishingStatus.textContent = 'Saving to gallery...';
 
-            const imageData = {
+            // Transform to Supabase schema
+            const dbImage = {
                 src,
                 alt: alt || caption,
                 caption,
                 category,
-                order: this.editingImageId
+                sort_order: this.editingImageId
                     ? this.gallery.images.find(i => i.id === this.editingImageId)?.order || 999
                     : this.gallery.images.length + 1
             };
 
-            const response = await fetch(`${this.apiBase}/save-gallery`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: this.editingImageId ? 'update' : 'add',
-                    image: imageData,
-                    imageId: this.editingImageId
-                })
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to save');
+            // Save directly to Supabase (instant!)
+            if (this.editingImageId) {
+                await galleryAPI.updateImage(this.editingImageId, dbImage);
+            } else {
+                dbImage.id = `img-${Date.now()}`;
+                await galleryAPI.createImage(dbImage);
             }
+
+            // Create local imageData for UI update
+            const imageData = {
+                id: this.editingImageId || dbImage.id,
+                src,
+                alt: alt || caption,
+                caption,
+                category,
+                order: dbImage.sort_order
+            };
 
             // Success
             publishingStatus.textContent = 'Saved successfully!';
@@ -1525,19 +1577,8 @@ class GalleryManager {
         publishingSpinner.hidden = false;
 
         try {
-            const response = await fetch(`${this.apiBase}/save-gallery`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'delete',
-                    imageId: this.deleteImageId
-                })
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to delete');
-            }
+            // Delete directly from Supabase (instant!)
+            await galleryAPI.deleteImage(this.deleteImageId);
 
             publishingStatus.textContent = 'Deleted successfully!';
             publishingStatus.className = 'publishing-status success';
@@ -1594,10 +1635,17 @@ class ProgressManager {
 
     async loadProgress() {
         try {
-            const response = await fetch(this.progressUrl);
-            if (!response.ok) throw new Error('Failed to load progress');
-            const data = await response.json();
-            this.goals = data.goals || [];
+            // Fetch from Supabase
+            const dbGoals = await progressAPI.getGoals();
+
+            // Transform snake_case to camelCase
+            this.goals = dbGoals.map(goal => ({
+                id: goal.id,
+                title: goal.title,
+                link: goal.link,
+                bars: typeof goal.bars === 'string' ? JSON.parse(goal.bars) : (goal.bars || []),
+                order: goal.sort_order
+            }));
         } catch (error) {
             console.error('Error loading progress:', error);
             this.goals = [];
@@ -1932,18 +1980,23 @@ class ProgressManager {
         publishingSpinner.hidden = false;
 
         try {
-            const response = await fetch(`${this.apiBase}/save-progress`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'save-all',
-                    goals: this.goals
-                })
-            });
+            // Save each goal to Supabase (instant update!)
+            for (const goal of this.goals) {
+                const dbGoal = {
+                    id: goal.id,
+                    title: goal.title,
+                    link: goal.link,
+                    bars: JSON.stringify(goal.bars || []),
+                    sort_order: goal.order || 0
+                };
 
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to save');
+                // Check if goal exists
+                const existingGoals = await supabase.query('progress_goals', { eq: { id: goal.id } });
+                if (existingGoals.length > 0) {
+                    await progressAPI.updateGoal(goal.id, dbGoal);
+                } else {
+                    await progressAPI.createGoal(dbGoal);
+                }
             }
 
             publishingStatus.textContent = 'Progress goals saved successfully!';
@@ -1983,15 +2036,40 @@ class ProgressManager {
         this.deleteGoalId = null;
     }
 
-    confirmDelete() {
+    async confirmDelete() {
         if (!this.deleteGoalId) return;
 
-        this.goals = this.goals.filter(g => g.id !== this.deleteGoalId);
-        this.hasUnsavedChanges = true;
-        this.updateSaveButton();
+        const publishingModal = document.getElementById('publishing-modal');
+        const publishingStatus = document.getElementById('publishing-status');
+        const publishingSpinner = document.getElementById('publishing-spinner');
 
         this.closeDeleteModal();
-        this.renderGoalsList();
+        publishingModal.hidden = false;
+        publishingStatus.textContent = 'Deleting goal...';
+        publishingStatus.className = 'publishing-status';
+        publishingSpinner.hidden = false;
+
+        try {
+            // Delete directly from Supabase (instant!)
+            await progressAPI.deleteGoal(this.deleteGoalId);
+
+            publishingStatus.textContent = 'Goal deleted successfully!';
+            publishingStatus.className = 'publishing-status success';
+            publishingSpinner.hidden = true;
+
+            // Update local data
+            this.goals = this.goals.filter(g => g.id !== this.deleteGoalId);
+            this.renderGoalsList();
+
+            setTimeout(() => {
+                publishingModal.hidden = true;
+            }, 1500);
+        } catch (error) {
+            console.error('Delete error:', error);
+            publishingStatus.textContent = `Error: ${error.message}`;
+            publishingStatus.className = 'publishing-status error';
+            publishingSpinner.hidden = true;
+        }
     }
 }
 
