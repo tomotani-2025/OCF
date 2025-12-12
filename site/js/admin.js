@@ -102,6 +102,12 @@ class AdminDashboard {
         document.getElementById('add-pdf-btn').addEventListener('click', () => this.addPdf());
         this.form.addEventListener('submit', (e) => this.publishPost(e));
 
+        // Featured video preview
+        const featuredVideoInput = document.getElementById('featured-video-url');
+        if (featuredVideoInput) {
+            featuredVideoInput.addEventListener('input', () => this.updateFeaturedVideoPreview());
+        }
+
         // Delete modal actions
         document.getElementById('cancel-delete-btn').addEventListener('click', () => this.closeDeleteModal());
         document.getElementById('confirm-delete-btn').addEventListener('click', () => this.confirmDelete());
@@ -290,6 +296,8 @@ class AdminDashboard {
             } else {
                 featuredVideoInput.value = '';
             }
+            // Update the preview
+            this.updateFeaturedVideoPreview();
         }
 
         // Load images
@@ -330,6 +338,9 @@ class AdminDashboard {
         this.videoCount = 0;
         this.pdfCount = 0;
         this.pendingUploads = [];
+
+        // Reset featured video preview
+        this.updateFeaturedVideoPreview();
     }
 
     // ========================================
@@ -629,6 +640,21 @@ class AdminDashboard {
         }
     }
 
+    updateFeaturedVideoPreview() {
+        const input = document.getElementById('featured-video-url');
+        const preview = document.getElementById('featured-video-preview');
+        if (!input || !preview) return;
+
+        const url = input.value.trim();
+        const embedUrl = this.getVideoEmbedUrl(url);
+
+        if (embedUrl) {
+            preview.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+        } else {
+            preview.innerHTML = '<div class="video-preview-placeholder"><span>Video preview</span></div>';
+        }
+    }
+
     getVideoEmbedUrl(url) {
         if (!url) return null;
         const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
@@ -734,12 +760,12 @@ class AdminDashboard {
             year: new Date(date).getFullYear(),
             category,
             author,
-            image: images.length > 0 ? images[0].src : '',
+            image: images.length > 0 ? images[0].src : null,
             imageAlt: images.length > 0 ? images[0].alt : '',
-            images: images.length > 1 ? images : undefined,
+            images: images.length > 0 ? images : [],
             featuredVideo: featuredVideo,
-            videos: videos.length > 0 ? videos : undefined,
-            pdfs: pdfs.length > 0 ? pdfs : undefined,
+            videos: videos.length > 0 ? videos : [],
+            pdfs: pdfs.length > 0 ? pdfs : [],
             summary,
             content
         };
@@ -818,8 +844,13 @@ class AdminDashboard {
             // Get featured video URL
             const featuredVideoUrl = cleanData.featuredVideo?.url || cleanData.featuredVideo || null;
 
+            // Get images array (use postData since cleanObject may have removed empty arrays)
+            const imagesArray = postData.images || [];
+
+            // Get primary image from images array or cleanData.image
+            let postImage = imagesArray.length > 0 ? imagesArray[0].src : (cleanData.image || null);
+
             // Auto-generate thumbnail from YouTube video if no image provided
-            let postImage = cleanData.image || null;
             if (!postImage && featuredVideoUrl) {
                 postImage = this.getVideoThumbnail(featuredVideoUrl);
             }
@@ -832,12 +863,12 @@ class AdminDashboard {
                 category: cleanData.category,
                 author: cleanData.author || 'Les Omotani',
                 image: postImage,
-                image_alt: cleanData.imageAlt || cleanData.title || null,
+                image_alt: imagesArray.length > 0 ? (imagesArray[0].alt || cleanData.title) : (cleanData.title || null),
                 summary: cleanData.summary,
                 content: cleanData.content,
-                images: JSON.stringify(cleanData.images || []),
-                videos: JSON.stringify(cleanData.videos || []),
-                pdfs: JSON.stringify(cleanData.pdfs || []),
+                images: JSON.stringify(imagesArray),
+                videos: JSON.stringify(postData.videos || []),
+                pdfs: JSON.stringify(postData.pdfs || []),
                 featured_video: featuredVideoUrl
             };
 
