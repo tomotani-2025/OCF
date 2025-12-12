@@ -152,6 +152,19 @@ class BlogPost {
             }];
         }
 
+        // Add PDFs to the carousel as preview cards
+        if (post.pdfs && Array.isArray(post.pdfs) && post.pdfs.length > 0) {
+            post.pdfs.forEach(pdf => {
+                this.images.push({
+                    type: 'pdf',
+                    src: pdf.url,
+                    alt: pdf.title || 'PDF Document',
+                    title: pdf.title,
+                    description: pdf.description
+                });
+            });
+        }
+
         this.renderImages();
 
         // Author - "by" regular weight, author name medium weight
@@ -239,33 +252,8 @@ class BlogPost {
         const pdfsContainer = document.querySelector('.post-pdfs');
         if (!pdfsContainer) return;
 
-        // Check for pdfs array
-        if (!post.pdfs || !Array.isArray(post.pdfs) || post.pdfs.length === 0) {
-            pdfsContainer.hidden = true;
-            return;
-        }
-
-        const pdfsHtml = post.pdfs.map(pdf => `
-            <a href="${pdf.url}" target="_blank" rel="noopener" class="post-pdf-link">
-                <div class="post-pdf-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                </div>
-                <div class="post-pdf-info">
-                    <p class="post-pdf-title">${pdf.title}</p>
-                    ${pdf.description ? `<p class="post-pdf-description">${pdf.description}</p>` : ''}
-                </div>
-                <span class="post-pdf-download">Download PDF</span>
-            </a>
-        `).join('');
-
-        pdfsContainer.innerHTML = pdfsHtml;
-        pdfsContainer.hidden = false;
+        // PDFs are now shown in the carousel, so hide the separate section
+        pdfsContainer.hidden = true;
     }
 
     renderImages() {
@@ -326,16 +314,51 @@ class BlogPost {
                         </svg>
                     </button>
                     <div class="carousel-images">
-                        ${this.images.map((img, idx) => `
-                            <img
-                                class="post-image ${idx === 0 ? 'active' : ''}"
-                                src="${img.src}"
-                                alt="${img.alt || ''}"
-                                data-index="${idx}"
-                                loading="${idx === 0 ? 'eager' : 'lazy'}"
-                                onerror="this.onerror=null; this.src='${img.originalUrl || img.src}';"
-                            >
-                        `).join('')}
+                        ${this.images.map((img, idx) => {
+                            if (img.type === 'pdf') {
+                                // Render PDF preview card
+                                return `
+                                    <div class="post-image pdf-preview ${idx === 0 ? 'active' : ''}" data-index="${idx}" data-pdf-url="${img.src}">
+                                        <div class="pdf-preview-card">
+                                            <div class="pdf-preview-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                    <polyline points="14 2 14 8 20 8"/>
+                                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                                    <polyline points="10 9 9 9 8 9"/>
+                                                </svg>
+                                            </div>
+                                            <div class="pdf-preview-content">
+                                                <span class="pdf-preview-label">PDF Document</span>
+                                                <h4 class="pdf-preview-title">${img.title || 'Download PDF'}</h4>
+                                                ${img.description ? `<p class="pdf-preview-description">${img.description}</p>` : ''}
+                                            </div>
+                                            <div class="pdf-preview-action">
+                                                <span>Click to view</span>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                                    <polyline points="15 3 21 3 21 9"/>
+                                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                // Render regular image
+                                return `
+                                    <img
+                                        class="post-image ${idx === 0 ? 'active' : ''}"
+                                        src="${img.src}"
+                                        alt="${img.alt || ''}"
+                                        data-index="${idx}"
+                                        loading="${idx === 0 ? 'eager' : 'lazy'}"
+                                        onerror="this.onerror=null; this.src='${img.originalUrl || img.src}';"
+                                    >
+                                `;
+                            }
+                        }).join('')}
                         ${paginationHTML}
                     </div>
                     <button class="carousel-arrow carousel-next" aria-label="Next image">
@@ -409,6 +432,18 @@ class BlogPost {
                 }
             });
         }
+
+        // PDF preview click handler - open PDF in new tab
+        const pdfPreviews = imageContainer.querySelectorAll('.pdf-preview');
+        pdfPreviews.forEach(preview => {
+            preview.addEventListener('click', () => {
+                const pdfUrl = preview.dataset.pdfUrl;
+                if (pdfUrl) {
+                    window.open(pdfUrl, '_blank', 'noopener');
+                }
+            });
+            preview.style.cursor = 'pointer';
+        });
 
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
