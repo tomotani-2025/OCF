@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Post Image</title>
+    <script src="site/js/supabase-client.js"></script>
+</head>
+<body>
+    <h1>Fix Post Image Path</h1>
+    <p>This will update the image path for the specified post.</p>
+
+    <div>
+        <label>Post ID: <input type="text" id="postId" value="feed-the-children-and-the-families-2021"></label>
+    </div>
+    <div>
+        <label>Image Path: <input type="text" id="imagePath" value="images/news/feed-the-children-and-the-families-2021/img-20210908-wa0020.webp" size="80"></label>
+    </div>
+    <div>
+        <label>Image Alt: <input type="text" id="imageAlt" value="Feed the children and the families" size="80"></label>
+    </div>
+    <button onclick="fixPost()">Fix Post</button>
+    <div id="result"></div>
+
+    <script>
+        async function fixPost() {
+            const postId = document.getElementById('postId').value;
+            const imagePath = document.getElementById('imagePath').value;
+            const imageAlt = document.getElementById('imageAlt').value;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Updating...';
+
+            try {
+                const images = [{ src: imagePath, alt: imageAlt }];
+
+                await postsAPI.update(postId, {
+                    image: imagePath,
+                    image_alt: imageAlt,
+                    images: JSON.stringify(images)
+                });
+
+                resultDiv.innerHTML = '<span style="color: green">✓ Post updated successfully!</span>';
+            } catch (error) {
+                resultDiv.innerHTML = '<span style="color: red">Error: ' + error.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>

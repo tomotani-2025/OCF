@@ -909,6 +909,16 @@ class AdminDashboard {
 
     async uploadFile(upload, postId) {
         try {
+            // Check file size before upload - Netlify has ~6MB request body limit
+            // Base64 adds ~33% overhead, so ~4.5MB file becomes ~6MB payload
+            const fileSizeMB = (upload.base64.length * 0.75) / (1024 * 1024);
+            if (fileSizeMB > 4.5) {
+                return {
+                    success: false,
+                    error: `File too large (${fileSizeMB.toFixed(1)}MB). Maximum size is ~4.5MB due to upload limits. Please compress the PDF or use a smaller file.`
+                };
+            }
+
             const response = await fetch(`${this.apiBase}/upload-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -921,7 +931,19 @@ class AdminDashboard {
                 })
             });
 
-            return await response.json();
+            // Check if response is OK before parsing
+            const text = await response.text();
+            if (!text) {
+                return { success: false, error: 'Empty response from server. The file may be too large.' };
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                // Non-JSON response (likely Netlify error page)
+                console.error('Non-JSON response:', text.substring(0, 500));
+                return { success: false, error: 'Server error. The file may be too large or there was a network issue.' };
+            }
         } catch (error) {
             return { success: false, error: error.message };
         }

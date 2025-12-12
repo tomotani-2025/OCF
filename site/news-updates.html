@@ -161,6 +161,7 @@
             align-items: center;
             gap: 36px;
             padding: 0 4px;
+            border-bottom: 1px solid rgba(49, 17, 15, 0.15);
         }
 
         .filter-link {
@@ -190,7 +191,7 @@
         .filter-link::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -1px;
             left: 0;
             width: 100%;
             height: 2px;
@@ -224,13 +225,6 @@
         /* Show count badge only on active/highlighted filter */
         .filter-link.active .filter-count {
             display: inline-flex;
-        }
-
-        .filter-divider {
-            width: 100%;
-            height: 2px;
-            background: #FFFFFF;
-            margin-top: 0;
         }
 
         .sort-by {
@@ -342,6 +336,7 @@
             padding: 24px;
             gap: 12px;
             flex: 1;
+            overflow: hidden;
         }
 
         .card-category {
@@ -362,6 +357,8 @@
             flex-direction: column;
             gap: 12px;
             flex: 1;
+            width: 100%;
+            min-width: 0;
         }
 
         .card-text h2 {
@@ -388,6 +385,8 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .card-divider {
