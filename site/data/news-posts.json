@@ -205,13 +205,12 @@
       "year": 2025,
       "category": "Batwa",
       "author": "Les Omotani",
-      "image": "",
-      "imageAlt": "Mushamba Moses provides a quick update on work at the farm!",
+      "featuredVideo": {
+        "url": "https://youtu.be/okE2dG5DoRY?si=F5GiyLdVIRWtmoXJ",
+        "embedUrl": "https://www.youtube.com/embed/okE2dG5DoRY"
+      },
       "summary": "BATWA FARM AT MATANDA, UGANDA\nMushamba Moses provides a quick update on work at the farm!",
-      "content": "BATWA FARM AT MATANDA, UGANDA\nMushamba Moses provides a quick update on work at the farm!",
-      "originalImage": "",
-      "originalLink": "/newsupdates/mushamba-moses-provides-a-quick-update-on-work-at-the-farm",
-      "images": []
+      "content": "BATWA FARM AT MATANDA, UGANDA\nMushamba Moses provides a quick update on work at the farm!"
     },
     {
       "id": "batwa-farm-at-matanda-update-may-4-2025-2025",
