@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 </head>
 <body>
     <header class="site-header">
@@ -51,113 +50,497 @@
         <section class="content-section">
             <div class="container">
                 <div class="progress-grid">
-                    <!-- Goal One -->
-                    <div class="progress-card">
-                        <h3>Goal One: Batwa Farm at Matanda [Kihihi] Uganda</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-1"></canvas>
+                    <!-- Goal One: Raised $34k, Phase 1 $27k, Goal $54k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal One:</h3>
+                            <h2 class="goal-title">Batwa Farm at Matanda [Kihihi] Uganda</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Batwa Farm at Matanda - PHASE 1 =</span>
+                                <span class="amount">$27,000</span>
+                            </div>
                         </div>
-                        <a href="goalone.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$9k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$18k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$27k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$36k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$45k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$54k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 100%;">
+                                        <span class="bar-text">Goal<br>$54,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 63%;">
+                                        <span class="bar-text">Donations To Date<br>$34,000</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 50%;" data-label="Phase 1 $27k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalone.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Two -->
-                    <div class="progress-card">
-                        <h3>Goal Two: Porters at Bwindi</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-2"></canvas>
+                    <!-- Goal Two: Raised $3.8k, Goal $5k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Two:</h3>
+                            <h2 class="goal-title">Porters at Bwindi</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Porters Sustainability Project</span>
+                                <span class="amount">$5,000</span>
+                            </div>
                         </div>
-                        <a href="goaltwo.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$1k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$3k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$5k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$6k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$5,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 63%;">
+                                        <span class="bar-text">Donations To Date<br>$3,800</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $5k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goaltwo.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Three -->
-                    <div class="progress-card">
-                        <h3>Goal Three: Health</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-3"></canvas>
+                    <!-- Goal Three: Raised $6.1k, Goal $10k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Three:</h3>
+                            <h2 class="goal-title">Health</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Emergency Food and Medicine</span>
+                                <span class="amount">$10,000</span>
+                            </div>
                         </div>
-                        <a href="goalthree.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$6k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$8k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$10k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$12k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$10,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 51%;">
+                                        <span class="bar-text">Donations To Date<br>$6,100</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $10k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalthree.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Four -->
-                    <div class="progress-card">
-                        <h3>Goal Four: Technology</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-4"></canvas>
+                    <!-- Goal Four: Raised $3.5k, Goal $5k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Four:</h3>
+                            <h2 class="goal-title">Technology</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Technology and Photography</span>
+                                <span class="amount">$5,000</span>
+                            </div>
                         </div>
-                        <a href="goalfour.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$1k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$3k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$5k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$6k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$5,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 58%;">
+                                        <span class="bar-text">Donations To Date<br>$3,500</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $5k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalfour.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Five -->
-                    <div class="progress-card">
-                        <h3>Goal Five: Fresh Water</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-5"></canvas>
+                    <!-- Goal Five: Raised $1.1k, Goal $5k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Five:</h3>
+                            <h2 class="goal-title">Fresh Water</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Clean Water Access</span>
+                                <span class="amount">$5,000</span>
+                            </div>
                         </div>
-                        <a href="goalfive.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$1k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$3k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$5k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$6k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$5,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 19%;">
+                                        <span class="bar-text">Donations To Date<br>$1,140</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $5k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalfive.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Six -->
-                    <div class="progress-card">
-                        <h3>Goal Six: Education</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-6"></canvas>
+                    <!-- Goal Six: Raised $7k, Goal $5k (exceeded) -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Six:</h3>
+                            <h2 class="goal-title">Education</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Education Support</span>
+                                <span class="amount">$5,000</span>
+                            </div>
                         </div>
-                        <a href="goalsix.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$1.5k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$3k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$4.5k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$6k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$7.5k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$9k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 56%;">
+                                        <span class="bar-text">Goal<br>$5,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 78%;">
+                                        <span class="bar-text">Donations To Date<br>$6,950</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 56%;" data-label="Goal $5k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalsix.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Seven -->
-                    <div class="progress-card">
-                        <h3>Goal Seven: Dreams & Visions</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-7"></canvas>
+                    <!-- Goal Seven: Raised $18.3k, Goal $30k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Seven:</h3>
+                            <h2 class="goal-title">Dreams & Visions</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Dreams and Visions Fund</span>
+                                <span class="amount">$30,000</span>
+                            </div>
                         </div>
-                        <a href="goalseven.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$6k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$12k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$18k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$24k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$30k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$36k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$30,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 51%;">
+                                        <span class="bar-text">Donations To Date<br>$18,306</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $30k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalseven.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Eight -->
-                    <div class="progress-card">
-                        <h3>Goal Eight: The Partners Nepal</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-8"></canvas>
+                    <!-- Goal Eight: Raised $23k, Goal $20k (exceeded) -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Eight:</h3>
+                            <h2 class="goal-title">The Partners Nepal</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Donations from USA to TPN</span>
+                                <span class="amount">$20,000</span>
+                            </div>
                         </div>
-                        <a href="goaleight.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$5k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$10k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$15k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$20k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$25k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$30k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 67%;">
+                                        <span class="bar-text">Goal<br>$20,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 77%;">
+                                        <span class="bar-text">Donations To Date<br>$23,000</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 67%;" data-label="Goal $20k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goaleight.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Nine -->
-                    <div class="progress-card">
-                        <h3>Goal Nine: Women In Gorilla Conservation</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-9"></canvas>
+                    <!-- Goal Nine: Raised $1.2k, Goal $5k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Nine:</h3>
+                            <h2 class="goal-title">Women In Gorilla Conservation</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Conservation Support</span>
+                                <span class="amount">$5,000</span>
+                            </div>
                         </div>
-                        <a href="goalnine.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$1k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$3k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$5k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$6k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$5,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 20%;">
+                                        <span class="bar-text">Donations To Date<br>$1,200</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $5k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalnine.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Ten -->
-                    <div class="progress-card">
-                        <h3>Goal Ten: Base Camp for Veterans</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-10"></canvas>
+                    <!-- Goal Ten: Raised $31k, Goal $25k (exceeded) -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Ten:</h3>
+                            <h2 class="goal-title">Base Camp for Veterans</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Veterans Support 2024-2025</span>
+                                <span class="amount">$25,000</span>
+                            </div>
                         </div>
-                        <a href="goalten.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$6k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$12k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$18k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$24k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$30k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$36k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 69%;">
+                                        <span class="bar-text">Goal<br>$25,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 86%;">
+                                        <span class="bar-text">Donations To Date<br>$31,000</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 69%;" data-label="Goal $25k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goalten.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Eleven -->
-                    <div class="progress-card">
-                        <h3>Goal Eleven: Randy Helm Horsemanship</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-11"></canvas>
+                    <!-- Goal Eleven: Raised $7k, Goal $10k -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Eleven:</h3>
+                            <h2 class="goal-title">Randy Helm Horsemanship</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Horsemanship Program</span>
+                                <span class="amount">$10,000</span>
+                            </div>
                         </div>
-                        <a href="goaleleven.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$2k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$4k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$6k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$8k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$10k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$12k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 83%;">
+                                        <span class="bar-text">Goal<br>$10,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 58%;">
+                                        <span class="bar-text">Donations To Date<br>$7,000</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 83%;" data-label="Goal $10k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goaleleven.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
 
-                    <!-- Goal Twelve -->
-                    <div class="progress-card">
-                        <h3>Goal Twelve: High Asia Habitat Fund</h3>
-                        <div class="chart-container">
-                            <canvas id="chart-goal-12"></canvas>
+                    <!-- Goal Twelve: Raised $67k, Goal $60k (exceeded) -->
+                    <article class="progress-card">
+                        <div class="card-body">
+                            <h3 class="goal-label">Goal Twelve:</h3>
+                            <h2 class="goal-title">High Asia Habitat Fund</h2>
+                            <div class="divider"></div>
+                            <div class="phase-info">
+                                <span>Conservation Fund</span>
+                                <span class="amount">$60,000</span>
+                            </div>
                         </div>
-                        <a href="goaltwelve.html" class="btn btn-outline">Learn More</a>
-                    </div>
+                        <div class="chart-area">
+                            <div class="chart-grid">
+                                <div class="grid-line" style="--position: 0%"><span class="grid-label">$0</span></div>
+                                <div class="grid-line" style="--position: 16.67%"><span class="grid-label">$14k</span></div>
+                                <div class="grid-line" style="--position: 33.33%"><span class="grid-label">$28k</span></div>
+                                <div class="grid-line" style="--position: 50%"><span class="grid-label">$42k</span></div>
+                                <div class="grid-line" style="--position: 66.67%"><span class="grid-label">$56k</span></div>
+                                <div class="grid-line" style="--position: 83.33%"><span class="grid-label">$70k</span></div>
+                                <div class="grid-line" style="--position: 100%"><span class="grid-label">$84k</span></div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="stacked-bar">
+                                    <div class="bar-goal" style="--bar-height: 71%;">
+                                        <span class="bar-text">Goal<br>$60,000</span>
+                                    </div>
+                                    <div class="bar-raised" style="--bar-height: 80%;">
+                                        <span class="bar-text">Donations To Date<br>$67,218</span>
+                                    </div>
+                                    <div class="goal-marker" style="--marker-position: 71%;" data-label="Goal $60k"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="goaltwelve.html" class="learn-more">
+                            <span>Learn More</span>
+                            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </article>
                 </div>
             </div>
         </section>
@@ -176,8 +559,8 @@
         </section>
     </main>
 
-        <!-- Footer -->
-        <footer class="site-footer">
+    <!-- Footer -->
+    <footer class="site-footer">
         <div class="footer-header">
             <img src="images/logo/OCF-FullWordmark-BlackRed.svg" alt="Omotani Caring Foundation" class="footer-logo">
         </div>
@@ -208,144 +591,285 @@
     </footer>
 
     <style>
+        /* Progress Page Styles */
         .progress-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: var(--spacing-xl);
+            grid-template-columns: repeat(auto-fill, minmax(327px, 1fr));
+            gap: 24px;
         }
 
+        @media (min-width: 768px) {
+            .progress-grid {
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .progress-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Progress Card */
         .progress-card {
-            background: var(--color-white);
-            padding: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px;
+            gap: 24px;
+            background: #FFFFFF;
             border-radius: 8px;
-            box-shadow: var(--shadow-sm);
-            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        .progress-card h3 {
-            color: var(--color-primary);
-            margin-bottom: var(--spacing-lg);
-            font-size: 1.1rem;
-        }
-
-        .chart-container {
+        /* Card Body */
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0;
             width: 100%;
-            height: 180px;
-            margin: 0 auto var(--spacing-lg);
+            gap: 0;
+            min-height: 180px;
+        }
+
+        .goal-label {
+            font-weight: 400;
+            font-size: 32px;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            color: #000000;
+            margin: 0;
+        }
+
+        .goal-title {
+            font-weight: 600;
+            font-size: 32px;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            color: #000000;
+            margin: 0;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: #F5E4AF;
+            margin: 18px 0;
+        }
+
+        .phase-info {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            padding: 4px 0;
+            font-size: 16px;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            color: #000000;
+        }
+
+        .phase-info .amount {
+            font-weight: 600;
+        }
+
+        /* Chart Area */
+        .chart-area {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            padding-left: 45px;
+        }
+
+        /* Grid Lines - 7 lines */
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 45px;
+            right: 0;
+            bottom: 0;
+        }
+
+        .grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: var(--position);
+            height: 1px;
+            background: #E0E0E0;
+        }
+
+        .grid-line:first-child {
+            height: 2px;
+            background: #CCCCCC;
+        }
+
+        .grid-label {
+            position: absolute;
+            right: 100%;
+            bottom: -6px;
+            margin-right: 6px;
+            font-size: 10px;
+            color: #666666;
+            white-space: nowrap;
+        }
+
+        /* Stacked Bar Container */
+        .chart-bar-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .stacked-bar {
+            position: relative;
+            width: 200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        /* Stacked bars - goal on bottom, raised on top */
+        .bar-goal {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bar-height, 50%);
+            background: #F5E4AF;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 12px;
+        }
+
+        .bar-raised {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bar-height, 50%);
+            background: #EF3A4F;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .bar-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #F7F4EB;
+            text-align: center;
+            line-height: 109%;
+            letter-spacing: -0.05em;
+            padding: 8px;
+        }
+
+        .bar-goal .bar-text {
+            color: #312121;
+        }
+
+        /* Goal marker line - shown on all graphs */
+        .goal-marker {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: var(--marker-position, 50%);
+            height: 3px;
+            background: #312121;
+            z-index: 2;
+        }
+
+        .goal-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: #F5E4AF;
+            white-space: nowrap;
+            background: #312121;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        /* Learn More Link */
+        .learn-more {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            height: 26px;
+            text-decoration: none;
+            padding: 0;
+            border-top: 1px solid #F5E4AF;
+            padding-top: 8px;
+        }
+
+        .learn-more span {
+            font-size: 12px;
+            line-height: 95%;
+            letter-spacing: -0.03em;
+            color: #000000;
+        }
+
+        .learn-more svg {
+            width: 18px;
+            height: 14.31px;
+            transform: rotate(-45deg);
+        }
+
+        .learn-more:hover span {
+            color: #EF3A4F;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .progress-card {
+                padding: 24px;
+            }
+
+            .goal-label,
+            .goal-title {
+                font-size: 24px;
+            }
+
+            .chart-area {
+                height: 279px;
+                padding-left: 35px;
+            }
+
+            .chart-grid {
+                left: 35px;
+            }
+
+            .stacked-bar {
+                width: 160px;
+            }
+
+            .bar-text {
+                font-size: 10px;
+                padding: 6px;
+            }
+
+            .grid-label {
+                font-size: 9px;
+            }
         }
     </style>
 
     <script src="js/main.js?v=2"></script>
-    <script>
-        // Goal data from original Squarespace site
-        const goalsData = {
-            1: {
-                labels: ['Raised $34k', 'Phase 1 $27k', 'Goal $54k'],
-                data: [34000, 27000, 54000]
-            },
-            2: {
-                labels: ['Raised $3.8k', 'Goal $5k'],
-                data: [3800, 5000]
-            },
-            3: {
-                labels: ['Raised $6.1k', 'Goal $10k'],
-                data: [6100, 10000]
-            },
-            4: {
-                labels: ['Raised $3.5k', 'Goal $5k'],
-                data: [3500, 5000]
-            },
-            5: {
-                labels: ['Raised $1.1k', 'Goal $5k'],
-                data: [1140, 5000]
-            },
-            6: {
-                labels: ['Raised $7k', 'Goal $5k'],
-                data: [6950, 5000]
-            },
-            7: {
-                labels: ['Raised $18.3k', 'Goal $30k'],
-                data: [18306, 30000]
-            },
-            8: {
-                labels: ['Raised $23k', 'Goal $20k'],
-                data: [23000, 20000]
-            },
-            9: {
-                labels: ['Raised $1.2k', 'Goal $5k'],
-                data: [1200, 5000]
-            },
-            10: {
-                labels: ['Raised $31k', 'Goal $25k'],
-                data: [31000, 25000]
-            },
-            11: {
-                labels: ['Raised $7k', 'Goal $10k'],
-                data: [7000, 10000]
-            },
-            12: {
-                labels: ['Raised $67k', 'Goal $60k'],
-                data: [67218, 60000]
-            }
-        };
-
-        // Colors matching original site palette
-        const barColors = ['#e85a71', '#000000', '#666666'];
-
-        // Create vertical bar charts for each goal
-        Object.keys(goalsData).forEach(function(goalNum) {
-            const canvas = document.getElementById('chart-goal-' + goalNum);
-            if (!canvas) return;
-
-            const goalData = goalsData[goalNum];
-            const ctx = canvas.getContext('2d');
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: goalData.labels,
-                    datasets: [{
-                        data: goalData.data,
-                        backgroundColor: goalData.data.map((_, i) => barColors[i % barColors.length]),
-                        borderWidth: 0,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + context.raw.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                font: { size: 10 },
-                                maxRotation: 0,
-                                minRotation: 0
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false },
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + (value / 1000) + 'k';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 </body>
 </html>
