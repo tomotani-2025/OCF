@@ -80,7 +80,8 @@ class NewsCMS {
         if (!url) return null;
         const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
         if (youtubeMatch) {
-            return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
+            // Use hqdefault which is always available (maxresdefault may not exist)
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`;
         }
         return null;
     }

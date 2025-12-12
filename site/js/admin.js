@@ -635,8 +635,8 @@ class AdminDashboard {
         // YouTube thumbnail
         const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
         if (youtubeMatch) {
-            // maxresdefault is highest quality, falls back to hqdefault
-            return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
+            // Use hqdefault which is always available (maxresdefault may not exist for all videos)
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`;
         }
         // Vimeo requires API call, so we can't easily get thumbnail
         return null;
