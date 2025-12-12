@@ -197,12 +197,15 @@
                             <h2>Featured Video (Optional)</h2>
                             <p class="form-help">Add a featured YouTube or Vimeo video that replaces the image carousel at the top of the post.</p>
 
-                            <div class="form-row">
+                            <div class="form-row two-col">
                                 <div class="form-group">
                                     <label for="featured-video-url">Featured Video URL</label>
                                     <input type="url" id="featured-video-url" name="featured-video-url"
                                            placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
                                     <small style="color: #666; font-size: 12px; margin-top: 4px;">This video will appear at the top of the post instead of images</small>
+                                </div>
+                                <div class="video-preview" id="featured-video-preview">
+                                    <div class="video-preview-placeholder"><span>Video preview</span></div>
                                 </div>
                             </div>
                         </div>
@@ -529,6 +532,6 @@
 
     <script src="js/main.js?v=2"></script>
     <script src="js/supabase-client.js"></script>
-    <script src="js/admin.js?v=10"></script>
+    <script src="js/admin.js?v=11"></script>
 </body>
 </html>

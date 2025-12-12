@@ -691,6 +691,7 @@ a {
     font-size: 14px;
     line-height: 140%;
     color: var(--color-paragraph-1);
+    margin: 0;
 }
 
 .footer-column a:hover {
