@@ -425,6 +425,8 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    align-self: flex-start;
+    width: fit-content;
     padding: 4px 12px;
     background: rgba(239, 58, 79, 0.3);
     border: none;
