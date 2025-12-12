@@ -61,12 +61,33 @@ async function githubRequest(method, path, body = null) {
     });
 }
 
+async function getFileSha(filePath) {
+    try {
+        const response = await githubRequest('GET', `/contents/${filePath}?ref=${GITHUB_BRANCH}`);
+        return response.sha;
+    } catch (error) {
+        // File doesn't exist, return null
+        if (error.statusCode === 404) {
+            return null;
+        }
+        throw error;
+    }
+}
+
 async function uploadToGitHub(filePath, content, message) {
+    // Check if file exists and get its SHA (required for updates)
+    const existingSha = await getFileSha(filePath);
+
     const body = {
         message: message,
         content: content, // Already base64 encoded
         branch: GITHUB_BRANCH
     };
+
+    // Include SHA if updating an existing file
+    if (existingSha) {
+        body.sha = existingSha;
+    }
 
     return githubRequest('PUT', `/contents/${filePath}`, body);
 }
