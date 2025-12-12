@@ -1699,17 +1699,16 @@ class GalleryManager {
 
 
 // ============================================================
-// Progress Manager
+// Progress Manager (Simplified Structure)
 // ============================================================
 
 class ProgressManager {
     constructor() {
-        this.progressUrl = 'data/progress.json?v=' + Date.now();
         this.apiBase = '/.netlify/functions';
         this.goals = [];
         this.editingGoalId = null;
         this.deleteGoalId = null;
-        this.barCount = 0;
+        this.goalItemCount = 0;
         this.hasUnsavedChanges = false;
 
         // DOM Elements
@@ -1717,7 +1716,7 @@ class ProgressManager {
         this.editorModal = document.getElementById('progress-editor-modal');
         this.deleteModal = document.getElementById('delete-progress-modal');
         this.form = document.getElementById('progress-goal-form');
-        this.barsContainer = document.getElementById('progress-bars-container');
+        this.goalsContainer = document.getElementById('progress-goals-container');
 
         this.init();
     }
@@ -1730,17 +1729,65 @@ class ProgressManager {
 
     async loadProgress() {
         try {
-            // Fetch from Supabase
             const dbGoals = await progressAPI.getGoals();
+            this.goals = dbGoals.map(goal => {
+                // Parse the new structure
+                const data = {
+                    id: goal.id,
+                    label: goal.label || '',
+                    title: goal.title,
+                    link: goal.link,
+                    order: goal.sort_order
+                };
 
-            // Transform snake_case to camelCase
-            this.goals = dbGoals.map(goal => ({
-                id: goal.id,
-                title: goal.title,
-                link: goal.link,
-                bars: typeof goal.bars === 'string' ? JSON.parse(goal.bars) : (goal.bars || []),
-                order: goal.sort_order
-            }));
+                // Parse goals array (new structure)
+                if (goal.goals) {
+                    data.goals = typeof goal.goals === 'string' ? JSON.parse(goal.goals) : goal.goals;
+                } else {
+                    data.goals = [];
+                }
+
+                // Parse donations (new structure)
+                if (goal.donations) {
+                    data.donations = typeof goal.donations === 'string' ? JSON.parse(goal.donations) : goal.donations;
+                } else {
+                    data.donations = { value: 0, color: '#e85a71' };
+                }
+
+                // Backwards compatibility: convert old bars/markers to new structure
+                if (data.goals.length === 0 && goal.bars) {
+                    const bars = typeof goal.bars === 'string' ? JSON.parse(goal.bars) : goal.bars;
+                    const markers = goal.markers ? (typeof goal.markers === 'string' ? JSON.parse(goal.markers) : goal.markers) : [];
+
+                    // Find donations bar (usually "Raised")
+                    const raisedBar = bars.find(b => b.label && b.label.toLowerCase().includes('raised'));
+                    if (raisedBar) {
+                        data.donations = {
+                            value: raisedBar.value,
+                            color: raisedBar.color || '#e85a71',
+                            markerEnabled: false
+                        };
+                    }
+
+                    // Convert other bars to goals
+                    bars.forEach(bar => {
+                        if (!bar.label.toLowerCase().includes('raised')) {
+                            const matchingMarker = markers.find(m => m.value === bar.value);
+                            data.goals.push({
+                                name: bar.label,
+                                value: bar.value,
+                                barLabel: bar.label,
+                                barColor: bar.color || '#F5E4AF',
+                                markerEnabled: !!matchingMarker,
+                                markerColor: matchingMarker?.color || bar.color || '#312121',
+                                markerTextColor: matchingMarker?.textColor || '#F5E4AF'
+                            });
+                        }
+                    });
+                }
+
+                return data;
+            });
         } catch (error) {
             console.error('Error loading progress:', error);
             this.goals = [];
@@ -1748,8 +1795,11 @@ class ProgressManager {
     }
 
     setupEventListeners() {
-        // Add goal button
-        document.getElementById('add-progress-goal-btn').addEventListener('click', () => this.showEditor());
+        // Add new progress card button (in the list)
+        const addBtn = document.getElementById('add-progress-goal-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => this.showEditor());
+        }
 
         // Save all button
         document.getElementById('save-all-progress-btn').addEventListener('click', () => this.saveAllGoals());
@@ -1758,8 +1808,11 @@ class ProgressManager {
         this.form.addEventListener('submit', (e) => this.saveGoal(e));
         document.getElementById('cancel-progress-edit').addEventListener('click', () => this.closeEditor());
 
-        // Add bar button
-        document.getElementById('add-progress-bar-btn').addEventListener('click', () => this.addBar());
+        // Add goal item button (inside editor)
+        const addGoalBtn = document.getElementById('add-progress-goal-btn');
+        if (addGoalBtn) {
+            // This is now in the editor form - add goal target
+        }
 
         // Delete modal
         document.getElementById('cancel-progress-delete').addEventListener('click', () => this.closeDeleteModal());
@@ -1768,6 +1821,33 @@ class ProgressManager {
         // Close modals
         this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
         this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
+
+        // Donations color sync
+        this.setupColorSync('donations-color', 'donations-color-text');
+        this.setupColorSync('donations-marker-color', 'donations-marker-color-text');
+        this.setupColorSync('donations-marker-text-color', 'donations-marker-text-color-text');
+
+        // Donations marker toggle
+        const donationsMarkerCheckbox = document.getElementById('donations-marker-enabled');
+        if (donationsMarkerCheckbox) {
+            donationsMarkerCheckbox.addEventListener('change', () => {
+                const colorsDiv = document.getElementById('donations-marker-colors');
+                colorsDiv.style.opacity = donationsMarkerCheckbox.checked ? '1' : '0.5';
+            });
+        }
+    }
+
+    setupColorSync(pickerId, textId) {
+        const picker = document.getElementById(pickerId);
+        const text = document.getElementById(textId);
+        if (picker && text) {
+            picker.addEventListener('input', () => { text.value = picker.value; });
+            text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
+                    picker.value = text.value;
+                }
+            });
+        }
     }
 
     renderGoalsList() {
@@ -1776,7 +1856,11 @@ class ProgressManager {
             return;
         }
 
-        this.goalsList.innerHTML = this.goals.map((goal, index) => `
+        this.goalsList.innerHTML = this.goals.map((goal) => {
+            const donations = goal.donations || {};
+            const goalItems = goal.goals || [];
+
+            return `
             <div class="progress-goal-card" data-id="${goal.id}" draggable="true">
                 <div class="progress-goal-drag-handle">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -1784,21 +1868,39 @@ class ProgressManager {
                     </svg>
                 </div>
                 <div class="progress-goal-info">
-                    <h3 class="progress-goal-title">${goal.title}</h3>
+                    <h3 class="progress-goal-title">${goal.label ? goal.label + ' ' : ''}${goal.title}</h3>
                     <div class="progress-goal-bars-preview">
-                        ${goal.bars.map(bar => `
-                            <span class="bar-preview" style="background-color: ${bar.color}">
-                                ${bar.label}: $${this.formatMoney(bar.value)}
+                        ${goalItems.map(g => `
+                            <span class="bar-preview" style="background-color: ${g.barColor || '#F5E4AF'}">
+                                ${g.barLabel || g.name}: $${this.formatMoney(g.value)}
                             </span>
                         `).join('')}
+                        <span class="bar-preview" style="background-color: ${donations.color || '#e85a71'}">
+                            Donations: $${this.formatMoney(donations.value || 0)}
+                        </span>
                     </div>
+                    ${goalItems.some(g => g.markerEnabled) || donations.markerEnabled ? `
+                    <div class="progress-goal-markers-preview">
+                        ${goalItems.filter(g => g.markerEnabled).map(g => `
+                            <span class="marker-preview" style="background-color: ${g.markerColor || '#312121'}; color: ${g.markerTextColor || '#F5E4AF'}">
+                                ▸ ${g.name}: $${this.formatMoney(g.value)}
+                            </span>
+                        `).join('')}
+                        ${donations.markerEnabled ? `
+                            <span class="marker-preview" style="background-color: ${donations.markerColor || '#e85a71'}; color: ${donations.markerTextColor || '#f7f7f7'}">
+                                ▸ Donations: $${this.formatMoney(donations.value || 0)}
+                            </span>
+                        ` : ''}
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="progress-goal-actions">
                     <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${goal.id}">Edit</button>
                     <button type="button" class="btn-action btn-delete" data-action="delete" data-id="${goal.id}">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         // Add event listeners
         this.goalsList.querySelectorAll('[data-action="edit"]').forEach(btn => {
@@ -1809,11 +1911,11 @@ class ProgressManager {
             btn.addEventListener('click', () => this.showDeleteModal(btn.dataset.id));
         });
 
-        // Drag and drop
         this.setupDragAndDrop();
     }
 
     formatMoney(value) {
+        if (!value) return '0';
         if (value >= 1000) {
             return (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1) + 'k';
         }
@@ -1858,14 +1960,12 @@ class ProgressManager {
                     const fromIndex = allCards.indexOf(draggedCard);
                     const toIndex = allCards.indexOf(card);
 
-                    // Reorder in DOM
                     if (fromIndex < toIndex) {
                         card.parentNode.insertBefore(draggedCard, card.nextSibling);
                     } else {
                         card.parentNode.insertBefore(draggedCard, card);
                     }
 
-                    // Reorder in data
                     this.reorderGoals();
                 }
             });
@@ -1905,41 +2005,183 @@ class ProgressManager {
 
     showEditor(goalId = null) {
         this.editingGoalId = goalId;
-        this.barCount = 0;
+        this.goalItemCount = 0;
 
-        const title = document.getElementById('progress-editor-title');
+        const editorTitle = document.getElementById('progress-editor-title');
         const idField = document.getElementById('progress-goal-id');
+        const labelField = document.getElementById('progress-goal-label');
         const titleField = document.getElementById('progress-goal-title');
         const linkField = document.getElementById('progress-goal-link');
 
-        this.barsContainer.innerHTML = '';
+        // Clear goals container
+        if (this.goalsContainer) {
+            this.goalsContainer.innerHTML = '';
+        }
+
+        // Setup add goal button
+        const addGoalBtn = document.querySelector('#add-progress-goal-btn');
+        if (addGoalBtn && !addGoalBtn._listenerAdded) {
+            addGoalBtn.addEventListener('click', () => this.addGoalItem());
+            addGoalBtn._listenerAdded = true;
+        }
 
         if (goalId) {
             const goal = this.goals.find(g => g.id === goalId);
             if (goal) {
-                title.textContent = 'Edit Goal';
+                editorTitle.textContent = 'Edit Goal';
                 idField.value = goalId;
+                labelField.value = goal.label || '';
                 titleField.value = goal.title || '';
                 linkField.value = goal.link || '';
 
-                // Load bars
-                if (goal.bars && goal.bars.length > 0) {
-                    goal.bars.forEach(bar => this.addBar(bar.label, bar.value, bar.color));
+                // Load goal items
+                if (goal.goals && goal.goals.length > 0) {
+                    goal.goals.forEach(g => this.addGoalItem(g));
                 } else {
-                    this.addBar();
+                    this.addGoalItem();
                 }
+
+                // Load donations
+                const donations = goal.donations || {};
+                document.getElementById('donations-value').value = donations.value || '';
+                document.getElementById('donations-color').value = donations.color || '#e85a71';
+                document.getElementById('donations-color-text').value = donations.color || '#e85a71';
+                document.getElementById('donations-marker-enabled').checked = donations.markerEnabled || false;
+                document.getElementById('donations-marker-color').value = donations.markerColor || '#e85a71';
+                document.getElementById('donations-marker-color-text').value = donations.markerColor || '#e85a71';
+                document.getElementById('donations-marker-text-color').value = donations.markerTextColor || '#f7f7f7';
+                document.getElementById('donations-marker-text-color-text').value = donations.markerTextColor || '#f7f7f7';
+
+                // Update marker colors visibility
+                const colorsDiv = document.getElementById('donations-marker-colors');
+                colorsDiv.style.opacity = donations.markerEnabled ? '1' : '0.5';
             }
         } else {
-            title.textContent = 'Add New Goal';
+            editorTitle.textContent = 'Add New Goal';
             this.form.reset();
             idField.value = '';
-            // Add default bars
-            this.addBar('Raised', '', '#e85a71');
-            this.addBar('Goal', '', '#000000');
+
+            // Reset donations defaults
+            document.getElementById('donations-color').value = '#e85a71';
+            document.getElementById('donations-color-text').value = '#e85a71';
+            document.getElementById('donations-marker-color').value = '#e85a71';
+            document.getElementById('donations-marker-color-text').value = '#e85a71';
+            document.getElementById('donations-marker-text-color').value = '#f7f7f7';
+            document.getElementById('donations-marker-text-color-text').value = '#f7f7f7';
+            document.getElementById('donations-marker-colors').style.opacity = '0.5';
+
+            // Add default goal
+            this.addGoalItem({ name: 'Goal', value: '', barLabel: 'Goal', barColor: '#F5E4AF', markerEnabled: true, markerColor: '#312121', markerTextColor: '#F5E4AF' });
         }
 
         this.editorModal.hidden = false;
         document.body.style.overflow = 'hidden';
+    }
+
+    addGoalItem(data = {}) {
+        if (!this.goalsContainer) return;
+
+        this.goalItemCount++;
+        const index = this.goalItemCount;
+
+        const item = document.createElement('div');
+        item.className = 'progress-goal-item';
+        item.dataset.index = index;
+
+        const markerEnabled = data.markerEnabled || false;
+
+        item.innerHTML = `
+            <div class="progress-goal-item-header">
+                <span class="progress-goal-item-number">Goal ${index}</span>
+                <button type="button" class="media-item-remove" data-action="remove-goal-item">Remove</button>
+            </div>
+            <div class="form-row two-col">
+                <div class="form-group">
+                    <label for="goal-name-${index}">Goal Name *</label>
+                    <input type="text" id="goal-name-${index}" placeholder="Phase 1 (Batwa Farm)" value="${data.name || ''}">
+                </div>
+                <div class="form-group">
+                    <label for="goal-value-${index}">Value ($) *</label>
+                    <input type="number" id="goal-value-${index}" placeholder="27000" value="${data.value || ''}">
+                </div>
+            </div>
+            <div class="form-row two-col">
+                <div class="form-group">
+                    <label for="goal-bar-label-${index}">Bar Label</label>
+                    <input type="text" id="goal-bar-label-${index}" placeholder="Phase 1" value="${data.barLabel || ''}">
+                </div>
+                <div class="form-group">
+                    <label for="goal-bar-color-${index}">Bar Color</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="goal-bar-color-${index}" value="${data.barColor || '#F5E4AF'}">
+                        <input type="text" id="goal-bar-color-text-${index}" value="${data.barColor || '#F5E4AF'}">
+                    </div>
+                </div>
+            </div>
+            <div class="marker-toggle-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="goal-marker-enabled-${index}" ${markerEnabled ? 'checked' : ''}>
+                    <span>Show Marker</span>
+                </label>
+                <div class="marker-colors" id="goal-marker-colors-${index}" style="opacity: ${markerEnabled ? '1' : '0.5'}">
+                    <div class="form-group">
+                        <label for="goal-marker-color-${index}">Line/Pill</label>
+                        <div class="color-input-wrapper compact">
+                            <input type="color" id="goal-marker-color-${index}" value="${data.markerColor || '#312121'}">
+                            <input type="text" id="goal-marker-color-text-${index}" value="${data.markerColor || '#312121'}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-marker-text-color-${index}">Text</label>
+                        <div class="color-input-wrapper compact">
+                            <input type="color" id="goal-marker-text-color-${index}" value="${data.markerTextColor || '#F5E4AF'}">
+                            <input type="text" id="goal-marker-text-color-text-${index}" value="${data.markerTextColor || '#F5E4AF'}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.goalsContainer.appendChild(item);
+
+        // Remove button
+        item.querySelector('[data-action="remove-goal-item"]').addEventListener('click', () => {
+            item.remove();
+            this.renumberGoalItems();
+        });
+
+        // Color syncs
+        this.setupColorSyncDynamic(`goal-bar-color-${index}`, `goal-bar-color-text-${index}`);
+        this.setupColorSyncDynamic(`goal-marker-color-${index}`, `goal-marker-color-text-${index}`);
+        this.setupColorSyncDynamic(`goal-marker-text-color-${index}`, `goal-marker-text-color-text-${index}`);
+
+        // Marker toggle
+        const checkbox = item.querySelector(`#goal-marker-enabled-${index}`);
+        checkbox.addEventListener('change', () => {
+            const colorsDiv = item.querySelector(`#goal-marker-colors-${index}`);
+            colorsDiv.style.opacity = checkbox.checked ? '1' : '0.5';
+        });
+    }
+
+    setupColorSyncDynamic(pickerId, textId) {
+        const picker = document.getElementById(pickerId);
+        const text = document.getElementById(textId);
+        if (picker && text) {
+            picker.addEventListener('input', () => { text.value = picker.value; });
+            text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
+                    picker.value = text.value;
+                }
+            });
+        }
+    }
+
+    renumberGoalItems() {
+        if (!this.goalsContainer) return;
+        const items = this.goalsContainer.querySelectorAll('.progress-goal-item');
+        items.forEach((item, idx) => {
+            item.querySelector('.progress-goal-item-number').textContent = `Goal ${idx + 1}`;
+        });
     }
 
     closeEditor() {
@@ -1948,107 +2190,70 @@ class ProgressManager {
         this.editingGoalId = null;
     }
 
-    addBar(label = '', value = '', color = '#e85a71') {
-        this.barCount++;
-        const index = this.barCount;
+    collectGoalItems() {
+        const items = [];
+        if (!this.goalsContainer) return items;
 
-        const barItem = document.createElement('div');
-        barItem.className = 'progress-bar-item';
-        barItem.dataset.index = index;
-        barItem.innerHTML = `
-            <div class="progress-bar-item-header">
-                <span class="progress-bar-item-number">Bar ${index}</span>
-                <button type="button" class="media-item-remove" data-action="remove-bar">Remove</button>
-            </div>
-            <div class="form-row three-col">
-                <div class="form-group">
-                    <label for="bar-label-${index}">Label *</label>
-                    <input type="text" id="bar-label-${index}" required placeholder="Raised $34k" value="${label}">
-                </div>
-                <div class="form-group">
-                    <label for="bar-value-${index}">Value ($) *</label>
-                    <input type="number" id="bar-value-${index}" required placeholder="34000" value="${value}">
-                </div>
-                <div class="form-group">
-                    <label for="bar-color-${index}">Color</label>
-                    <div class="color-input-wrapper">
-                        <input type="color" id="bar-color-${index}" value="${color}">
-                        <input type="text" id="bar-color-text-${index}" value="${color}" placeholder="#e85a71">
-                    </div>
-                </div>
-            </div>
-        `;
-
-        this.barsContainer.appendChild(barItem);
-
-        const removeBtn = barItem.querySelector('[data-action="remove-bar"]');
-        removeBtn.addEventListener('click', () => this.removeBar(barItem));
-
-        // Sync color inputs
-        const colorPicker = barItem.querySelector(`#bar-color-${index}`);
-        const colorText = barItem.querySelector(`#bar-color-text-${index}`);
-        colorPicker.addEventListener('input', () => { colorText.value = colorPicker.value; });
-        colorText.addEventListener('input', () => {
-            if (/^#[0-9A-Fa-f]{6}$/.test(colorText.value)) {
-                colorPicker.value = colorText.value;
-            }
-        });
-    }
-
-    removeBar(barItem) {
-        barItem.remove();
-        this.renumberBars();
-    }
-
-    renumberBars() {
-        const bars = this.barsContainer.querySelectorAll('.progress-bar-item');
-        bars.forEach((bar, idx) => {
-            bar.querySelector('.progress-bar-item-number').textContent = `Bar ${idx + 1}`;
-        });
-    }
-
-    collectBars() {
-        const bars = [];
-        this.barsContainer.querySelectorAll('.progress-bar-item').forEach(item => {
+        this.goalsContainer.querySelectorAll('.progress-goal-item').forEach(item => {
             const index = item.dataset.index;
-            const label = document.getElementById(`bar-label-${index}`).value.trim();
-            const value = parseInt(document.getElementById(`bar-value-${index}`).value) || 0;
-            const color = document.getElementById(`bar-color-${index}`).value;
+            const name = document.getElementById(`goal-name-${index}`)?.value.trim() || '';
+            const value = parseInt(document.getElementById(`goal-value-${index}`)?.value) || 0;
 
-            if (label && value > 0) {
-                bars.push({ label, value, color });
+            if (name && value > 0) {
+                items.push({
+                    name,
+                    value,
+                    barLabel: document.getElementById(`goal-bar-label-${index}`)?.value.trim() || name,
+                    barColor: document.getElementById(`goal-bar-color-${index}`)?.value || '#F5E4AF',
+                    markerEnabled: document.getElementById(`goal-marker-enabled-${index}`)?.checked || false,
+                    markerColor: document.getElementById(`goal-marker-color-${index}`)?.value || '#312121',
+                    markerTextColor: document.getElementById(`goal-marker-text-color-${index}`)?.value || '#F5E4AF'
+                });
             }
         });
-        return bars;
+        return items;
+    }
+
+    collectDonations() {
+        return {
+            value: parseInt(document.getElementById('donations-value')?.value) || 0,
+            color: document.getElementById('donations-color')?.value || '#e85a71',
+            markerEnabled: document.getElementById('donations-marker-enabled')?.checked || false,
+            markerColor: document.getElementById('donations-marker-color')?.value || '#e85a71',
+            markerTextColor: document.getElementById('donations-marker-text-color')?.value || '#f7f7f7'
+        };
     }
 
     async saveGoal(e) {
         e.preventDefault();
 
+        const label = document.getElementById('progress-goal-label').value.trim();
         const title = document.getElementById('progress-goal-title').value.trim();
         const link = document.getElementById('progress-goal-link').value.trim();
-        const bars = this.collectBars();
+        const goals = this.collectGoalItems();
+        const donations = this.collectDonations();
 
         if (!title) {
             alert('Please enter a goal title.');
             return;
         }
 
-        if (bars.length === 0) {
-            alert('Please add at least one bar with a label and value.');
+        if (!donations.value) {
+            alert('Please enter a donations value.');
             return;
         }
 
         const goalData = {
+            label,
             title,
             link,
-            bars,
+            goals,
+            donations,
             order: this.editingGoalId
                 ? this.goals.find(g => g.id === this.editingGoalId)?.order || 999
                 : this.goals.length + 1
         };
 
-        // Update local data
         if (this.editingGoalId) {
             const index = this.goals.findIndex(g => g.id === this.editingGoalId);
             if (index !== -1) {
@@ -2079,9 +2284,11 @@ class ProgressManager {
             for (const goal of this.goals) {
                 const dbGoal = {
                     id: goal.id,
+                    label: goal.label || '',
                     title: goal.title,
                     link: goal.link,
-                    bars: JSON.stringify(goal.bars || []),
+                    goals: JSON.stringify(goal.goals || []),
+                    donations: JSON.stringify(goal.donations || {}),
                     sort_order: goal.order || 0
                 };
 

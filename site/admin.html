@@ -447,31 +447,85 @@
                             <h2 id="progress-editor-title">Edit Goal</h2>
                             <form id="progress-goal-form">
                                 <input type="hidden" id="progress-goal-id" value="">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="progress-goal-title">Goal Title *</label>
-                                        <input type="text" id="progress-goal-title" required placeholder="Goal One: Batwa Farm at Matanda">
+
+                                <!-- 1. Goal Title -->
+                                <div class="form-section">
+                                    <h3>1. Goal Title</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="progress-goal-label">Line One (e.g., "Goal One:")</label>
+                                            <input type="text" id="progress-goal-label" placeholder="Goal One:">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="progress-goal-link">Link (page URL)</label>
-                                        <input type="text" id="progress-goal-link" placeholder="goalone.html">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="progress-goal-title">Line Two (Main Title) *</label>
+                                            <input type="text" id="progress-goal-title" required placeholder="Batwa Farm at Matanda [Kihihi] Uganda">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="progress-goal-link">Link (page URL)</label>
+                                            <input type="text" id="progress-goal-link" placeholder="goalone.html">
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- 2. Goals -->
                                 <div class="form-section">
-                                    <h3>Chart Bars</h3>
-                                    <p class="form-help">Add bars to show on the chart (e.g., "Raised", "Goal", "Phase 1").</p>
-                                    <div id="progress-bars-container" class="progress-bars-container">
-                                        <!-- Bars will be added here -->
+                                    <h3>2. Goals</h3>
+                                    <p class="form-help">Add goal targets (e.g., Phase 1, Overall Goal). Each can have a bar and/or marker.</p>
+                                    <div id="progress-goals-container" class="progress-goals-container">
+                                        <!-- Goals will be added here -->
                                     </div>
-                                    <button type="button" id="add-progress-bar-btn" class="btn btn-outline add-media-btn">
+                                    <button type="button" id="add-progress-goal-btn" class="btn btn-outline add-media-btn">
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                             <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                         </svg>
-                                        Add Bar
+                                        Add Goal
                                     </button>
+                                </div>
+
+                                <!-- 3. Donations To Date -->
+                                <div class="form-section">
+                                    <h3>3. Donations To Date</h3>
+                                    <div class="progress-donations-section">
+                                        <div class="form-row two-col">
+                                            <div class="form-group">
+                                                <label for="donations-value">Value ($) *</label>
+                                                <input type="number" id="donations-value" required placeholder="34000">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="donations-color">Bar Color</label>
+                                                <div class="color-input-wrapper">
+                                                    <input type="color" id="donations-color" value="#e85a71">
+                                                    <input type="text" id="donations-color-text" value="#e85a71" placeholder="#e85a71">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="marker-toggle-row">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="donations-marker-enabled">
+                                                <span>Show Marker</span>
+                                            </label>
+                                            <div class="marker-colors" id="donations-marker-colors">
+                                                <div class="form-group">
+                                                    <label for="donations-marker-color">Line/Pill</label>
+                                                    <div class="color-input-wrapper compact">
+                                                        <input type="color" id="donations-marker-color" value="#e85a71">
+                                                        <input type="text" id="donations-marker-color-text" value="#e85a71">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="donations-marker-text-color">Text</label>
+                                                    <div class="color-input-wrapper compact">
+                                                        <input type="color" id="donations-marker-text-color" value="#f7f7f7">
+                                                        <input type="text" id="donations-marker-text-color-text" value="#f7f7f7">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-actions">

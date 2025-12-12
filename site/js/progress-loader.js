@@ -1,5 +1,6 @@
 // Progress Page Data Loader
 // Loads progress goals from Supabase and renders CSS-only charts
+// Supports new simplified data structure with backwards compatibility
 
 (async function() {
     const container = document.getElementById('progress-grid');
@@ -35,56 +36,113 @@ function createProgressCard(goal) {
     const article = document.createElement('article');
     article.className = 'progress-card';
 
-    // Parse bars data
-    let bars = [];
+    // Parse new structure: goals array and donations object
+    let goalItems = [];
+    let donations = { value: 0, color: '#e85a71' };
+
     try {
-        bars = typeof goal.bars === 'string' ? JSON.parse(goal.bars) : (goal.bars || []);
+        goalItems = typeof goal.goals === 'string' ? JSON.parse(goal.goals) : (goal.goals || []);
     } catch (e) {
-        console.error('Error parsing bars:', e);
+        console.error('Error parsing goals:', e);
     }
 
-    // Find raised amount and goal amount from bars
-    const raisedBar = bars.find(b => b.label && b.label.toLowerCase().includes('raised'));
-    const goalBar = bars.find(b => b.label && b.label.toLowerCase().includes('goal'));
-    const phaseBar = bars.find(b => b.label && b.label.toLowerCase().includes('phase'));
+    try {
+        donations = typeof goal.donations === 'string' ? JSON.parse(goal.donations) : (goal.donations || { value: 0, color: '#e85a71' });
+    } catch (e) {
+        console.error('Error parsing donations:', e);
+    }
 
-    const raisedAmount = raisedBar ? parseFloat(raisedBar.value) || 0 : 0;
-    const goalAmount = goalBar ? parseFloat(goalBar.value) || 0 : 0;
-    const phaseAmount = phaseBar ? parseFloat(phaseBar.value) || 0 : 0;
+    // Backwards compatibility: if no new structure, fall back to old bars/markers
+    if (goalItems.length === 0 && goal.bars) {
+        const bars = typeof goal.bars === 'string' ? JSON.parse(goal.bars) : goal.bars;
+        const markers = goal.markers ? (typeof goal.markers === 'string' ? JSON.parse(goal.markers) : goal.markers) : [];
 
-    // Calculate chart max (120% of largest value)
-    const maxValue = Math.max(raisedAmount, goalAmount, phaseAmount) * 1.2;
+        // Find donations bar (usually "Raised")
+        const raisedBar = bars.find(b => b.label && b.label.toLowerCase().includes('raised'));
+        if (raisedBar) {
+            donations = {
+                value: raisedBar.value,
+                color: raisedBar.color || '#e85a71',
+                markerEnabled: false
+            };
+        }
 
-    // Calculate percentages
-    const raisedPercent = maxValue > 0 ? (raisedAmount / maxValue * 100) : 0;
-    const goalPercent = maxValue > 0 ? (goalAmount / maxValue * 100) : 0;
-    const phasePercent = maxValue > 0 ? (phaseAmount / maxValue * 100) : 0;
+        // Convert other bars to goals
+        bars.forEach(bar => {
+            if (!bar.label.toLowerCase().includes('raised')) {
+                const matchingMarker = markers.find(m => m.value === bar.value);
+                goalItems.push({
+                    name: bar.label,
+                    value: bar.value,
+                    barLabel: bar.label,
+                    barColor: bar.color || '#F5E4AF',
+                    markerEnabled: !!matchingMarker,
+                    markerColor: matchingMarker?.color || '#312121',
+                    markerTextColor: matchingMarker?.textColor || '#F5E4AF'
+                });
+            }
+        });
+    }
 
-    // Parse goal title to extract label and subtitle
-    const titleParts = goal.title.split(':');
-    const goalLabel = titleParts[0] ? titleParts[0].trim() + ':' : 'Goal:';
-    const goalTitle = titleParts[1] ? titleParts[1].trim() : goal.title;
+    // Get donations value
+    const donationsValue = parseFloat(donations.value) || 0;
+    const donationsColor = donations.color || '#e85a71';
+
+    // Find the highest goal value for chart scaling
+    const allValues = [donationsValue, ...goalItems.map(g => parseFloat(g.value) || 0)];
+    const maxValue = Math.max(...allValues) * 1.2;
+
+    // Calculate donations percentage
+    const donationsPercent = maxValue > 0 ? (donationsValue / maxValue * 100) : 0;
+
+    // Get label and title
+    const goalLabel = goal.label ? goal.label : '';
+    const goalTitle = goal.title || '';
 
     // Generate grid lines (7 lines from 0 to max)
     const gridLines = generateGridLines(maxValue);
 
-    // Build phase info section
+    // Build phase info section (show first goal with highest value as "phase info")
     let phaseInfoHTML = '';
-    if (goalBar) {
+    if (goalItems.length > 0) {
+        // Sort by value descending and get the main goal
+        const sortedGoals = [...goalItems].sort((a, b) => (b.value || 0) - (a.value || 0));
+        const mainGoal = sortedGoals[0];
         phaseInfoHTML = `
             <div class="phase-info">
-                <span>${phaseBar ? phaseBar.label : 'Goal'}</span>
-                <span class="amount">${formatCurrency(goalAmount)}</span>
+                <span>${mainGoal.name}</span>
+                <span class="amount">${formatCurrency(mainGoal.value)}</span>
             </div>
         `;
     }
 
-    // Build goal marker (for phase or goal line indicator)
-    let goalMarkerHTML = '';
-    if (phaseBar && phaseAmount > 0) {
-        goalMarkerHTML = `<div class="goal-marker" style="--marker-position: ${phasePercent}%;" data-label="${phaseBar.label} ${formatShortCurrency(phaseAmount)}"></div>`;
-    } else if (goalBar && goalAmount > 0) {
-        goalMarkerHTML = `<div class="goal-marker" style="--marker-position: ${goalPercent}%;" data-label="Goal ${formatShortCurrency(goalAmount)}"></div>`;
+    // Build goal bars HTML (stacked from bottom, largest first)
+    let goalBarsHTML = '';
+    const sortedGoals = [...goalItems].sort((a, b) => (b.value || 0) - (a.value || 0));
+    sortedGoals.forEach(g => {
+        const value = parseFloat(g.value) || 0;
+        const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
+        const color = g.barColor || '#F5E4AF';
+        goalBarsHTML += `<div class="bar-goal" style="--bar-height: ${percent}%; background: ${color};"></div>`;
+    });
+
+    // Build markers HTML
+    let markersHTML = '';
+    goalItems.forEach(g => {
+        if (g.markerEnabled) {
+            const value = parseFloat(g.value) || 0;
+            const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
+            const color = g.markerColor || '#312121';
+            const textColor = g.markerTextColor || '#F5E4AF';
+            markersHTML += `<div class="goal-marker" style="--marker-position: ${percent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="${g.name} ${formatShortCurrency(value)}"></div>`;
+        }
+    });
+
+    // Add donations marker if enabled
+    if (donations.markerEnabled) {
+        const color = donations.markerColor || '#e85a71';
+        const textColor = donations.markerTextColor || '#f7f7f7';
+        markersHTML += `<div class="goal-marker" style="--marker-position: ${donationsPercent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="Donations ${formatShortCurrency(donationsValue)}"></div>`;
     }
 
     article.innerHTML = `
@@ -100,17 +158,13 @@ function createProgressCard(goal) {
             </div>
             <div class="chart-bar-container">
                 <div class="stacked-bar">
-                    ${goalAmount > 0 ? `
-                    <div class="bar-goal" style="--bar-height: ${goalPercent}%;">
-                        <span class="bar-text">Goal<br>${formatCurrency(goalAmount)}</span>
+                    ${goalBarsHTML}
+                    ${donationsValue > 0 ? `
+                    <div class="bar-raised" style="--bar-height: ${donationsPercent}%; background: ${donationsColor};">
+                        <span class="bar-text">Donations To Date<br>${formatCurrency(donationsValue)}</span>
                     </div>
                     ` : ''}
-                    ${raisedAmount > 0 ? `
-                    <div class="bar-raised" style="--bar-height: ${raisedPercent}%;">
-                        <span class="bar-text">Donations To Date<br>${formatCurrency(raisedAmount)}</span>
-                    </div>
-                    ` : ''}
-                    ${goalMarkerHTML}
+                    ${markersHTML}
                 </div>
             </div>
         </div>
