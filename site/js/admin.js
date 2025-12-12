@@ -396,6 +396,10 @@ class AdminDashboard {
 
         const fileInput = imageItem.querySelector(`#image-file-${index}`);
         fileInput.addEventListener('change', (e) => this.handleImageUpload(e, index));
+
+        // Make the custom button trigger the hidden file input
+        const fileUploadBtn = imageItem.querySelector('.file-upload-btn');
+        fileUploadBtn.addEventListener('click', () => fileInput.click());
     }
 
     async handleImageUpload(event, index) {
@@ -540,6 +544,10 @@ class AdminDashboard {
 
         const fileInput = pdfItem.querySelector(`#pdf-file-${index}`);
         fileInput.addEventListener('change', (e) => this.handlePdfUpload(e, index));
+
+        // Make the custom button trigger the hidden file input
+        const fileUploadBtn = pdfItem.querySelector('.file-upload-btn');
+        fileUploadBtn.addEventListener('click', () => fileInput.click());
     }
 
     async handlePdfUpload(event, index) {
@@ -1240,7 +1248,12 @@ class GalleryManager {
         document.getElementById('cancel-gallery-edit').addEventListener('click', () => this.closeEditor());
 
         // File input
-        document.getElementById('gallery-image-file').addEventListener('change', (e) => this.handleFileSelect(e));
+        const galleryFileInput = document.getElementById('gallery-image-file');
+        galleryFileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+
+        // Make the custom button trigger the hidden file input
+        const galleryFileBtn = this.editorModal.querySelector('.file-upload-btn');
+        galleryFileBtn.addEventListener('click', () => galleryFileInput.click());
 
         // Image path input preview
         document.getElementById('gallery-image-src').addEventListener('input', (e) => this.updatePreview(e.target.value));
