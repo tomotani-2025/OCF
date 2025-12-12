@@ -1126,13 +1126,13 @@ class AdminDashboard {
             `;
         }
 
-        // Match post.html layout order: meta (date/author) -> category -> title -> media -> content
+        // Match post.html layout order: meta (date/author/category) -> title -> media -> content
         this.previewContainer.innerHTML = `
             <div class="preview-meta">
                 <span class="preview-date">${formatDate(data.date)}</span>
                 <span class="preview-author">By ${data.author}</span>
+                <div class="preview-category-badge">${data.category || 'Category'}</div>
             </div>
-            <div class="preview-category-badge">${data.category || 'Category'}</div>
             <h1 class="preview-title">${data.title || 'Post Title'}</h1>
             ${featuredMediaHtml}
             ${imagesHtml}
