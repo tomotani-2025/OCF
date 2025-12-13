@@ -136,7 +136,8 @@ function createProgressCard(goal) {
             const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
             const color = g.markerColor || '#312121';
             const textColor = g.markerTextColor || '#F5E4AF';
-            markersHTML += `<div class="goal-marker" style="--marker-position: ${percent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="${g.name} ${formatShortCurrency(value)}"></div>`;
+            const markerLabel = g.barLabel || g.name;
+            markersHTML += `<div class="goal-marker" style="--marker-position: ${percent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="${markerLabel} ${formatShortCurrency(value)}"></div>`;
         }
     });
 
