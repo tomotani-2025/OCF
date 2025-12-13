@@ -429,7 +429,18 @@
                             Add Goal
                         </button>
                         <button type="button" id="save-all-progress-btn" class="btn btn-outline">
-                            Save All Changes
+                            <svg class="btn-icon default-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 2V14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <svg class="btn-icon spinner-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: none;">
+                                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="12" stroke-linecap="round">
+                                    <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                            <svg class="btn-icon success-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: none;">
+                                <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="btn-text">Publish Changes</span>
                         </button>
                     </div>
 

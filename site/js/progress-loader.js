@@ -52,6 +52,9 @@ function createProgressCard(goal) {
         console.error('Error parsing donations:', e);
     }
 
+    // Debug logging - remove in production
+    console.log('Progress card data:', goal.title, 'goalItems:', JSON.stringify(goalItems), 'donations:', JSON.stringify(donations));
+
     // Backwards compatibility: if no new structure, fall back to old bars/markers
     if (goalItems.length === 0 && goal.bars) {
         const bars = typeof goal.bars === 'string' ? JSON.parse(goal.bars) : goal.bars;
@@ -102,18 +105,17 @@ function createProgressCard(goal) {
     // Generate grid lines (7 lines from 0 to max)
     const gridLines = generateGridLines(maxValue);
 
-    // Build phase info section (show first goal with highest value as "phase info")
+    // Build phase info section - show ALL goals with name and value
     let phaseInfoHTML = '';
     if (goalItems.length > 0) {
-        // Sort by value descending and get the main goal
+        // Sort by value descending (largest first)
         const sortedGoals = [...goalItems].sort((a, b) => (b.value || 0) - (a.value || 0));
-        const mainGoal = sortedGoals[0];
-        phaseInfoHTML = `
+        phaseInfoHTML = sortedGoals.map(g => `
             <div class="phase-info">
-                <span>${mainGoal.name}</span>
-                <span class="amount">${formatCurrency(mainGoal.value)}</span>
+                <span>${escapeHtml(g.name)}</span>
+                <span class="amount">${formatCurrency(g.value)}</span>
             </div>
-        `;
+        `).join('');
     }
 
     // Build goal bars HTML (stacked from bottom, largest first)

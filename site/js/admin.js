@@ -2270,14 +2270,18 @@ class ProgressManager {
     }
 
     async saveAllGoals() {
-        const publishingModal = document.getElementById('publishing-modal');
-        const publishingStatus = document.getElementById('publishing-status');
-        const publishingSpinner = document.getElementById('publishing-spinner');
+        const btn = document.getElementById('save-all-progress-btn');
+        const defaultIcon = btn.querySelector('.default-icon');
+        const spinnerIcon = btn.querySelector('.spinner-icon');
+        const successIcon = btn.querySelector('.success-icon');
+        const btnText = btn.querySelector('.btn-text');
 
-        publishingModal.hidden = false;
-        publishingStatus.textContent = 'Saving progress goals...';
-        publishingStatus.className = 'publishing-status';
-        publishingSpinner.hidden = false;
+        // Show spinner state
+        btn.disabled = true;
+        defaultIcon.style.display = 'none';
+        spinnerIcon.style.display = 'inline';
+        successIcon.style.display = 'none';
+        btnText.textContent = 'Publishing...';
 
         try {
             // Save each goal to Supabase (instant update!)
@@ -2301,22 +2305,38 @@ class ProgressManager {
                 }
             }
 
-            publishingStatus.textContent = 'Progress goals saved successfully!';
-            publishingStatus.className = 'publishing-status success';
-            publishingSpinner.hidden = true;
+            // Show success state
+            spinnerIcon.style.display = 'none';
+            successIcon.style.display = 'inline';
+            btnText.textContent = 'Published!';
+            btn.classList.add('btn-success');
 
             this.hasUnsavedChanges = false;
             this.updateSaveButton();
 
+            // Reset button after delay
             setTimeout(() => {
-                publishingModal.hidden = true;
-            }, 1500);
+                defaultIcon.style.display = 'inline';
+                successIcon.style.display = 'none';
+                btnText.textContent = 'Publish Changes';
+                btn.classList.remove('btn-success');
+                btn.disabled = false;
+            }, 2000);
 
         } catch (error) {
             console.error('Save error:', error);
-            publishingStatus.textContent = `Error: ${error.message}`;
-            publishingStatus.className = 'publishing-status error';
-            publishingSpinner.hidden = true;
+            // Show error state
+            spinnerIcon.style.display = 'none';
+            defaultIcon.style.display = 'inline';
+            btnText.textContent = 'Error - Try Again';
+            btn.classList.add('btn-error');
+            btn.disabled = false;
+
+            // Reset button after delay
+            setTimeout(() => {
+                btnText.textContent = 'Publish Changes';
+                btn.classList.remove('btn-error');
+            }, 3000);
         }
     }
 
