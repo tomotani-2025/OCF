@@ -165,7 +165,7 @@
     font-family: var(--font-primary);
     font-weight: 400;
     font-size: 24px;
-    line-height: 100%;
+    line-height: 140%;
     letter-spacing: -0.04em;
     color: #1F0808;
     margin: 0;
@@ -238,7 +238,7 @@
     font-family: var(--font-primary);
     font-weight: 400;
     font-size: 16px;
-    line-height: 100%;
+    line-height: 150%;
     letter-spacing: -0.04em;
     color: #1F0808;
     margin: 0;

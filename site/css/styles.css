@@ -439,13 +439,37 @@ a {
 
 .btn-outline {
     background: transparent;
-    color: var(--color-paragraph-1);
-    border: 2px solid var(--color-paragraph-1);
+    color: #000000;
+    border: 2px solid #EF3A4F;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-outline svg {
+    width: 18px;
+    height: 14px;
+    flex-shrink: 0;
+    transform: rotate(-45deg);
+}
+
+.btn-outline svg path {
+    stroke: #EF3A4F;
+    transition: stroke 0.3s ease;
 }
 
 .btn-outline:hover {
-    background: var(--color-paragraph-1);
-    color: var(--color-paragraph-2);
+    background: #EF3A4F;
+    color: #FFFFFF;
+}
+
+.btn-outline:hover svg path {
+    stroke: #FFFFFF;
+}
+
+/* Prevent arrow on non-Learn More outline buttons */
+.btn-outline:not(:has(svg))::after {
+    display: none;
 }
 
 /* =========================================
@@ -825,6 +849,128 @@ a {
     margin: 0 auto;
 }
 
+/* Mission Statement Section */
+.mission-statement-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 0 0;
+    background: #F7F4EB;
+}
+
+.mission-statement-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 976px;
+    padding: 0 24px;
+}
+
+.mission-statement-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.mission-statement {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 40px 0;
+    border-top: 1px solid #EF3A4F;
+}
+
+.mission-statement p {
+    width: 700px;
+    max-width: 100%;
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 95%;
+    letter-spacing: -0.05em;
+    color: #312121;
+    margin: 0;
+}
+
+.mission-statement:nth-child(odd) {
+    justify-content: flex-start;
+}
+
+.mission-statement:nth-child(even) {
+    justify-content: flex-end;
+}
+
+.mission-statement.full-width p {
+    width: 100%;
+}
+
+/* Mission Image Breaker */
+.mission-image-breaker {
+    width: 100%;
+    height: 625px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Legacy Mission Points - keeping for backwards compatibility */
+.mission-points {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.mission-points h4 {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 96%;
+    letter-spacing: -0.04em;
+    color: var(--color-paragraph-1);
+    margin: 0;
+}
+
+/* Mission Statement Responsive */
+@media (max-width: 1100px) {
+    .mission-statement-section {
+        padding: 50px 0 0;
+    }
+
+    .mission-statement p {
+        font-size: 36px;
+    }
+
+    .mission-image-breaker {
+        height: 480px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mission-statement-section {
+        padding: 24px 0 80px;
+    }
+
+    .mission-statement-content {
+        padding: 0 24px;
+    }
+
+    .mission-statement p {
+        font-size: 36px;
+        width: 100%;
+    }
+
+    .mission-statement:nth-child(odd),
+    .mission-statement:nth-child(even) {
+        justify-content: center;
+    }
+
+    .mission-image-breaker {
+        height: 280px;
+    }
+}
+
 /* Charity Info Section */
 .charity-info {
     text-align: center;
@@ -1074,6 +1220,24 @@ p {
     margin-bottom: var(--spacing-xs);
 }
 
+.project-content .goal-label {
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+
+.project-content .goal-title {
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
 .project-content p {
     color: #666;
     font-size: 0.95rem;
@@ -1162,8 +1326,15 @@ p {
    Additional Components
    ========================================= */
 .section-title {
-    text-align: center;
-    margin-bottom: var(--spacing-xl);
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 95%;
+    letter-spacing: -0.06em;
+    color: #EF3A4F;
+    text-align: left;
+    max-width: 976px;
+    margin: 0 auto 36px;
 }
 
 .section-cta {
@@ -1355,6 +1526,17 @@ p {
     border-bottom: none;
 }
 
+/* Mission Goals Section */
+.mission-goals-section {
+    background: #312121;
+    padding: 80px 0;
+}
+
+.mission-goals-section .section-title {
+    color: #F5E4AF;
+    margin-bottom: 80px;
+}
+
 /* Goals Grid */
 .goals-grid {
     display: flex;
@@ -1368,7 +1550,7 @@ p {
 .goal-card {
     display: flex;
     flex-direction: row;
-    background: var(--color-background-1);
+    background: #FFFFFF;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -1401,11 +1583,37 @@ p {
 
 .goal-content h3 {
     font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+
+.goal-content h3 strong {
     font-weight: 600;
-    font-size: 28px;
-    line-height: 120%;
-    letter-spacing: -0.03em;
-    color: var(--color-paragraph-1);
+    display: block;
+    margin-top: 8px;
+}
+
+.goal-content .goal-label {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+
+.goal-content .goal-title {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #000000;
     margin: 0;
 }
 
@@ -1422,7 +1630,8 @@ p {
     font-family: var(--font-primary);
     font-weight: 400;
     font-size: 16px;
-    line-height: 160%;
+    line-height: 150%;
+    letter-spacing: -0.04em;
     color: var(--color-paragraph-1);
     margin: 0;
 }
@@ -1467,6 +1676,11 @@ p {
     .goal-content h3 {
         font-size: 24px;
     }
+
+    .goal-content .goal-label,
+    .goal-content .goal-title {
+        font-size: 24px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1484,6 +1698,11 @@ p {
     }
 
     .goal-content h3 {
+        font-size: 20px;
+    }
+
+    .goal-content .goal-label,
+    .goal-content .goal-title {
         font-size: 20px;
     }
 
