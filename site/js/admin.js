@@ -1992,14 +1992,15 @@ class ProgressManager {
 
     updateSaveButton() {
         const saveBtn = document.getElementById('save-all-progress-btn');
+        const btnText = saveBtn.querySelector('.btn-text');
         if (this.hasUnsavedChanges) {
             saveBtn.classList.add('btn-primary');
             saveBtn.classList.remove('btn-outline');
-            saveBtn.textContent = 'Save All Changes *';
+            if (btnText) btnText.textContent = 'Publish Changes *';
         } else {
             saveBtn.classList.remove('btn-primary');
             saveBtn.classList.add('btn-outline');
-            saveBtn.textContent = 'Save All Changes';
+            if (btnText) btnText.textContent = 'Publish Changes';
         }
     }
 
