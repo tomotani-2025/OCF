@@ -336,9 +336,9 @@ a {
     max-width: 976px;
 }
 
-/* Scroll reveal animation */
-.offering-item,
-.reveal-on-scroll {
+/* Scroll reveal animation - only hide if JS is enabled */
+.js-enabled .offering-item,
+.js-enabled .reveal-on-scroll {
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
@@ -350,15 +350,15 @@ a {
     transform: translateY(0);
 }
 
-.offering-item:nth-child(2) {
+.js-enabled .offering-item:nth-child(2) {
     transition-delay: 0.2s;
 }
 
 /* Staggered reveal delays */
-.reveal-on-scroll:nth-child(2) { transition-delay: 0.1s; }
-.reveal-on-scroll:nth-child(3) { transition-delay: 0.2s; }
-.reveal-on-scroll:nth-child(4) { transition-delay: 0.3s; }
-.reveal-on-scroll:nth-child(5) { transition-delay: 0.4s; }
+.js-enabled .reveal-on-scroll:nth-child(2) { transition-delay: 0.1s; }
+.js-enabled .reveal-on-scroll:nth-child(3) { transition-delay: 0.2s; }
+.js-enabled .reveal-on-scroll:nth-child(4) { transition-delay: 0.3s; }
+.js-enabled .reveal-on-scroll:nth-child(5) { transition-delay: 0.4s; }
 
 .offering-list {
     display: flex;

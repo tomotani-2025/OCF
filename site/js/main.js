@@ -2,6 +2,9 @@
  * Omotani Caring Foundation - Main JavaScript
  */
 
+// Add js-enabled class immediately for reveal animations
+document.documentElement.classList.add('js-enabled');
+
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile menu toggle
     const menuToggle = document.querySelector('.mobile-menu-toggle');
@@ -82,9 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Scroll reveal animation for offering items and reveal-on-scroll elements
-    if ('IntersectionObserver' in window) {
-        const revealItems = document.querySelectorAll('.offering-item, .reveal-on-scroll');
+    const revealItems = document.querySelectorAll('.offering-item, .reveal-on-scroll');
 
+    if ('IntersectionObserver' in window && revealItems.length > 0) {
         const revealObserver = new IntersectionObserver(function(entries, observer) {
             entries.forEach(function(entry) {
                 if (entry.isIntersecting) {
@@ -93,16 +96,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }, {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.05,
+            rootMargin: '0px 0px 0px 0px'
         });
 
         revealItems.forEach(function(item) {
             revealObserver.observe(item);
         });
+
+        // Fallback: reveal all items after a short delay if observer doesn't trigger
+        setTimeout(function() {
+            revealItems.forEach(function(item) {
+                if (!item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+            });
+        }, 2000);
     } else {
         // Fallback for browsers without IntersectionObserver
-        document.querySelectorAll('.offering-item, .reveal-on-scroll').forEach(function(item) {
+        revealItems.forEach(function(item) {
             item.classList.add('revealed');
         });
     }
