@@ -718,12 +718,23 @@
             left: 0;
             right: 0;
             height: var(--bar-height, 50%);
-            background: #F5E4AF;
+            background: var(--bar-color, #F5E4AF);
             border-radius: 0;
             display: flex;
             align-items: flex-start;
             justify-content: center;
             padding-top: 12px;
+        }
+
+        /* Striped bar pattern */
+        .bar-goal.bar-striped {
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--bar-color, #F5E4AF),
+                var(--bar-color, #F5E4AF) 8px,
+                rgba(0, 0, 0, 0.15) 8px,
+                rgba(0, 0, 0, 0.15) 16px
+            );
         }
 
         .bar-raised {

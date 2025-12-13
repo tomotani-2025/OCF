@@ -2121,6 +2121,10 @@ class ProgressManager {
             </div>
             <div class="marker-toggle-row">
                 <label class="checkbox-label">
+                    <input type="checkbox" id="goal-striped-${index}" ${data.striped ? 'checked' : ''}>
+                    <span>Striped Fill</span>
+                </label>
+                <label class="checkbox-label">
                     <input type="checkbox" id="goal-marker-enabled-${index}" ${markerEnabled ? 'checked' : ''}>
                     <span>Show Marker</span>
                 </label>
@@ -2206,6 +2210,7 @@ class ProgressManager {
                     value,
                     barLabel: document.getElementById(`goal-bar-label-${index}`)?.value.trim() || name,
                     barColor: document.getElementById(`goal-bar-color-${index}`)?.value || '#F5E4AF',
+                    striped: document.getElementById(`goal-striped-${index}`)?.checked || false,
                     markerEnabled: document.getElementById(`goal-marker-enabled-${index}`)?.checked || false,
                     markerColor: document.getElementById(`goal-marker-color-${index}`)?.value || '#312121',
                     markerTextColor: document.getElementById(`goal-marker-text-color-${index}`)?.value || '#F5E4AF'

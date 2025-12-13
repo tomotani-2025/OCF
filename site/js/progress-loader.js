@@ -125,7 +125,8 @@ function createProgressCard(goal) {
         const value = parseFloat(g.value) || 0;
         const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
         const color = g.barColor || '#F5E4AF';
-        goalBarsHTML += `<div class="bar-goal" style="--bar-height: ${percent}%; background: ${color};"></div>`;
+        const stripedClass = g.striped ? ' bar-striped' : '';
+        goalBarsHTML += `<div class="bar-goal${stripedClass}" style="--bar-height: ${percent}%; --bar-color: ${color};"></div>`;
     });
 
     // Build markers HTML
