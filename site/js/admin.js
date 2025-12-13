@@ -1883,7 +1883,7 @@ class ProgressManager {
                     <div class="progress-goal-markers-preview">
                         ${goalItems.filter(g => g.markerEnabled).map(g => `
                             <span class="marker-preview" style="background-color: ${g.markerColor || '#312121'}; color: ${g.markerTextColor || '#F5E4AF'}">
-                                ▸ ${g.name}: $${this.formatMoney(g.value)}
+                                ▸ ${g.barLabel || g.name}: $${this.formatMoney(g.value)}
                             </span>
                         `).join('')}
                         ${donations.markerEnabled ? `
