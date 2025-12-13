@@ -81,9 +81,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Scroll reveal animation for offering items
+    // Scroll reveal animation for offering items and reveal-on-scroll elements
     if ('IntersectionObserver' in window) {
-        const offeringItems = document.querySelectorAll('.offering-item');
+        const revealItems = document.querySelectorAll('.offering-item, .reveal-on-scroll');
 
         const revealObserver = new IntersectionObserver(function(entries, observer) {
             entries.forEach(function(entry) {
@@ -93,16 +93,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }, {
-            threshold: 0.2,
+            threshold: 0.15,
             rootMargin: '0px 0px -50px 0px'
         });
 
-        offeringItems.forEach(function(item) {
+        revealItems.forEach(function(item) {
             revealObserver.observe(item);
         });
     } else {
         // Fallback for browsers without IntersectionObserver
-        document.querySelectorAll('.offering-item').forEach(function(item) {
+        document.querySelectorAll('.offering-item, .reveal-on-scroll').forEach(function(item) {
             item.classList.add('revealed');
         });
     }

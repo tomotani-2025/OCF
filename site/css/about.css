@@ -1,0 +1,480 @@
+/* =========================================
+   About Us Page Styles
+   Based on Figma Design
+   ========================================= */
+
+/* About Header Section */
+.about-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 70px 50px;
+    min-height: 300px;
+    background: #1F0808;
+    margin-top: var(--nav-height);
+}
+
+.about-header-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0 119px;
+    width: 100%;
+    max-width: 1180px;
+    height: 160px;
+}
+
+.about-header h1 {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 76px;
+    line-height: 95%;
+    text-align: center;
+    letter-spacing: -0.06em;
+    color: #F5E4AF;
+    margin: 0;
+}
+
+/* Main Card Section */
+.about-card-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 70px 70px;
+    background: #F7F4EB;
+}
+
+.about-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 976px;
+}
+
+/* Charity Info Card */
+.charity-info-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1280px;
+    min-height: 480px;
+    background: transparent;
+    padding: 60px;
+}
+
+.charity-info-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+.charity-logo-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 36px;
+    flex-shrink: 0;
+}
+
+.charity-badge {
+    width: 240px;
+    height: auto;
+}
+
+.charity-wordmark {
+    width: 240px;
+    height: auto;
+}
+
+.charity-divider {
+    width: 2px;
+    height: 260px;
+    background: #EF3A4F;
+    flex-shrink: 0;
+}
+
+.charity-text {
+    max-width: 589px;
+}
+
+.charity-text p {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 50px;
+    line-height: 95%;
+    letter-spacing: -0.06em;
+    color: #000000;
+    margin: 0;
+}
+
+.charity-text strong {
+    font-weight: 400;
+}
+
+/* Section Divider Line */
+.section-divider-line {
+    width: 100%;
+    max-width: 976px;
+    height: 1px;
+    background: #1F0808;
+    border: none;
+    margin: 40px auto 40px;
+}
+
+/* Content Container */
+.about-content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 100px;
+    width: 100%;
+    max-width: 976px;
+}
+
+/* Trustees Block */
+.trustees-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+}
+
+.trustees-block h2 {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 95%;
+    letter-spacing: -0.06em;
+    color: #EF3A4F;
+    margin: 0;
+}
+
+.trustees-block p {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #1F0808;
+    margin: 0;
+}
+
+/* Advisors Block */
+.advisors-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 36px;
+    width: 100%;
+}
+
+.advisors-block h2 {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 95%;
+    letter-spacing: -0.06em;
+    color: #EF3A4F;
+    margin: 0;
+}
+
+/* New Advisor Cards */
+.advisor-card-new {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.advisor-photo {
+    flex: 0 0 268px;
+    min-height: 303px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px 0 0 8px;
+}
+
+.advisor-card-tall .advisor-photo {
+    min-height: 672px;
+}
+
+.advisor-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px;
+    gap: 24px;
+    flex: 1;
+}
+
+.advisor-info h3 {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #1F0808;
+    margin: 0;
+}
+
+.advisor-info p {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #1F0808;
+    margin: 0;
+}
+
+.advisor-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-top: auto;
+}
+
+.advisor-links-new {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.advisor-links-new a {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #EF3A4F;
+    text-decoration: underline;
+}
+
+.advisor-links-new a:hover {
+    color: #1F0808;
+}
+
+.advisor-links-new .link-item {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #1F0808;
+}
+
+.advisor-links-new .link-item a {
+    display: inline;
+}
+
+.advisor-links-new .link-item strong {
+    font-weight: 600;
+}
+
+.advisor-partner-logo {
+    width: 63px;
+    height: 63px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.advisor-partner-logo-wide {
+    width: 120px;
+    height: 63px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1100px) {
+    .about-header {
+        padding: 50px 24px;
+        min-height: 200px;
+    }
+
+    .about-header-content {
+        padding: 0;
+        height: auto;
+    }
+
+    .about-header h1 {
+        font-size: 56px;
+    }
+
+    .about-card-section {
+        padding: 0 24px 48px;
+    }
+
+    .charity-info-card {
+        padding: 40px 24px;
+        min-height: auto;
+    }
+
+    .charity-info-row {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .charity-divider {
+        width: 200px;
+        height: 2px;
+    }
+
+    .charity-text p {
+        font-size: 48px;
+        text-align: center;
+    }
+
+    .about-content-container {
+        gap: 60px;
+    }
+
+    .trustees-block h2,
+    .advisors-block h2 {
+        font-size: 48px;
+    }
+
+    .trustees-block p {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-header h1 {
+        font-size: 40px;
+    }
+
+    .charity-info-card {
+        padding: 32px 16px;
+    }
+
+    .charity-badge,
+    .charity-wordmark {
+        width: 180px;
+    }
+
+    .charity-text p {
+        font-size: 32px;
+    }
+
+    .trustees-block h2,
+    .advisors-block h2 {
+        font-size: 36px;
+    }
+
+    .trustees-block p {
+        font-size: 18px;
+        line-height: 140%;
+    }
+
+    /* Stack advisor cards vertically on mobile */
+    .advisor-card-new {
+        flex-direction: column;
+    }
+
+    .advisor-photo {
+        flex: 0 0 250px;
+        min-height: 250px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .advisor-card-tall .advisor-photo {
+        min-height: 300px;
+    }
+
+    .advisor-info {
+        padding: 24px;
+    }
+
+    .advisor-info h3 {
+        font-size: 20px;
+    }
+
+    .advisor-info p {
+        font-size: 15px;
+        line-height: 140%;
+    }
+
+    .advisor-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .advisor-partner-logo {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-header {
+        padding: 40px 16px;
+        min-height: 150px;
+    }
+
+    .about-header h1 {
+        font-size: 32px;
+    }
+
+    .charity-badge,
+    .charity-wordmark {
+        width: 150px;
+    }
+
+    .charity-text p {
+        font-size: 24px;
+    }
+
+    .trustees-block h2,
+    .advisors-block h2 {
+        font-size: 28px;
+    }
+
+    .trustees-block p {
+        font-size: 16px;
+    }
+
+    .advisor-photo {
+        flex: 0 0 200px;
+        min-height: 200px;
+    }
+
+    .advisor-card-tall .advisor-photo {
+        min-height: 250px;
+    }
+
+    .advisor-info {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .advisor-info h3 {
+        font-size: 18px;
+    }
+
+    .advisor-info p {
+        font-size: 14px;
+    }
+
+    .advisor-links-new a,
+    .advisor-links-new .link-item {
+        font-size: 14px;
+    }
+}
