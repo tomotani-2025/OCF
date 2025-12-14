@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css?v=6">
+    <link rel="stylesheet" href="css/admin.css?v=7">
 </head>
 <body class="admin-page">
     <header class="site-header">
@@ -32,9 +32,9 @@
                     <li><a href="progress.html">Progress</a></li>
                     <li><a href="news-updates.html">News + Updates</a></li>
                     <li><a href="honor-and-memory.html">Honor and Memory</a></li>
-                    <li><a href="global-images.html">Global Images</a></li>
+                    
                     <li><a href="contact-us.html">Contact Us</a></li>
-                    <li><a href="make-a-donation.html" class="btn btn-donate">Donate Now</a></li>
+                    <li><a href="make-a-donation.html" class="btn btn-donate"><svg class="donate-icon" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" clip-rule="evenodd" viewBox="0 0 33 33"><g transform="translate(.309 .704)"><rect width="32" height="32" fill="none"></rect><path fill="currentColor" d="M84.34,138.455L85.336,134.244C85.549,133.342 86.355,132.704 87.282,132.704C90.886,132.704 105.732,132.704 109.336,132.704C110.263,132.704 111.069,133.342 111.282,134.244L112.278,138.455C112.294,138.52 112.305,138.587 112.308,138.656L112.309,138.699C112.309,138.699 112.309,147.62 112.309,151.704C112.309,153.361 110.966,154.704 109.309,154.704C104.466,154.704 92.152,154.704 87.309,154.704C85.652,154.704 84.309,153.361 84.309,151.704C84.309,147.62 84.31,138.659 84.31,138.659L84.31,138.656C84.313,138.587 84.324,138.52 84.34,138.455ZM110.309,139.704L86.309,139.704L86.309,151.704C86.309,152.256 86.757,152.704 87.309,152.704C92.152,152.704 104.466,152.704 109.309,152.704C109.861,152.704 110.309,152.256 110.309,151.704L110.309,139.704ZM98.309,141.905C99.87,140.433 102.332,140.461 103.859,141.988C105.414,143.544 105.414,146.069 103.859,147.624C103.851,147.632 103.843,147.64 103.834,147.648C103.834,147.648 101.789,149.559 100.357,150.896C99.204,151.973 97.414,151.973 96.261,150.896C94.829,149.559 92.783,147.648 92.783,147.648L92.759,147.624C91.204,146.069 91.204,143.544 92.759,141.988C94.286,140.461 96.748,140.433 98.309,141.905ZM102.451,146.203C103.22,145.428 103.217,144.175 102.445,143.402C101.67,142.628 100.412,142.628 99.637,143.402C99.637,143.402 99.637,143.402 99.637,143.402C99.285,143.755 98.807,143.952 98.309,143.952C97.811,143.952 97.333,143.755 96.981,143.402L96.981,143.402C96.206,142.628 94.948,142.628 94.173,143.402C93.401,144.175 93.398,145.428 94.166,146.203L97.626,149.435C98.011,149.794 98.607,149.794 98.992,149.435L102.451,146.203ZM101.309,134.704C101.861,134.704 102.309,135.152 102.309,135.704C102.309,136.256 101.861,136.704 101.309,136.704L95.309,136.704C94.757,136.704 94.309,136.256 94.309,135.704C94.309,135.152 94.757,134.704 95.309,134.704C95.309,134.704 87.282,134.704 87.282,134.704L86.573,137.704L110.045,137.704L109.336,134.704L101.309,134.704Z" transform="translate(-82.309 -127.704)"></path></g></svg>Donate Now</a></li>
                 </ul>
             </nav>
         </div>
@@ -48,6 +48,9 @@
                     <button type="button" class="admin-tab active" data-tab="posts">Manage Posts</button>
                     <button type="button" class="admin-tab" data-tab="gallery">Manage Gallery</button>
                     <button type="button" class="admin-tab" data-tab="progress">Progress Charts</button>
+                    <button type="button" class="admin-tab" data-tab="about">About Us</button>
+                    <button type="button" class="admin-tab" data-tab="mission">Our Mission</button>
+                    <button type="button" class="admin-tab" data-tab="goals">Goal Pages</button>
                 </div>
 
                 <!-- Posts Tab -->
@@ -586,6 +589,401 @@
                         </div>
                     </div>
                 </div><!-- End Progress Tab -->
+
+                <!-- About Us Tab -->
+                <div id="about-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>About Us Page</h1>
+                        <p>Edit the trustees section and advisor cards.</p>
+                    </div>
+
+                    <!-- Trustees Section -->
+                    <div class="form-section">
+                        <h2>Our Trustees</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="trustees-text">Trustees Description</label>
+                                <textarea id="trustees-text" rows="6" placeholder="Enter the trustees description text..."></textarea>
+                            </div>
+                        </div>
+                        <button type="button" id="save-trustees-btn" class="btn btn-primary">Save Trustees Text</button>
+                    </div>
+
+                    <!-- Advisors Section -->
+                    <div class="form-section">
+                        <h2>Our Advisors</h2>
+                        <div class="dashboard-actions">
+                            <button type="button" id="add-advisor-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Advisor
+                            </button>
+                        </div>
+                        <div id="advisors-list" class="advisors-list">
+                            <div class="loading-message">Loading advisors...</div>
+                        </div>
+                    </div>
+
+                    <!-- Advisor Editor Modal -->
+                    <div id="advisor-editor-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content advisor-editor-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="advisor-editor-title">Edit Advisor</h2>
+                            <form id="advisor-form">
+                                <input type="hidden" id="advisor-id" value="">
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="advisor-name">Name *</label>
+                                        <input type="text" id="advisor-name" required placeholder="Paul Kirui">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="advisor-title">Title/Role *</label>
+                                        <input type="text" id="advisor-title" required placeholder="Senior Advisor">
+                                    </div>
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="advisor-photo-file">Upload Photo</label>
+                                        <div class="file-upload-wrapper">
+                                            <input type="file" id="advisor-photo-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                            <div class="file-upload-btn">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <span>Choose File</span>
+                                            </div>
+                                            <span class="file-name" id="advisor-photo-file-name">No file chosen</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="advisor-photo">Photo Path (or URL)</label>
+                                        <input type="text" id="advisor-photo" placeholder="images/AboutUs/photo.jpg">
+                                        <div class="image-preview" id="advisor-photo-preview">
+                                            <span class="image-preview-placeholder">Photo preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="advisor-bio">Biography *</label>
+                                        <textarea id="advisor-bio" required rows="6" placeholder="Enter bio paragraphs. Use blank lines to separate paragraphs."></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="advisor-links">External Links (one per line: Label|URL)</label>
+                                        <textarea id="advisor-links" rows="4" placeholder="Natural Habitat Adventures Bio|https://www.nathab.com/guides-and-staff/guide-bios/paul-kirui/
+Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="advisor-partner-logo">Partner Logo Path</label>
+                                        <input type="text" id="advisor-partner-logo" placeholder="images/AboutUs/logo.webp">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="advisor-partner-name">Partner Name</label>
+                                        <input type="text" id="advisor-partner-name" placeholder="Natural Habitat Adventures">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="advisor-tall-card">
+                                            <span>Tall card (for longer bios)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-advisor-edit" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Advisor</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Delete Advisor Modal -->
+                    <div id="delete-advisor-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Advisor?</h2>
+                            <p id="delete-advisor-title">Are you sure you want to delete this advisor?</p>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-advisor-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-advisor-delete" class="btn btn-danger">Delete Advisor</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End About Us Tab -->
+
+                <!-- Our Mission Tab -->
+                <div id="mission-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>Our Mission Page</h1>
+                        <p>Edit mission statements and goal overview cards.</p>
+                    </div>
+
+                    <!-- Mission Image Breaker -->
+                    <div class="form-section">
+                        <h2>Mission Image Breaker</h2>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="mission-breaker-image">Background Image Path</label>
+                                <input type="text" id="mission-breaker-image" placeholder="images/mission-breaker.jpg">
+                            </div>
+                            <div class="image-preview" id="mission-breaker-preview">
+                                <span class="image-preview-placeholder">Image preview</span>
+                            </div>
+                        </div>
+                        <button type="button" id="save-mission-breaker-btn" class="btn btn-primary">Save Breaker Image</button>
+                    </div>
+
+                    <!-- Mission Statements Section -->
+                    <div class="form-section">
+                        <h2>Mission Statements</h2>
+                        <p class="form-help">These appear at the top of the Our Mission page.</p>
+                        <div class="dashboard-actions">
+                            <button type="button" id="add-mission-statement-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Statement
+                            </button>
+                        </div>
+                        <div id="mission-statements-list" class="mission-statements-list">
+                            <div class="loading-message">Loading statements...</div>
+                        </div>
+                    </div>
+
+                    <!-- Goal Cards Section -->
+                    <div class="form-section">
+                        <h2>Goal Overview Cards</h2>
+                        <p class="form-help">These are the goal preview cards shown in the "Our Mission Goals" grid.</p>
+                        <div id="goal-cards-list" class="goal-cards-list">
+                            <div class="loading-message">Loading goal cards...</div>
+                        </div>
+                    </div>
+
+                    <!-- Mission Statement Editor Modal -->
+                    <div id="mission-statement-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="mission-statement-modal-title">Edit Statement</h2>
+                            <form id="mission-statement-form">
+                                <input type="hidden" id="mission-statement-id" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="mission-statement-text">Statement Text *</label>
+                                        <textarea id="mission-statement-text" required rows="4" placeholder="Enter the mission statement..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="mission-statement-fullwidth">
+                                            <span>Full width (spans both columns)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-mission-statement" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Statement</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Goal Card Editor Modal -->
+                    <div id="goal-card-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="goal-card-modal-title">Edit Goal Card</h2>
+                            <form id="goal-card-form">
+                                <input type="hidden" id="goal-card-id" value="">
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="goal-card-label">Label (e.g., "Goal One:")</label>
+                                        <input type="text" id="goal-card-label" placeholder="Goal One:">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="goal-card-title">Title *</label>
+                                        <input type="text" id="goal-card-title" required placeholder="Sustainability">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="goal-card-subtitle">Subtitle</label>
+                                        <input type="text" id="goal-card-subtitle" placeholder="Batwa Farms at Matanda, Uganda">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="goal-card-description">Description *</label>
+                                        <textarea id="goal-card-description" required rows="4" placeholder="Enter the goal description..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row two-col">
+                                    <div class="form-group">
+                                        <label for="goal-card-image">Image Path *</label>
+                                        <input type="text" id="goal-card-image" required placeholder="images/batwa+visit+farm+ocf.jpg">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="goal-card-link">Link (goal page) *</label>
+                                        <input type="text" id="goal-card-link" required placeholder="goalone.html">
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-goal-card" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Goal Card</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Delete Mission Statement Modal -->
+                    <div id="delete-mission-statement-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Statement?</h2>
+                            <p>Are you sure you want to delete this mission statement?</p>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-statement-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-statement-delete" class="btn btn-danger">Delete Statement</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Our Mission Tab -->
+
+                <!-- Goal Pages Tab -->
+                <div id="goals-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>Goal Pages</h1>
+                        <p>Edit the content of individual goal pages (Goal One through Goal Twelve).</p>
+                    </div>
+
+                    <div class="dashboard-actions">
+                        <button type="button" id="add-goal-page-btn" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Add Goal Page
+                        </button>
+                    </div>
+
+                    <div id="goal-pages-list" class="goal-pages-list">
+                        <div class="loading-message">Loading goal pages...</div>
+                    </div>
+
+                    <!-- Goal Page Editor Modal -->
+                    <div id="goal-page-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content goal-page-editor-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="goal-page-modal-title">Edit Goal Page</h2>
+                            <form id="goal-page-form">
+                                <input type="hidden" id="goal-page-id" value="">
+
+                                <!-- Title Section -->
+                                <div class="form-section">
+                                    <h3>Page Title</h3>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="goal-page-label">Label (e.g., "Goal One:")</label>
+                                            <input type="text" id="goal-page-label" placeholder="Goal One:">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="goal-page-title">Title *</label>
+                                            <input type="text" id="goal-page-title" required placeholder="Batwa Farm at Matanda, Uganda">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="goal-page-slug">Page Filename *</label>
+                                            <input type="text" id="goal-page-slug" required placeholder="goalone.html">
+                                            <small class="form-hint">The filename for this goal page (e.g., goalone.html, goaltwo.html)</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hero Image Section -->
+                                <div class="form-section">
+                                    <h3>Hero Image</h3>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="goal-page-hero">Hero Image Path *</label>
+                                            <input type="text" id="goal-page-hero" required placeholder="images/batwa+farm+lead+photo+news+and+update.jpg">
+                                        </div>
+                                        <div class="image-preview" id="goal-page-hero-preview">
+                                            <span class="image-preview-placeholder">Image preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Funding Section -->
+                                <div class="form-section">
+                                    <h3>Funding Information (Optional)</h3>
+                                    <div id="funding-items-container">
+                                        <!-- Funding items will be added here -->
+                                    </div>
+                                    <button type="button" id="add-funding-item-btn" class="btn btn-outline add-media-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        Add Funding Phase
+                                    </button>
+                                </div>
+
+                                <!-- Body Content -->
+                                <div class="form-section">
+                                    <h3>Body Content</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="goal-page-content">Page Content *</label>
+                                            <textarea id="goal-page-content" required rows="8" placeholder="Enter the page content. Use blank lines to separate paragraphs."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Gallery Section -->
+                                <div class="form-section">
+                                    <h3>Gallery Images</h3>
+                                    <div id="goal-gallery-container" class="media-container">
+                                        <!-- Gallery items will be added here -->
+                                    </div>
+                                    <button type="button" id="add-goal-gallery-image-btn" class="btn btn-outline add-media-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        Add Gallery Image
+                                    </button>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-goal-page" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Goal Page</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Delete Goal Page Modal -->
+                    <div id="delete-goal-page-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Goal Page?</h2>
+                            <p id="delete-goal-page-title">Are you sure you want to delete this goal page?</p>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-goal-page-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-goal-page-delete" class="btn btn-danger">Delete Goal Page</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Goal Pages Tab -->
             </div>
         </section>
     </main>
@@ -623,6 +1021,6 @@
 
     <script src="js/main.js?v=2"></script>
     <script src="js/supabase-client.js"></script>
-    <script src="js/admin.js?v=11"></script>
+    <script src="js/admin.js?v=12"></script>
 </body>
 </html>

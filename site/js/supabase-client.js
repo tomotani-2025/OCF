@@ -277,8 +277,159 @@ const progressAPI = {
     }
 };
 
+// About Us API (trustees and advisors)
+const aboutAPI = {
+    async getContent() {
+        const results = await supabase.query('about_content', {
+            select: '*',
+            order: 'sort_order.asc'
+        });
+        return results;
+    },
+
+    async getByType(type) {
+        return supabase.query('about_content', {
+            select: '*',
+            eq: { type },
+            order: 'sort_order.asc'
+        });
+    },
+
+    async upsert(item) {
+        // Check if item exists
+        const existing = await supabase.query('about_content', {
+            select: 'id',
+            eq: { id: item.id }
+        });
+
+        if (existing && existing.length > 0) {
+            return supabase.update('about_content', item, { id: item.id });
+        } else {
+            return supabase.insert('about_content', item);
+        }
+    },
+
+    async update(id, data) {
+        return supabase.update('about_content', data, { id });
+    },
+
+    async delete(id) {
+        return supabase.delete('about_content', { id });
+    }
+};
+
+// Mission API (mission statements and goal cards on Our Mission page)
+const missionAPI = {
+    async getStatements() {
+        return supabase.query('mission_statements', {
+            select: '*',
+            order: 'sort_order.asc'
+        });
+    },
+
+    async upsertStatement(item) {
+        const existing = await supabase.query('mission_statements', {
+            select: 'id',
+            eq: { id: item.id }
+        });
+
+        if (existing && existing.length > 0) {
+            return supabase.update('mission_statements', item, { id: item.id });
+        } else {
+            return supabase.insert('mission_statements', item);
+        }
+    },
+
+    async deleteStatement(id) {
+        return supabase.delete('mission_statements', { id });
+    },
+
+    async getGoalCards() {
+        return supabase.query('mission_goal_cards', {
+            select: '*',
+            order: 'sort_order.asc'
+        });
+    },
+
+    async upsertGoalCard(item) {
+        const existing = await supabase.query('mission_goal_cards', {
+            select: 'id',
+            eq: { id: item.id }
+        });
+
+        if (existing && existing.length > 0) {
+            return supabase.update('mission_goal_cards', item, { id: item.id });
+        } else {
+            return supabase.insert('mission_goal_cards', item);
+        }
+    },
+
+    async deleteGoalCard(id) {
+        return supabase.delete('mission_goal_cards', { id });
+    },
+
+    async getSettings() {
+        const results = await supabase.query('mission_settings', {
+            select: '*',
+            limit: 1
+        });
+        return results[0] || null;
+    },
+
+    async updateSettings(data) {
+        const existing = await this.getSettings();
+        if (existing) {
+            return supabase.update('mission_settings', data, { id: existing.id });
+        } else {
+            return supabase.insert('mission_settings', { id: 'main', ...data });
+        }
+    }
+};
+
+// Goal Pages API (individual goal page content)
+const goalPagesAPI = {
+    async getAll() {
+        return supabase.query('goal_pages', {
+            select: '*',
+            order: 'sort_order.asc'
+        });
+    },
+
+    async getById(id) {
+        const results = await supabase.query('goal_pages', {
+            select: '*',
+            eq: { id }
+        });
+        return results[0] || null;
+    },
+
+    async upsert(item) {
+        const existing = await supabase.query('goal_pages', {
+            select: 'id',
+            eq: { id: item.id }
+        });
+
+        if (existing && existing.length > 0) {
+            return supabase.update('goal_pages', item, { id: item.id });
+        } else {
+            return supabase.insert('goal_pages', item);
+        }
+    },
+
+    async update(id, data) {
+        return supabase.update('goal_pages', data, { id });
+    },
+
+    async delete(id) {
+        return supabase.delete('goal_pages', { id });
+    }
+};
+
 // Export for use
 window.supabase = supabase;
 window.postsAPI = postsAPI;
 window.galleryAPI = galleryAPI;
 window.progressAPI = progressAPI;
+window.aboutAPI = aboutAPI;
+window.missionAPI = missionAPI;
+window.goalPagesAPI = goalPagesAPI;

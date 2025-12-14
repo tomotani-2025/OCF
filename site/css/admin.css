@@ -1894,3 +1894,367 @@
     opacity: 0.7;
     cursor: not-allowed;
 }
+
+
+/* =========================================
+   About Us Tab Styles
+   ========================================= */
+
+.advisors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.advisor-card-admin {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #F7F4EB;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.advisor-card-admin:active {
+    cursor: grabbing;
+}
+
+.advisor-card-admin:hover {
+    background: #EDE4D2;
+}
+
+.advisor-card-admin.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.advisor-drag-handle {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.advisor-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.advisor-preview-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    background-color: #ddd;
+    flex-shrink: 0;
+}
+
+.advisor-preview-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.advisor-preview-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 4px 0;
+}
+
+.advisor-preview-info p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+.advisor-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.advisor-editor-content {
+    max-width: 700px;
+    padding: 32px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   Mission Tab Styles
+   ========================================= */
+
+.mission-statements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.mission-statement-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    background: #F7F4EB;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.mission-statement-card:active {
+    cursor: grabbing;
+}
+
+.mission-statement-card:hover {
+    background: #EDE4D2;
+}
+
+.mission-statement-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.statement-drag-handle {
+    color: #999;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.statement-preview {
+    flex: 1;
+    min-width: 0;
+}
+
+.statement-preview p {
+    font-size: 14px;
+    color: #31110F;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+.statement-preview .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #EF3A4F;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 10px;
+}
+
+.statement-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Goal Cards in Mission Tab */
+.goal-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.goal-card-admin {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #F7F4EB;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.goal-card-admin:active {
+    cursor: grabbing;
+}
+
+.goal-card-admin:hover {
+    background: #EDE4D2;
+}
+
+.goal-card-admin.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.goal-card-drag-handle {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.goal-card-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.goal-card-preview-image {
+    width: 80px;
+    height: 50px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    background-color: #ddd;
+    flex-shrink: 0;
+}
+
+.goal-card-preview-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.goal-card-preview-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 4px 0;
+}
+
+.goal-card-preview-info p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+.goal-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   Goal Pages Tab Styles
+   ========================================= */
+
+.goal-pages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.goal-page-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #F7F4EB;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s;
+}
+
+.goal-page-card:active {
+    cursor: grabbing;
+}
+
+.goal-page-card:hover {
+    background: #EDE4D2;
+}
+
+.goal-page-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.goal-page-drag-handle {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.goal-page-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.goal-page-preview-image {
+    width: 100px;
+    height: 60px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    background-color: #ddd;
+    flex-shrink: 0;
+}
+
+.goal-page-preview-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.goal-page-preview-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 4px 0;
+}
+
+.goal-page-preview-info p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    font-family: monospace;
+}
+
+.goal-page-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.goal-page-actions .btn-view {
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+}
+
+.goal-page-actions .btn-view:hover {
+    background: #1d4ed8;
+}
+
+.goal-page-editor-content {
+    max-width: 800px;
+    padding: 32px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.goal-page-editor-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 16px 0;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Funding and Gallery items in goal page editor */
+.funding-item,
+.gallery-image-item {
+    background: #F7F4EB;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+}

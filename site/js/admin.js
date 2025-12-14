@@ -2652,7 +2652,10 @@ function setupTabs() {
     const tabContents = {
         posts: document.getElementById('posts-tab'),
         gallery: document.getElementById('gallery-tab'),
-        progress: document.getElementById('progress-tab')
+        progress: document.getElementById('progress-tab'),
+        about: document.getElementById('about-tab'),
+        mission: document.getElementById('mission-tab'),
+        goals: document.getElementById('goals-tab')
     };
 
     function showTab(tabName) {
@@ -2686,10 +2689,1117 @@ function setupTabs() {
 }
 
 
+// ============================================================
+// About Us Manager
+// ============================================================
+
+class AboutManager {
+    constructor() {
+        this.apiBase = '/.netlify/functions';
+        this.trustees = null;
+        this.advisors = [];
+        this.editingAdvisorId = null;
+        this.deleteAdvisorId = null;
+
+        // DOM Elements
+        this.trusteesTextarea = document.getElementById('trustees-text');
+        this.advisorsList = document.getElementById('advisors-list');
+        this.editorModal = document.getElementById('advisor-editor-modal');
+        this.deleteModal = document.getElementById('delete-advisor-modal');
+        this.form = document.getElementById('advisor-form');
+
+        this.init();
+    }
+
+    async init() {
+        await this.loadContent();
+        this.renderAdvisorsList();
+        this.setupEventListeners();
+    }
+
+    async loadContent() {
+        try {
+            const content = await aboutAPI.getContent();
+
+            // Find trustees
+            const trusteesItem = content.find(c => c.type === 'trustees');
+            if (trusteesItem) {
+                this.trustees = trusteesItem;
+                this.trusteesTextarea.value = trusteesItem.content || '';
+            }
+
+            // Find advisors
+            this.advisors = content.filter(c => c.type === 'advisor').sort((a, b) => a.sort_order - b.sort_order);
+        } catch (error) {
+            console.error('Error loading about content:', error);
+            this.advisors = [];
+        }
+    }
+
+    setupEventListeners() {
+        // Save trustees
+        document.getElementById('save-trustees-btn').addEventListener('click', () => this.saveTrustees());
+
+        // Add advisor
+        document.getElementById('add-advisor-btn').addEventListener('click', () => this.showEditor());
+
+        // Form
+        this.form.addEventListener('submit', (e) => this.saveAdvisor(e));
+        document.getElementById('cancel-advisor-edit').addEventListener('click', () => this.closeEditor());
+
+        // Delete modal
+        document.getElementById('cancel-advisor-delete').addEventListener('click', () => this.closeDeleteModal());
+        document.getElementById('confirm-advisor-delete').addEventListener('click', () => this.confirmDelete());
+
+        // Close modals
+        this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
+        this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
+
+        // Photo preview
+        const photoInput = document.getElementById('advisor-photo');
+        if (photoInput) {
+            photoInput.addEventListener('input', () => this.updatePhotoPreview());
+        }
+
+        // File upload
+        const fileInput = document.getElementById('advisor-photo-file');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => this.handlePhotoUpload(e));
+        }
+    }
+
+    async saveTrustees() {
+        try {
+            const content = this.trusteesTextarea.value;
+            const item = {
+                id: this.trustees?.id || 'trustees',
+                type: 'trustees',
+                content: content,
+                sort_order: 0
+            };
+            await aboutAPI.upsert(item);
+            this.trustees = item;
+            alert('Trustees text saved successfully!');
+        } catch (error) {
+            console.error('Error saving trustees:', error);
+            alert('Error saving trustees: ' + error.message);
+        }
+    }
+
+    renderAdvisorsList() {
+        if (this.advisors.length === 0) {
+            this.advisorsList.innerHTML = '<div class="loading-message">No advisors found. Click "Add Advisor" to create one.</div>';
+            return;
+        }
+
+        this.advisorsList.innerHTML = this.advisors.map(advisor => {
+            const data = typeof advisor.data === 'string' ? JSON.parse(advisor.data) : (advisor.data || {});
+            return `
+                <div class="advisor-card-admin" data-id="${advisor.id}" draggable="true">
+                    <div class="advisor-drag-handle">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 4H6V6H4V4ZM10 4H12V6H10V4ZM4 7H6V9H4V7ZM10 7H12V9H10V7ZM4 10H6V12H4V10ZM10 10H12V12H10V10Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="advisor-preview">
+                        <div class="advisor-preview-photo" style="background-image: url('${data.photo || ''}');"></div>
+                        <div class="advisor-preview-info">
+                            <h4>${data.name || 'Untitled'}</h4>
+                            <p>${data.title || ''}</p>
+                        </div>
+                    </div>
+                    <div class="advisor-actions">
+                        <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${advisor.id}">Edit</button>
+                        <button type="button" class="btn-action btn-delete" data-action="delete" data-id="${advisor.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers
+        this.advisorsList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showEditor(btn.dataset.id));
+        });
+        this.advisorsList.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showDeleteModal(btn.dataset.id));
+        });
+
+        // Setup drag and drop
+        this.setupDragDrop();
+    }
+
+    setupDragDrop() {
+        const cards = this.advisorsList.querySelectorAll('.advisor-card-admin');
+        let draggedItem = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                draggedItem = card;
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                this.updateOrder();
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedItem && draggedItem !== card) {
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        card.parentNode.insertBefore(draggedItem, card);
+                    } else {
+                        card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                    }
+                }
+            });
+        });
+    }
+
+    async updateOrder() {
+        const cards = this.advisorsList.querySelectorAll('.advisor-card-admin');
+        const updates = [];
+
+        cards.forEach((card, index) => {
+            const id = card.dataset.id;
+            const advisor = this.advisors.find(a => a.id === id);
+            if (advisor) {
+                advisor.sort_order = index;
+                updates.push(aboutAPI.update(id, { sort_order: index }));
+            }
+        });
+
+        try {
+            await Promise.all(updates);
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+    }
+
+    showEditor(advisorId = null) {
+        this.editingAdvisorId = advisorId;
+        const title = document.getElementById('advisor-editor-title');
+
+        if (advisorId) {
+            title.textContent = 'Edit Advisor';
+            const advisor = this.advisors.find(a => a.id === advisorId);
+            if (advisor) {
+                const data = typeof advisor.data === 'string' ? JSON.parse(advisor.data) : (advisor.data || {});
+                document.getElementById('advisor-id').value = advisorId;
+                document.getElementById('advisor-name').value = data.name || '';
+                document.getElementById('advisor-title').value = data.title || '';
+                document.getElementById('advisor-photo').value = data.photo || '';
+                document.getElementById('advisor-bio').value = data.bio || '';
+                document.getElementById('advisor-links').value = (data.links || []).map(l => `${l.label}|${l.url}`).join('\n');
+                document.getElementById('advisor-partner-logo').value = data.partnerLogo || '';
+                document.getElementById('advisor-partner-name').value = data.partnerName || '';
+                document.getElementById('advisor-tall-card').checked = data.tallCard || false;
+                this.updatePhotoPreview();
+            }
+        } else {
+            title.textContent = 'Add Advisor';
+            this.resetForm();
+        }
+
+        this.editorModal.hidden = false;
+    }
+
+    closeEditor() {
+        this.editorModal.hidden = true;
+        this.editingAdvisorId = null;
+        this.resetForm();
+    }
+
+    resetForm() {
+        document.getElementById('advisor-id').value = '';
+        document.getElementById('advisor-name').value = '';
+        document.getElementById('advisor-title').value = '';
+        document.getElementById('advisor-photo').value = '';
+        document.getElementById('advisor-bio').value = '';
+        document.getElementById('advisor-links').value = '';
+        document.getElementById('advisor-partner-logo').value = '';
+        document.getElementById('advisor-partner-name').value = '';
+        document.getElementById('advisor-tall-card').checked = false;
+        document.getElementById('advisor-photo-file-name').textContent = 'No file chosen';
+        this.updatePhotoPreview();
+    }
+
+    updatePhotoPreview() {
+        const photoPath = document.getElementById('advisor-photo').value;
+        const preview = document.getElementById('advisor-photo-preview');
+        if (photoPath) {
+            preview.innerHTML = `<img src="${photoPath}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Photo preview</span>';
+        }
+    }
+
+    async handlePhotoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        document.getElementById('advisor-photo-file-name').textContent = file.name;
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    folder: 'images/AboutUs'
+                })
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const result = await response.json();
+            document.getElementById('advisor-photo').value = result.path;
+            this.updatePhotoPreview();
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+            alert('Error uploading photo: ' + error.message);
+        }
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+        });
+    }
+
+    async saveAdvisor(e) {
+        e.preventDefault();
+
+        const linksText = document.getElementById('advisor-links').value;
+        const links = linksText.split('\n').filter(l => l.trim()).map(line => {
+            const [label, url] = line.split('|');
+            return { label: label?.trim() || '', url: url?.trim() || '' };
+        });
+
+        const data = {
+            name: document.getElementById('advisor-name').value,
+            title: document.getElementById('advisor-title').value,
+            photo: document.getElementById('advisor-photo').value,
+            bio: document.getElementById('advisor-bio').value,
+            links: links,
+            partnerLogo: document.getElementById('advisor-partner-logo').value,
+            partnerName: document.getElementById('advisor-partner-name').value,
+            tallCard: document.getElementById('advisor-tall-card').checked
+        };
+
+        const item = {
+            id: this.editingAdvisorId || `advisor-${Date.now()}`,
+            type: 'advisor',
+            data: JSON.stringify(data),
+            sort_order: this.editingAdvisorId ? (this.advisors.find(a => a.id === this.editingAdvisorId)?.sort_order || 0) : this.advisors.length
+        };
+
+        try {
+            await aboutAPI.upsert(item);
+            await this.loadContent();
+            this.renderAdvisorsList();
+            this.closeEditor();
+        } catch (error) {
+            console.error('Error saving advisor:', error);
+            alert('Error saving advisor: ' + error.message);
+        }
+    }
+
+    showDeleteModal(advisorId) {
+        this.deleteAdvisorId = advisorId;
+        const advisor = this.advisors.find(a => a.id === advisorId);
+        const data = advisor ? (typeof advisor.data === 'string' ? JSON.parse(advisor.data) : advisor.data) : {};
+        document.getElementById('delete-advisor-title').textContent = `Are you sure you want to delete "${data.name || 'this advisor'}"?`;
+        this.deleteModal.hidden = false;
+    }
+
+    closeDeleteModal() {
+        this.deleteModal.hidden = true;
+        this.deleteAdvisorId = null;
+    }
+
+    async confirmDelete() {
+        if (!this.deleteAdvisorId) return;
+
+        try {
+            await aboutAPI.delete(this.deleteAdvisorId);
+            await this.loadContent();
+            this.renderAdvisorsList();
+            this.closeDeleteModal();
+        } catch (error) {
+            console.error('Error deleting advisor:', error);
+            alert('Error deleting advisor: ' + error.message);
+        }
+    }
+}
+
+
+// ============================================================
+// Mission Manager
+// ============================================================
+
+class MissionManager {
+    constructor() {
+        this.apiBase = '/.netlify/functions';
+        this.statements = [];
+        this.goalCards = [];
+        this.settings = null;
+        this.editingStatementId = null;
+        this.editingGoalCardId = null;
+        this.deleteStatementId = null;
+
+        // DOM Elements
+        this.statementsList = document.getElementById('mission-statements-list');
+        this.goalCardsList = document.getElementById('goal-cards-list');
+        this.statementModal = document.getElementById('mission-statement-modal');
+        this.goalCardModal = document.getElementById('goal-card-modal');
+        this.deleteStatementModal = document.getElementById('delete-mission-statement-modal');
+        this.statementForm = document.getElementById('mission-statement-form');
+        this.goalCardForm = document.getElementById('goal-card-form');
+
+        this.init();
+    }
+
+    async init() {
+        await this.loadContent();
+        this.renderStatementsList();
+        this.renderGoalCardsList();
+        this.setupEventListeners();
+    }
+
+    async loadContent() {
+        try {
+            this.statements = await missionAPI.getStatements();
+            this.goalCards = await missionAPI.getGoalCards();
+            this.settings = await missionAPI.getSettings();
+
+            // Load mission breaker image
+            if (this.settings?.breaker_image) {
+                document.getElementById('mission-breaker-image').value = this.settings.breaker_image;
+                this.updateBreakerPreview();
+            }
+        } catch (error) {
+            console.error('Error loading mission content:', error);
+            this.statements = [];
+            this.goalCards = [];
+        }
+    }
+
+    setupEventListeners() {
+        // Save breaker image
+        document.getElementById('save-mission-breaker-btn').addEventListener('click', () => this.saveBreakerImage());
+
+        // Breaker image preview
+        document.getElementById('mission-breaker-image').addEventListener('input', () => this.updateBreakerPreview());
+
+        // Add statement
+        document.getElementById('add-mission-statement-btn').addEventListener('click', () => this.showStatementEditor());
+
+        // Statement form
+        this.statementForm.addEventListener('submit', (e) => this.saveStatement(e));
+        document.getElementById('cancel-mission-statement').addEventListener('click', () => this.closeStatementEditor());
+
+        // Goal card form
+        this.goalCardForm.addEventListener('submit', (e) => this.saveGoalCard(e));
+        document.getElementById('cancel-goal-card').addEventListener('click', () => this.closeGoalCardEditor());
+
+        // Delete statement modal
+        document.getElementById('cancel-statement-delete').addEventListener('click', () => this.closeDeleteStatementModal());
+        document.getElementById('confirm-statement-delete').addEventListener('click', () => this.confirmDeleteStatement());
+
+        // Close modals
+        this.statementModal.querySelector('.modal-close').addEventListener('click', () => this.closeStatementEditor());
+        this.statementModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeStatementEditor());
+        this.goalCardModal.querySelector('.modal-close').addEventListener('click', () => this.closeGoalCardEditor());
+        this.goalCardModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeGoalCardEditor());
+    }
+
+    updateBreakerPreview() {
+        const path = document.getElementById('mission-breaker-image').value;
+        const preview = document.getElementById('mission-breaker-preview');
+        if (path) {
+            preview.innerHTML = `<img src="${path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
+    }
+
+    async saveBreakerImage() {
+        try {
+            const breakerImage = document.getElementById('mission-breaker-image').value;
+            await missionAPI.updateSettings({ breaker_image: breakerImage });
+            alert('Mission breaker image saved successfully!');
+        } catch (error) {
+            console.error('Error saving breaker image:', error);
+            alert('Error saving breaker image: ' + error.message);
+        }
+    }
+
+    renderStatementsList() {
+        if (this.statements.length === 0) {
+            this.statementsList.innerHTML = '<div class="loading-message">No statements found. Click "Add Statement" to create one.</div>';
+            return;
+        }
+
+        this.statementsList.innerHTML = this.statements.map(statement => `
+            <div class="mission-statement-card" data-id="${statement.id}" draggable="true">
+                <div class="statement-drag-handle">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 4H6V6H4V4ZM10 4H12V6H10V4ZM4 7H6V9H4V7ZM10 7H12V9H10V7ZM4 10H6V12H4V10ZM10 10H12V12H10V10Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="statement-preview">
+                    <p>${statement.content?.substring(0, 150)}${statement.content?.length > 150 ? '...' : ''}</p>
+                    ${statement.full_width ? '<span class="badge">Full Width</span>' : ''}
+                </div>
+                <div class="statement-actions">
+                    <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${statement.id}">Edit</button>
+                    <button type="button" class="btn-action btn-delete" data-action="delete" data-id="${statement.id}">Delete</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Add click handlers
+        this.statementsList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showStatementEditor(btn.dataset.id));
+        });
+        this.statementsList.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showDeleteStatementModal(btn.dataset.id));
+        });
+
+        // Setup drag and drop
+        this.setupStatementDragDrop();
+    }
+
+    setupStatementDragDrop() {
+        const cards = this.statementsList.querySelectorAll('.mission-statement-card');
+        let draggedItem = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                draggedItem = card;
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                this.updateStatementOrder();
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedItem && draggedItem !== card) {
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        card.parentNode.insertBefore(draggedItem, card);
+                    } else {
+                        card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                    }
+                }
+            });
+        });
+    }
+
+    async updateStatementOrder() {
+        const cards = this.statementsList.querySelectorAll('.mission-statement-card');
+        const updates = [];
+
+        cards.forEach((card, index) => {
+            const id = card.dataset.id;
+            updates.push(missionAPI.upsertStatement({ id, sort_order: index }));
+        });
+
+        try {
+            await Promise.all(updates);
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+    }
+
+    showStatementEditor(statementId = null) {
+        this.editingStatementId = statementId;
+        const title = document.getElementById('mission-statement-modal-title');
+
+        if (statementId) {
+            title.textContent = 'Edit Statement';
+            const statement = this.statements.find(s => s.id === statementId);
+            if (statement) {
+                document.getElementById('mission-statement-id').value = statementId;
+                document.getElementById('mission-statement-text').value = statement.content || '';
+                document.getElementById('mission-statement-fullwidth').checked = statement.full_width || false;
+            }
+        } else {
+            title.textContent = 'Add Statement';
+            this.resetStatementForm();
+        }
+
+        this.statementModal.hidden = false;
+    }
+
+    closeStatementEditor() {
+        this.statementModal.hidden = true;
+        this.editingStatementId = null;
+        this.resetStatementForm();
+    }
+
+    resetStatementForm() {
+        document.getElementById('mission-statement-id').value = '';
+        document.getElementById('mission-statement-text').value = '';
+        document.getElementById('mission-statement-fullwidth').checked = false;
+    }
+
+    async saveStatement(e) {
+        e.preventDefault();
+
+        const item = {
+            id: this.editingStatementId || `statement-${Date.now()}`,
+            content: document.getElementById('mission-statement-text').value,
+            full_width: document.getElementById('mission-statement-fullwidth').checked,
+            sort_order: this.editingStatementId ? (this.statements.find(s => s.id === this.editingStatementId)?.sort_order || 0) : this.statements.length
+        };
+
+        try {
+            await missionAPI.upsertStatement(item);
+            await this.loadContent();
+            this.renderStatementsList();
+            this.closeStatementEditor();
+        } catch (error) {
+            console.error('Error saving statement:', error);
+            alert('Error saving statement: ' + error.message);
+        }
+    }
+
+    showDeleteStatementModal(statementId) {
+        this.deleteStatementId = statementId;
+        this.deleteStatementModal.hidden = false;
+    }
+
+    closeDeleteStatementModal() {
+        this.deleteStatementModal.hidden = true;
+        this.deleteStatementId = null;
+    }
+
+    async confirmDeleteStatement() {
+        if (!this.deleteStatementId) return;
+
+        try {
+            await missionAPI.deleteStatement(this.deleteStatementId);
+            await this.loadContent();
+            this.renderStatementsList();
+            this.closeDeleteStatementModal();
+        } catch (error) {
+            console.error('Error deleting statement:', error);
+            alert('Error deleting statement: ' + error.message);
+        }
+    }
+
+    renderGoalCardsList() {
+        if (this.goalCards.length === 0) {
+            this.goalCardsList.innerHTML = '<div class="loading-message">No goal cards found.</div>';
+            return;
+        }
+
+        this.goalCardsList.innerHTML = this.goalCards.map(card => `
+            <div class="goal-card-admin" data-id="${card.id}" draggable="true">
+                <div class="goal-card-drag-handle">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 4H6V6H4V4ZM10 4H12V6H10V4ZM4 7H6V9H4V7ZM10 7H12V9H10V7ZM4 10H6V12H4V10ZM10 10H12V12H10V10Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="goal-card-preview">
+                    <div class="goal-card-preview-image" style="background-image: url('${card.image || ''}');"></div>
+                    <div class="goal-card-preview-info">
+                        <h4>${card.label || ''} ${card.title || 'Untitled'}</h4>
+                        <p>${card.subtitle || ''}</p>
+                    </div>
+                </div>
+                <div class="goal-card-actions">
+                    <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${card.id}">Edit</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Add click handlers
+        this.goalCardsList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showGoalCardEditor(btn.dataset.id));
+        });
+
+        // Setup drag and drop
+        this.setupGoalCardDragDrop();
+    }
+
+    setupGoalCardDragDrop() {
+        const cards = this.goalCardsList.querySelectorAll('.goal-card-admin');
+        let draggedItem = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                draggedItem = card;
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                this.updateGoalCardOrder();
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedItem && draggedItem !== card) {
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        card.parentNode.insertBefore(draggedItem, card);
+                    } else {
+                        card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                    }
+                }
+            });
+        });
+    }
+
+    async updateGoalCardOrder() {
+        const cards = this.goalCardsList.querySelectorAll('.goal-card-admin');
+        const updates = [];
+
+        cards.forEach((card, index) => {
+            const id = card.dataset.id;
+            updates.push(missionAPI.upsertGoalCard({ id, sort_order: index }));
+        });
+
+        try {
+            await Promise.all(updates);
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+    }
+
+    showGoalCardEditor(cardId) {
+        this.editingGoalCardId = cardId;
+        document.getElementById('goal-card-modal-title').textContent = 'Edit Goal Card';
+
+        const card = this.goalCards.find(c => c.id === cardId);
+        if (card) {
+            document.getElementById('goal-card-id').value = cardId;
+            document.getElementById('goal-card-label').value = card.label || '';
+            document.getElementById('goal-card-title').value = card.title || '';
+            document.getElementById('goal-card-subtitle').value = card.subtitle || '';
+            document.getElementById('goal-card-description').value = card.description || '';
+            document.getElementById('goal-card-image').value = card.image || '';
+            document.getElementById('goal-card-link').value = card.link || '';
+        }
+
+        this.goalCardModal.hidden = false;
+    }
+
+    closeGoalCardEditor() {
+        this.goalCardModal.hidden = true;
+        this.editingGoalCardId = null;
+        this.resetGoalCardForm();
+    }
+
+    resetGoalCardForm() {
+        document.getElementById('goal-card-id').value = '';
+        document.getElementById('goal-card-label').value = '';
+        document.getElementById('goal-card-title').value = '';
+        document.getElementById('goal-card-subtitle').value = '';
+        document.getElementById('goal-card-description').value = '';
+        document.getElementById('goal-card-image').value = '';
+        document.getElementById('goal-card-link').value = '';
+    }
+
+    async saveGoalCard(e) {
+        e.preventDefault();
+
+        const item = {
+            id: this.editingGoalCardId,
+            label: document.getElementById('goal-card-label').value,
+            title: document.getElementById('goal-card-title').value,
+            subtitle: document.getElementById('goal-card-subtitle').value,
+            description: document.getElementById('goal-card-description').value,
+            image: document.getElementById('goal-card-image').value,
+            link: document.getElementById('goal-card-link').value,
+            sort_order: this.goalCards.find(c => c.id === this.editingGoalCardId)?.sort_order || 0
+        };
+
+        try {
+            await missionAPI.upsertGoalCard(item);
+            await this.loadContent();
+            this.renderGoalCardsList();
+            this.closeGoalCardEditor();
+        } catch (error) {
+            console.error('Error saving goal card:', error);
+            alert('Error saving goal card: ' + error.message);
+        }
+    }
+}
+
+
+// ============================================================
+// Goal Pages Manager
+// ============================================================
+
+class GoalPagesManager {
+    constructor() {
+        this.apiBase = '/.netlify/functions';
+        this.pages = [];
+        this.editingPageId = null;
+        this.deletePageId = null;
+        this.fundingItemCount = 0;
+        this.galleryImageCount = 0;
+
+        // DOM Elements
+        this.pagesList = document.getElementById('goal-pages-list');
+        this.editorModal = document.getElementById('goal-page-modal');
+        this.deleteModal = document.getElementById('delete-goal-page-modal');
+        this.form = document.getElementById('goal-page-form');
+        this.fundingContainer = document.getElementById('funding-items-container');
+        this.galleryContainer = document.getElementById('goal-gallery-container');
+
+        this.init();
+    }
+
+    async init() {
+        await this.loadPages();
+        this.renderPagesList();
+        this.setupEventListeners();
+    }
+
+    async loadPages() {
+        try {
+            this.pages = await goalPagesAPI.getAll();
+        } catch (error) {
+            console.error('Error loading goal pages:', error);
+            this.pages = [];
+        }
+    }
+
+    setupEventListeners() {
+        // Add page
+        document.getElementById('add-goal-page-btn').addEventListener('click', () => this.showEditor());
+
+        // Form
+        this.form.addEventListener('submit', (e) => this.savePage(e));
+        document.getElementById('cancel-goal-page').addEventListener('click', () => this.closeEditor());
+
+        // Add funding item
+        document.getElementById('add-funding-item-btn').addEventListener('click', () => this.addFundingItem());
+
+        // Add gallery image
+        document.getElementById('add-goal-gallery-image-btn').addEventListener('click', () => this.addGalleryImage());
+
+        // Delete modal
+        document.getElementById('cancel-goal-page-delete').addEventListener('click', () => this.closeDeleteModal());
+        document.getElementById('confirm-goal-page-delete').addEventListener('click', () => this.confirmDelete());
+
+        // Close modals
+        this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
+        this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
+
+        // Hero image preview
+        document.getElementById('goal-page-hero').addEventListener('input', () => this.updateHeroPreview());
+    }
+
+    updateHeroPreview() {
+        const path = document.getElementById('goal-page-hero').value;
+        const preview = document.getElementById('goal-page-hero-preview');
+        if (path) {
+            preview.innerHTML = `<img src="${path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
+    }
+
+    renderPagesList() {
+        if (this.pages.length === 0) {
+            this.pagesList.innerHTML = '<div class="loading-message">No goal pages found. Click "Add Goal Page" to create one.</div>';
+            return;
+        }
+
+        this.pagesList.innerHTML = this.pages.map(page => `
+            <div class="goal-page-card" data-id="${page.id}" draggable="true">
+                <div class="goal-page-drag-handle">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 4H6V6H4V4ZM10 4H12V6H10V4ZM4 7H6V9H4V7ZM10 7H12V9H10V7ZM4 10H6V12H4V10ZM10 10H12V12H10V10Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="goal-page-preview">
+                    <div class="goal-page-preview-image" style="background-image: url('${page.hero_image || ''}');"></div>
+                    <div class="goal-page-preview-info">
+                        <h4>${page.label || ''} ${page.title || 'Untitled'}</h4>
+                        <p>${page.slug || ''}</p>
+                    </div>
+                </div>
+                <div class="goal-page-actions">
+                    <a href="${page.slug}" target="_blank" class="btn-action btn-view">View</a>
+                    <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${page.id}">Edit</button>
+                    <button type="button" class="btn-action btn-delete" data-action="delete" data-id="${page.id}">Delete</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Add click handlers
+        this.pagesList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showEditor(btn.dataset.id));
+        });
+        this.pagesList.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', () => this.showDeleteModal(btn.dataset.id));
+        });
+
+        // Setup drag and drop
+        this.setupDragDrop();
+    }
+
+    setupDragDrop() {
+        const cards = this.pagesList.querySelectorAll('.goal-page-card');
+        let draggedItem = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                draggedItem = card;
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                this.updateOrder();
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedItem && draggedItem !== card) {
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        card.parentNode.insertBefore(draggedItem, card);
+                    } else {
+                        card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                    }
+                }
+            });
+        });
+    }
+
+    async updateOrder() {
+        const cards = this.pagesList.querySelectorAll('.goal-page-card');
+        const updates = [];
+
+        cards.forEach((card, index) => {
+            const id = card.dataset.id;
+            updates.push(goalPagesAPI.update(id, { sort_order: index }));
+        });
+
+        try {
+            await Promise.all(updates);
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+    }
+
+    showEditor(pageId = null) {
+        this.editingPageId = pageId;
+        const title = document.getElementById('goal-page-modal-title');
+
+        if (pageId) {
+            title.textContent = 'Edit Goal Page';
+            const page = this.pages.find(p => p.id === pageId);
+            if (page) {
+                document.getElementById('goal-page-id').value = pageId;
+                document.getElementById('goal-page-label').value = page.label || '';
+                document.getElementById('goal-page-title').value = page.title || '';
+                document.getElementById('goal-page-slug').value = page.slug || '';
+                document.getElementById('goal-page-hero').value = page.hero_image || '';
+                document.getElementById('goal-page-content').value = page.content || '';
+
+                // Load funding items
+                const funding = typeof page.funding === 'string' ? JSON.parse(page.funding || '[]') : (page.funding || []);
+                this.fundingContainer.innerHTML = '';
+                this.fundingItemCount = 0;
+                funding.forEach(item => this.addFundingItem(item));
+
+                // Load gallery images
+                const gallery = typeof page.gallery === 'string' ? JSON.parse(page.gallery || '[]') : (page.gallery || []);
+                this.galleryContainer.innerHTML = '';
+                this.galleryImageCount = 0;
+                gallery.forEach(img => this.addGalleryImage(img));
+
+                this.updateHeroPreview();
+            }
+        } else {
+            title.textContent = 'Add Goal Page';
+            this.resetForm();
+        }
+
+        this.editorModal.hidden = false;
+    }
+
+    closeEditor() {
+        this.editorModal.hidden = true;
+        this.editingPageId = null;
+        this.resetForm();
+    }
+
+    resetForm() {
+        document.getElementById('goal-page-id').value = '';
+        document.getElementById('goal-page-label').value = '';
+        document.getElementById('goal-page-title').value = '';
+        document.getElementById('goal-page-slug').value = '';
+        document.getElementById('goal-page-hero').value = '';
+        document.getElementById('goal-page-content').value = '';
+        this.fundingContainer.innerHTML = '';
+        this.fundingItemCount = 0;
+        this.galleryContainer.innerHTML = '';
+        this.galleryImageCount = 0;
+        this.updateHeroPreview();
+    }
+
+    addFundingItem(data = {}) {
+        const index = this.fundingItemCount++;
+        const html = `
+            <div class="funding-item media-item" data-index="${index}">
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label>Phase Label</label>
+                        <input type="text" name="funding-label-${index}" value="${data.label || ''}" placeholder="Phase one:">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="text" name="funding-amount-${index}" value="${data.amount || ''}" placeholder="$23,000 USD">
+                    </div>
+                </div>
+                <button type="button" class="btn-remove-media" onclick="this.closest('.funding-item').remove()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        this.fundingContainer.insertAdjacentHTML('beforeend', html);
+    }
+
+    addGalleryImage(data = {}) {
+        const index = this.galleryImageCount++;
+        const html = `
+            <div class="gallery-image-item media-item" data-index="${index}">
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label>Image Path</label>
+                        <input type="text" name="gallery-src-${index}" value="${data.src || ''}" placeholder="images/photo.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>Alt Text</label>
+                        <input type="text" name="gallery-alt-${index}" value="${data.alt || ''}" placeholder="Description">
+                    </div>
+                </div>
+                <button type="button" class="btn-remove-media" onclick="this.closest('.gallery-image-item').remove()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        this.galleryContainer.insertAdjacentHTML('beforeend', html);
+    }
+
+    collectFundingItems() {
+        const items = [];
+        this.fundingContainer.querySelectorAll('.funding-item').forEach(item => {
+            const index = item.dataset.index;
+            const label = item.querySelector(`[name="funding-label-${index}"]`)?.value || '';
+            const amount = item.querySelector(`[name="funding-amount-${index}"]`)?.value || '';
+            if (label || amount) {
+                items.push({ label, amount });
+            }
+        });
+        return items;
+    }
+
+    collectGalleryImages() {
+        const images = [];
+        this.galleryContainer.querySelectorAll('.gallery-image-item').forEach(item => {
+            const index = item.dataset.index;
+            const src = item.querySelector(`[name="gallery-src-${index}"]`)?.value || '';
+            const alt = item.querySelector(`[name="gallery-alt-${index}"]`)?.value || '';
+            if (src) {
+                images.push({ src, alt });
+            }
+        });
+        return images;
+    }
+
+    async savePage(e) {
+        e.preventDefault();
+
+        const item = {
+            id: this.editingPageId || `goal-${Date.now()}`,
+            label: document.getElementById('goal-page-label').value,
+            title: document.getElementById('goal-page-title').value,
+            slug: document.getElementById('goal-page-slug').value,
+            hero_image: document.getElementById('goal-page-hero').value,
+            content: document.getElementById('goal-page-content').value,
+            funding: JSON.stringify(this.collectFundingItems()),
+            gallery: JSON.stringify(this.collectGalleryImages()),
+            sort_order: this.editingPageId ? (this.pages.find(p => p.id === this.editingPageId)?.sort_order || 0) : this.pages.length
+        };
+
+        try {
+            await goalPagesAPI.upsert(item);
+            await this.loadPages();
+            this.renderPagesList();
+            this.closeEditor();
+        } catch (error) {
+            console.error('Error saving goal page:', error);
+            alert('Error saving goal page: ' + error.message);
+        }
+    }
+
+    showDeleteModal(pageId) {
+        this.deletePageId = pageId;
+        const page = this.pages.find(p => p.id === pageId);
+        document.getElementById('delete-goal-page-title').textContent = `Are you sure you want to delete "${page?.title || 'this page'}"?`;
+        this.deleteModal.hidden = false;
+    }
+
+    closeDeleteModal() {
+        this.deleteModal.hidden = true;
+        this.deletePageId = null;
+    }
+
+    async confirmDelete() {
+        if (!this.deletePageId) return;
+
+        try {
+            await goalPagesAPI.delete(this.deletePageId);
+            await this.loadPages();
+            this.renderPagesList();
+            this.closeDeleteModal();
+        } catch (error) {
+            console.error('Error deleting page:', error);
+            alert('Error deleting page: ' + error.message);
+        }
+    }
+}
+
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     new AdminDashboard();
     new GalleryManager();
     new ProgressManager();
+    new AboutManager();
+    new MissionManager();
+    new GoalPagesManager();
 });
