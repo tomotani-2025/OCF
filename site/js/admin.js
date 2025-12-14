@@ -2112,11 +2112,8 @@ class ProgressManager {
                     <input type="text" id="goal-bar-label-${index}" placeholder="Phase 1" value="${data.barLabel || ''}">
                 </div>
                 <div class="form-group">
-                    <label for="goal-bar-color-${index}">Bar Color</label>
-                    <div class="color-input-wrapper">
-                        <input type="color" id="goal-bar-color-${index}" value="${data.barColor || '#F5E4AF'}">
-                        <input type="text" id="goal-bar-color-text-${index}" value="${data.barColor || '#F5E4AF'}">
-                    </div>
+                    <label>Bar Color</label>
+                    ${this.createGradientPickerHTML(index, data.barColor, data.gradientColor1, data.gradientColor2)}
                 </div>
             </div>
             <div class="marker-toggle-row">
@@ -2155,8 +2152,10 @@ class ProgressManager {
             this.renumberGoalItems();
         });
 
+        // Setup gradient picker
+        this.setupGradientPicker(index);
+
         // Color syncs
-        this.setupColorSyncDynamic(`goal-bar-color-${index}`, `goal-bar-color-text-${index}`);
         this.setupColorSyncDynamic(`goal-marker-color-${index}`, `goal-marker-color-text-${index}`);
         this.setupColorSyncDynamic(`goal-marker-text-color-${index}`, `goal-marker-text-color-text-${index}`);
 
@@ -2176,6 +2175,117 @@ class ProgressManager {
             text.addEventListener('input', () => {
                 if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
                     picker.value = text.value;
+                }
+            });
+        }
+    }
+
+    createGradientPickerHTML(index, barColor, gradientColor1, gradientColor2) {
+        // Determine if using gradient based on whether gradient colors exist
+        const isGradient = gradientColor1 && gradientColor2;
+        const solidColor = barColor || '#F5E4AF';
+        const color1 = gradientColor1 || '#F5E4AF';
+        const color2 = gradientColor2 || '#D4C48A';
+
+        return `
+            <div class="gradient-picker" id="gradient-picker-${index}">
+                <div class="gradient-type-toggle">
+                    <button type="button" data-type="solid" class="${!isGradient ? 'active' : ''}">Solid</button>
+                    <button type="button" data-type="gradient" class="${isGradient ? 'active' : ''}">Gradient</button>
+                </div>
+                <div class="gradient-solid-picker ${!isGradient ? 'active' : ''}">
+                    <div class="color-input-wrapper">
+                        <input type="color" id="goal-bar-color-${index}" value="${solidColor}">
+                        <input type="text" id="goal-bar-color-text-${index}" value="${solidColor}">
+                    </div>
+                </div>
+                <div class="gradient-colors-picker ${isGradient ? 'active' : ''}">
+                    <div class="gradient-color-row">
+                        <label>Top</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="goal-gradient-color1-${index}" value="${color1}">
+                            <input type="text" id="goal-gradient-color1-text-${index}" value="${color1}">
+                        </div>
+                    </div>
+                    <div class="gradient-color-row">
+                        <label>Bottom</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="goal-gradient-color2-${index}" value="${color2}">
+                            <input type="text" id="goal-gradient-color2-text-${index}" value="${color2}">
+                        </div>
+                    </div>
+                    <div class="gradient-preview" id="gradient-preview-${index}" style="background: linear-gradient(to bottom, ${color1}, ${color2});"></div>
+                </div>
+                <input type="hidden" id="goal-use-gradient-${index}" value="${isGradient ? '1' : '0'}">
+            </div>
+        `;
+    }
+
+    setupGradientPicker(index) {
+        const picker = document.getElementById(`gradient-picker-${index}`);
+        if (!picker) return;
+
+        const toggleBtns = picker.querySelectorAll('.gradient-type-toggle button');
+        const solidPicker = picker.querySelector('.gradient-solid-picker');
+        const gradientPicker = picker.querySelector('.gradient-colors-picker');
+        const useGradientInput = document.getElementById(`goal-use-gradient-${index}`);
+
+        // Toggle buttons
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                if (btn.dataset.type === 'solid') {
+                    solidPicker.classList.add('active');
+                    gradientPicker.classList.remove('active');
+                    useGradientInput.value = '0';
+                } else {
+                    solidPicker.classList.remove('active');
+                    gradientPicker.classList.add('active');
+                    useGradientInput.value = '1';
+                }
+            });
+        });
+
+        // Sync solid color
+        this.setupColorSyncDynamic(`goal-bar-color-${index}`, `goal-bar-color-text-${index}`);
+
+        // Sync gradient colors and update preview
+        const color1Picker = document.getElementById(`goal-gradient-color1-${index}`);
+        const color1Text = document.getElementById(`goal-gradient-color1-text-${index}`);
+        const color2Picker = document.getElementById(`goal-gradient-color2-${index}`);
+        const color2Text = document.getElementById(`goal-gradient-color2-text-${index}`);
+        const preview = document.getElementById(`gradient-preview-${index}`);
+
+        const updatePreview = () => {
+            if (preview) {
+                preview.style.background = `linear-gradient(to bottom, ${color1Picker.value}, ${color2Picker.value})`;
+            }
+        };
+
+        if (color1Picker && color1Text) {
+            color1Picker.addEventListener('input', () => {
+                color1Text.value = color1Picker.value;
+                updatePreview();
+            });
+            color1Text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(color1Text.value)) {
+                    color1Picker.value = color1Text.value;
+                    updatePreview();
+                }
+            });
+        }
+
+        if (color2Picker && color2Text) {
+            color2Picker.addEventListener('input', () => {
+                color2Text.value = color2Picker.value;
+                updatePreview();
+            });
+            color2Text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(color2Text.value)) {
+                    color2Picker.value = color2Text.value;
+                    updatePreview();
                 }
             });
         }
@@ -2205,7 +2315,8 @@ class ProgressManager {
             const value = parseInt(document.getElementById(`goal-value-${index}`)?.value) || 0;
 
             if (name && value > 0) {
-                items.push({
+                const useGradient = document.getElementById(`goal-use-gradient-${index}`)?.value === '1';
+                const goalData = {
                     name,
                     value,
                     barLabel: document.getElementById(`goal-bar-label-${index}`)?.value.trim() || name,
@@ -2214,7 +2325,15 @@ class ProgressManager {
                     markerEnabled: document.getElementById(`goal-marker-enabled-${index}`)?.checked || false,
                     markerColor: document.getElementById(`goal-marker-color-${index}`)?.value || '#312121',
                     markerTextColor: document.getElementById(`goal-marker-text-color-${index}`)?.value || '#F5E4AF'
-                });
+                };
+
+                // Add gradient colors if using gradient
+                if (useGradient) {
+                    goalData.gradientColor1 = document.getElementById(`goal-gradient-color1-${index}`)?.value || '#F5E4AF';
+                    goalData.gradientColor2 = document.getElementById(`goal-gradient-color2-${index}`)?.value || '#D4C48A';
+                }
+
+                items.push(goalData);
             }
         });
         return items;

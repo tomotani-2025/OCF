@@ -126,7 +126,14 @@ function createProgressCard(goal) {
         const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
         const color = g.barColor || '#F5E4AF';
         const stripedClass = g.striped ? ' bar-striped' : '';
-        goalBarsHTML += `<div class="bar-goal${stripedClass}" style="--bar-height: ${percent}%; --bar-color: ${color};"></div>`;
+
+        // Check for gradient colors
+        let backgroundStyle = '';
+        if (g.gradientColor1 && g.gradientColor2) {
+            backgroundStyle = `--bar-gradient: linear-gradient(to bottom, ${g.gradientColor1}, ${g.gradientColor2});`;
+        }
+
+        goalBarsHTML += `<div class="bar-goal${stripedClass}" style="--bar-height: ${percent}%; --bar-color: ${color}; ${backgroundStyle}"></div>`;
     });
 
     // Build markers HTML

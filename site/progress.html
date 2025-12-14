@@ -718,7 +718,7 @@
             left: 0;
             right: 0;
             height: var(--bar-height, 50%);
-            background: var(--bar-color, #F5E4AF);
+            background: var(--bar-gradient, var(--bar-color, #F5E4AF));
             border-radius: 0;
             display: flex;
             align-items: flex-start;
@@ -726,7 +726,7 @@
             padding-top: 12px;
         }
 
-        /* Striped bar pattern - layer stripes over solid color */
+        /* Striped bar pattern - layer stripes over solid or gradient color */
         .bar-goal.bar-striped {
             background:
                 repeating-linear-gradient(
@@ -736,7 +736,7 @@
                     rgba(255, 255, 255, 0.3) 8px,
                     rgba(255, 255, 255, 0.3) 16px
                 ),
-                var(--bar-color, #F5E4AF);
+                var(--bar-gradient, var(--bar-color, #F5E4AF));
         }
 
         .bar-raised {

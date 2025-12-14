@@ -1691,6 +1691,83 @@
     min-width: 0;
 }
 
+/* Gradient Color Picker */
+.gradient-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gradient-type-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.gradient-type-toggle button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: #f8f8f8;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gradient-type-toggle button.active {
+    background: #312121;
+    color: #fff;
+}
+
+.gradient-type-toggle button:hover:not(.active) {
+    background: #eee;
+}
+
+.gradient-solid-picker,
+.gradient-colors-picker {
+    display: none;
+}
+
+.gradient-solid-picker.active,
+.gradient-colors-picker.active {
+    display: flex;
+    gap: 8px;
+}
+
+.gradient-colors-picker {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gradient-color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gradient-color-row label {
+    font-size: 11px;
+    color: #666;
+    width: 50px;
+    flex-shrink: 0;
+}
+
+.gradient-color-row .color-input-wrapper {
+    flex: 1;
+}
+
+.gradient-preview {
+    width: 100%;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    margin-top: 4px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-section {
