@@ -10,18 +10,61 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.querySelector('.mobile-menu-toggle');
     const navList = document.querySelector('.nav-list');
 
+    // Create overlay element for mobile menu
+    let menuOverlay = document.querySelector('.mobile-menu-overlay');
+    if (!menuOverlay && menuToggle) {
+        menuOverlay = document.createElement('div');
+        menuOverlay.className = 'mobile-menu-overlay';
+        document.body.appendChild(menuOverlay);
+    }
+
+    function openMobileMenu() {
+        navList.classList.add('active');
+        menuToggle.classList.add('active');
+        menuOverlay.classList.add('active');
+        document.body.classList.add('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMobileMenu() {
+        navList.classList.remove('active');
+        menuToggle.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+    }
+
     if (menuToggle && navList) {
         menuToggle.addEventListener('click', function() {
-            navList.classList.toggle('active');
-            menuToggle.classList.toggle('active');
+            if (navList.classList.contains('active')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
         });
+
+        // Close menu when clicking overlay
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMobileMenu);
+        }
 
         // Close menu when clicking on a link
         navList.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                navList.classList.remove('active');
-                menuToggle.classList.remove('active');
-            });
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navList.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // Close menu when resizing to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1100 && navList.classList.contains('active')) {
+                closeMobileMenu();
+            }
         });
     }
 
