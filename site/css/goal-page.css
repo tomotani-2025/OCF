@@ -80,6 +80,41 @@
     margin: 0;
 }
 
+/* Album Title Block - for gallery pages */
+.album-title-block {
+    margin-bottom: 32px;
+}
+
+.album-title-block .album-label {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #312121;
+    margin: 0;
+}
+
+.album-title-block .album-title {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #312121;
+    margin: 0 0 8px 0;
+}
+
+.album-title-block .album-helper-text {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: -0.03em;
+    color: rgba(49, 33, 33, 0.6);
+    margin: 0;
+}
+
 /* Goal Body */
 .goal-body {
     max-width: 700px;

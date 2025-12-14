@@ -1339,7 +1339,6 @@ p {
 .gallery-item {
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 4px;
     cursor: pointer;
 }
 
