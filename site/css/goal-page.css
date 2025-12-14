@@ -1,0 +1,249 @@
+/* =========================================
+   Goal Page Styles
+   ========================================= */
+
+/* Goal Page Content Section */
+.goal-page-content {
+    padding: 40px 0 80px;
+    background: #F7F4EB;
+}
+
+.goal-page-content .container {
+    max-width: 976px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Back Link */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-primary);
+    font-weight: 500;
+    font-size: 16px;
+    color: #312121;
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #EF3A4F;
+}
+
+.back-link svg {
+    width: 18px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #EF3A4F;
+}
+
+/* Goal Hero Image */
+.goal-hero {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.goal-hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+/* Goal Title Block */
+.goal-title-block {
+    margin-bottom: 32px;
+}
+
+.goal-title-block .goal-label {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #312121;
+    margin: 0;
+}
+
+.goal-title-block .goal-title {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 109%;
+    letter-spacing: -0.05em;
+    color: #312121;
+    margin: 0;
+}
+
+/* Goal Body */
+.goal-body {
+    max-width: 700px;
+}
+
+.goal-body p {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 160%;
+    letter-spacing: -0.04em;
+    color: #312121;
+    margin: 0 0 24px;
+}
+
+.goal-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Goal Funding Box */
+.goal-funding {
+    background: #FFFFFF;
+    padding: 24px 32px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    border-left: 4px solid #EF3A4F;
+}
+
+.goal-funding p {
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+.goal-funding p:first-child {
+    margin-top: 0;
+}
+
+.goal-funding p:last-child {
+    margin-bottom: 0;
+}
+
+/* Goal Gallery Section */
+.goal-gallery-section {
+    padding: 0 0 80px;
+    background: #F7F4EB;
+}
+
+.goal-gallery-section .container {
+    max-width: 976px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.goal-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.goal-gallery .gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+}
+
+.goal-gallery .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.goal-gallery .gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 1100px) {
+    .goal-title-block .goal-label,
+    .goal-title-block .goal-title {
+        font-size: 28px;
+    }
+
+    .goal-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .goal-page-content {
+        padding: 24px 0 48px;
+    }
+
+    .goal-hero {
+        margin-bottom: 24px;
+        border-radius: 0;
+        margin-left: -24px;
+        margin-right: -24px;
+        width: calc(100% + 48px);
+    }
+
+    .goal-title-block {
+        margin-bottom: 24px;
+    }
+
+    .goal-title-block .goal-label,
+    .goal-title-block .goal-title {
+        font-size: 24px;
+    }
+
+    .goal-body p {
+        font-size: 16px;
+    }
+
+    .goal-funding {
+        padding: 20px 24px;
+    }
+
+    .goal-gallery-section {
+        padding: 0 0 48px;
+    }
+
+    .goal-gallery {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .goal-gallery {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .goal-title-block .goal-label,
+    .goal-title-block .goal-title {
+        font-size: 20px;
+    }
+}
+
+/* CTA Buttons */
+.cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.cta-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Button Icons */
+.btn-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.btn-primary .btn-icon {
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(329deg) brightness(97%) contrast(92%);
+}
+
+/* Lightbox styles are in styles.css */

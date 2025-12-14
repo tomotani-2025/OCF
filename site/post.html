@@ -43,6 +43,14 @@
         <!-- Post Section -->
         <section class="post-section">
             <div class="post-container">
+                <!-- Back to all posts link -->
+                <a href="news-updates.html" class="back-link">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 7H1M1 7L7 1M1 7L7 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to all posts
+                </a>
+
                 <!-- Author / Date / Category Header -->
                 <div class="post-meta">
                     <span class="post-date">Loading...</span>
@@ -161,6 +169,31 @@
             gap: 48px;
             max-width: 976px;
             width: 100%;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            gap: 8px;
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #312121;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #EF3A4F;
+        }
+
+        .back-link svg {
+            width: 18px;
+            height: 14px;
+            flex-shrink: 0;
+            color: #EF3A4F;
         }
 
         /* Author / Date / Category Header */

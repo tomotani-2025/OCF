@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goal Two: Porters at Bwindi — Omotani CARING Foundation</title>
+    <title>Goal Two: Porters at Bwindi — Omotani Caring Foundation</title>
     <meta name="description" content="Goal Two: Supporting porters at Bwindi through sustainability projects.">
-    <link rel="stylesheet" href="css/styles.css?v=2">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css?v=4">
+    <link rel="stylesheet" href="css/goal-page.css?v=2">
 </head>
 <body>
     <header class="site-header">
         <div class="container">
             <a href="index.html" class="logo">
-                <img src="images/logo/OCF-Badge-WhiteRed.svg" alt="Omotani CARING Foundation">
+                <img src="images/logo/OCF-Badge-WhiteRed.svg" alt="Omotani Caring Foundation">
             </a>
             <nav class="main-nav">
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -25,8 +23,8 @@
                 <ul class="nav-list">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="about-us.html">About Us</a></li>
-                    <li><a href="our-mission.html" class="active">Our Mission</a></li>
-                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="our-mission.html">Our Mission</a></li>
+                    <li><a href="projects.html" class="active">Projects</a></li>
                     <li><a href="gallery.html">Gallery</a></li>
                     <li><a href="progress.html">Progress</a></li>
                     <li><a href="news-updates.html">News + Updates</a></li>
@@ -42,14 +40,29 @@
     <main>
         <section class="page-header">
             <div class="container">
-                <h1>Goal Two: Porters at Bwindi</h1>
-                <p>Supporting porter sustainability</p>
+                <h1>Our Projects</h1>
             </div>
         </section>
 
-        <section class="content-section">
+        <section class="goal-page-content">
             <div class="container">
-                <div class="content-wrapper">
+                <a href="projects.html" class="back-link">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 7H1M1 7L7 1M1 7L7 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to all projects
+                </a>
+
+                <div class="goal-hero">
+                    <img src="images/porters-03-cropped-1180x437.jpg" alt="Porters at Bwindi">
+                </div>
+
+                <div class="goal-title-block">
+                    <h3 class="goal-label">Goal Two:</h3>
+                    <h2 class="goal-title">Porters at Bwindi</h2>
+                </div>
+
+                <div class="goal-body">
                     <p>Support the development and expansion of food related sustainability project that will allow the porters in one of the four major porter's association to supplement the income they receive from tourism.</p>
 
                     <p>This project will be coordinated with the support and project accountability controls of the Rafiki Wildlife Conservation Initiative.</p>
@@ -61,7 +74,7 @@
             </div>
         </section>
 
-        <section class="content-section alt-bg">
+        <section class="goal-gallery-section">
             <div class="container">
                 <div class="goal-gallery">
                     <div class="gallery-item">
@@ -80,21 +93,31 @@
             </div>
         </section>
 
+        <!-- CTA Section -->
         <section class="cta-section section">
             <div class="container">
                 <div class="cta-content">
                     <div class="cta-buttons">
-                        <a href="our-mission.html" class="btn btn-primary">View All Goals</a>
-                        <a href="progress.html" class="btn btn-secondary">View Progress</a>
-                        <a href="make-a-donation.html" class="btn btn-secondary">Make a Donation</a>
+                        <a href="projects.html" class="btn btn-primary">
+                            <img src="images/SVG/charity.svg" alt="" class="btn-icon">
+                            View All Projects
+                        </a>
+                        <a href="progress.html" class="btn btn-secondary">
+                            <img src="images/SVG/charts.svg" alt="" class="btn-icon">
+                            View Progress
+                        </a>
+                        <a href="make-a-donation.html" class="btn btn-secondary">
+                            <img src="images/SVG/donation.svg" alt="" class="btn-icon">
+                            Make a Donation
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-        <!-- Footer -->
-        <footer class="site-footer">
+    <!-- Footer -->
+    <footer class="site-footer">
         <div class="footer-header">
             <img src="images/logo/OCF-FullWordmark-BlackRed.svg" alt="Omotani Caring Foundation" class="footer-logo">
         </div>
@@ -125,31 +148,5 @@
     </footer>
 
     <script src="js/main.js?v=2"></script>
-
-    <style>
-        .goal-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: var(--spacing-md);
-        }
-
-        .goal-gallery .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            aspect-ratio: 4/3;
-        }
-
-        .goal-gallery .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .goal-gallery .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-    </style>
 </body>
 </html>
