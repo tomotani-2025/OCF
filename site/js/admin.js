@@ -2053,6 +2053,32 @@ class ProgressManager {
                 document.getElementById('donations-marker-text-color').value = donations.markerTextColor || '#f7f7f7';
                 document.getElementById('donations-marker-text-color-text').value = donations.markerTextColor || '#f7f7f7';
 
+                // Load donations gradient values
+                const isGradient = donations.gradientColor1 && donations.gradientColor2;
+                document.getElementById('donations-use-gradient').value = isGradient ? '1' : '0';
+                document.getElementById('donations-gradient-color1').value = donations.gradientColor1 || '#e85a71';
+                document.getElementById('donations-gradient-color1-text').value = donations.gradientColor1 || '#e85a71';
+                document.getElementById('donations-gradient-color2').value = donations.gradientColor2 || '#c44a5f';
+                document.getElementById('donations-gradient-color2-text').value = donations.gradientColor2 || '#c44a5f';
+
+                // Update gradient picker UI
+                const gradientPicker = document.getElementById('donations-gradient-picker');
+                const solidPicker = gradientPicker.querySelector('.gradient-solid-picker');
+                const gradientColorsPicker = gradientPicker.querySelector('.gradient-colors-picker');
+                const toggleBtns = gradientPicker.querySelectorAll('.gradient-type-toggle button');
+                toggleBtns.forEach(btn => btn.classList.remove('active'));
+                if (isGradient) {
+                    toggleBtns[1].classList.add('active');
+                    solidPicker.classList.remove('active');
+                    gradientColorsPicker.classList.add('active');
+                } else {
+                    toggleBtns[0].classList.add('active');
+                    solidPicker.classList.add('active');
+                    gradientColorsPicker.classList.remove('active');
+                }
+                document.getElementById('donations-gradient-preview').style.background =
+                    `linear-gradient(to bottom, ${donations.gradientColor1 || '#e85a71'}, ${donations.gradientColor2 || '#c44a5f'})`;
+
                 // Update marker colors visibility
                 const colorsDiv = document.getElementById('donations-marker-colors');
                 colorsDiv.style.opacity = donations.markerEnabled ? '1' : '0.5';
@@ -2071,9 +2097,29 @@ class ProgressManager {
             document.getElementById('donations-marker-text-color-text').value = '#f7f7f7';
             document.getElementById('donations-marker-colors').style.opacity = '0.5';
 
+            // Reset donations gradient defaults
+            document.getElementById('donations-use-gradient').value = '0';
+            document.getElementById('donations-gradient-color1').value = '#e85a71';
+            document.getElementById('donations-gradient-color1-text').value = '#e85a71';
+            document.getElementById('donations-gradient-color2').value = '#c44a5f';
+            document.getElementById('donations-gradient-color2-text').value = '#c44a5f';
+            const gradientPicker = document.getElementById('donations-gradient-picker');
+            const solidPicker = gradientPicker.querySelector('.gradient-solid-picker');
+            const gradientColorsPicker = gradientPicker.querySelector('.gradient-colors-picker');
+            const toggleBtns = gradientPicker.querySelectorAll('.gradient-type-toggle button');
+            toggleBtns.forEach(btn => btn.classList.remove('active'));
+            toggleBtns[0].classList.add('active');
+            solidPicker.classList.add('active');
+            gradientColorsPicker.classList.remove('active');
+            document.getElementById('donations-gradient-preview').style.background =
+                'linear-gradient(to bottom, #e85a71, #c44a5f)';
+
             // Add default goal
             this.addGoalItem({ name: 'Goal', value: '', barLabel: 'Goal', barColor: '#F5E4AF', markerEnabled: true, markerColor: '#312121', markerTextColor: '#F5E4AF' });
         }
+
+        // Setup donations gradient picker event listeners
+        this.setupDonationsGradientPicker();
 
         this.editorModal.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -2291,6 +2337,73 @@ class ProgressManager {
         }
     }
 
+    setupDonationsGradientPicker() {
+        const picker = document.getElementById('donations-gradient-picker');
+        if (!picker) return;
+
+        const toggleBtns = picker.querySelectorAll('.gradient-type-toggle button');
+        const solidPicker = picker.querySelector('.gradient-solid-picker');
+        const gradientPicker = picker.querySelector('.gradient-colors-picker');
+        const useGradientInput = document.getElementById('donations-use-gradient');
+
+        // Toggle buttons
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                if (btn.dataset.type === 'solid') {
+                    solidPicker.classList.add('active');
+                    gradientPicker.classList.remove('active');
+                    useGradientInput.value = '0';
+                } else {
+                    solidPicker.classList.remove('active');
+                    gradientPicker.classList.add('active');
+                    useGradientInput.value = '1';
+                }
+            });
+        });
+
+        // Sync gradient colors and update preview
+        const color1Picker = document.getElementById('donations-gradient-color1');
+        const color1Text = document.getElementById('donations-gradient-color1-text');
+        const color2Picker = document.getElementById('donations-gradient-color2');
+        const color2Text = document.getElementById('donations-gradient-color2-text');
+        const preview = document.getElementById('donations-gradient-preview');
+
+        const updatePreview = () => {
+            if (preview) {
+                preview.style.background = `linear-gradient(to bottom, ${color1Picker.value}, ${color2Picker.value})`;
+            }
+        };
+
+        if (color1Picker && color1Text) {
+            color1Picker.addEventListener('input', () => {
+                color1Text.value = color1Picker.value;
+                updatePreview();
+            });
+            color1Text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(color1Text.value)) {
+                    color1Picker.value = color1Text.value;
+                    updatePreview();
+                }
+            });
+        }
+
+        if (color2Picker && color2Text) {
+            color2Picker.addEventListener('input', () => {
+                color2Text.value = color2Picker.value;
+                updatePreview();
+            });
+            color2Text.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(color2Text.value)) {
+                    color2Picker.value = color2Text.value;
+                    updatePreview();
+                }
+            });
+        }
+    }
+
     renumberGoalItems() {
         if (!this.goalsContainer) return;
         const items = this.goalsContainer.querySelectorAll('.progress-goal-item');
@@ -2340,13 +2453,22 @@ class ProgressManager {
     }
 
     collectDonations() {
-        return {
+        const useGradient = document.getElementById('donations-use-gradient')?.value === '1';
+        const donations = {
             value: parseInt(document.getElementById('donations-value')?.value) || 0,
             color: document.getElementById('donations-color')?.value || '#e85a71',
             markerEnabled: document.getElementById('donations-marker-enabled')?.checked || false,
             markerColor: document.getElementById('donations-marker-color')?.value || '#e85a71',
             markerTextColor: document.getElementById('donations-marker-text-color')?.value || '#f7f7f7'
         };
+
+        // Add gradient colors if using gradient
+        if (useGradient) {
+            donations.gradientColor1 = document.getElementById('donations-gradient-color1')?.value || '#e85a71';
+            donations.gradientColor2 = document.getElementById('donations-gradient-color2')?.value || '#c44a5f';
+        }
+
+        return donations;
     }
 
     async saveGoal(e) {
