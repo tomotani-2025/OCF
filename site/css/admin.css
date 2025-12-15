@@ -2381,6 +2381,13 @@
     background-position: center;
     background-color: #F7F4EB;
     position: relative;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.album-card-image:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
 }
 
 .album-status-badge {

@@ -166,7 +166,7 @@ class GalleryAdmin {
 
         this.albumsList.innerHTML = this.albums.map(album => `
             <div class="album-card" data-album-id="${album.id}">
-                <div class="album-card-image" style="background-image: url('${album.cover_image || 'images/placeholder.jpg'}');">
+                <div class="album-card-image" style="background-image: url('${album.cover_image || 'images/placeholder.jpg'}');" onclick="galleryAdmin.showImagesView(${album.id})" role="button" tabindex="0">
                     ${!album.is_active ? '<span class="album-status-badge">Hidden</span>' : ''}
                 </div>
                 <div class="album-card-content">
