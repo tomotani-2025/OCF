@@ -88,12 +88,20 @@ html {
 }
 
 
+/* Hide body until fonts loaded to prevent FOUT layout shift */
 body {
     font-family: var(--font-primary);
     font-size: 1rem;
     line-height: 1.6;
     color: var(--color-paragraph-1);
     background-color: var(--color-background-1);
+    visibility: hidden;
+    opacity: 0;
+}
+
+html.fonts-loaded body {
+    visibility: visible;
+    opacity: 1;
 }
 
 img {

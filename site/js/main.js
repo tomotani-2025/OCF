@@ -5,6 +5,26 @@
 // Add js-enabled class immediately for reveal animations
 document.documentElement.classList.add('js-enabled');
 
+// Font loading with localStorage caching (prevents FOUT/layout shift)
+(function() {
+    // Check if fonts were previously loaded (instant on repeat visits)
+    if (localStorage.getItem('fontsLoaded')) {
+        document.documentElement.classList.add('fonts-loaded');
+        return;
+    }
+
+    // Wait for fonts to load, then reveal page
+    if ('fonts' in document) {
+        document.fonts.ready.then(function() {
+            document.documentElement.classList.add('fonts-loaded');
+            localStorage.setItem('fontsLoaded', 'true');
+        });
+    } else {
+        // Fallback for older browsers
+        document.documentElement.classList.add('fonts-loaded');
+    }
+})();
+
 // Smooth page transitions
 (function() {
     // Handle clicks on internal links for smooth page exit
