@@ -5,6 +5,41 @@
 // Add js-enabled class immediately for reveal animations
 document.documentElement.classList.add('js-enabled');
 
+// Smooth page transitions
+(function() {
+    // Handle clicks on internal links for smooth page exit
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+
+        // Skip if: external link, anchor link, new tab, or special protocol
+        if (!href ||
+            href.startsWith('#') ||
+            href.startsWith('http') ||
+            href.startsWith('mailto:') ||
+            href.startsWith('tel:') ||
+            link.target === '_blank' ||
+            e.ctrlKey || e.metaKey || e.shiftKey) {
+            return;
+        }
+
+        // Fade out and navigate
+        e.preventDefault();
+        document.body.classList.add('page-transitioning');
+
+        setTimeout(function() {
+            window.location.href = href;
+        }, 150);
+    });
+
+    // Fade in on page load (handles back/forward navigation)
+    window.addEventListener('pageshow', function(e) {
+        document.body.classList.remove('page-transitioning');
+    });
+})();
+
 // Global function to initialize reveal animations (can be called after dynamic content loads)
 window.initRevealAnimations = function() {
     const revealItems = document.querySelectorAll('.reveal-on-scroll:not(.revealed), .offering-item:not(.revealed)');
