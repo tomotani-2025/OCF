@@ -413,6 +413,11 @@ class GalleryAdmin {
         modal.hidden = false;
     }
 
+    showBulkUploader() {
+        // TODO: Implement bulk upload modal with file upload integration
+        alert('Bulk upload functionality is coming soon! This feature will allow you to upload multiple images at once with batch metadata input.');
+    }
+
     showImageEditor(imageId) {
         this.editingImage = imageId;
         const image = this.currentImages.find(img => img.id === imageId);

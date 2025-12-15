@@ -1,0 +1,76 @@
+# =====================================================
+# Claude Code Ignore File
+# Improves performance by excluding large/unnecessary files
+# =====================================================
+
+# Node modules (scraper has ~1700 files)
+**/node_modules/
+
+# Migrated content archive (~2200 files - old scraped data)
+migrated-content/
+
+# Image files (thousands of images that aren't needed for code analysis)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.ico
+*.bmp
+*.tiff
+
+# Keep SVG since they're often code/icons we may need to edit
+# !*.svg
+
+# Large data files
+*.json
+!package.json
+!package-lock.json
+!netlify.toml
+
+# Binary and media files
+*.mp4
+*.mp3
+*.wav
+*.ogg
+*.pdf
+*.zip
+*.tar
+*.gz
+*.rar
+
+# Build artifacts and caches
+.cache/
+dist/
+build/
+*.min.js
+*.min.css
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Database folder (SQL scripts are useful, but backups aren't)
+database/*.backup
+database/*.dump
+
+# Art assets folder (design files not needed for code analysis)
+_Art/
+
+# Netlify functions build
+netlify/functions/

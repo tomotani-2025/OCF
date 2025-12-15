@@ -64,23 +64,25 @@
 
                     <!-- Dashboard Actions -->
                     <div class="dashboard-actions">
-                        <button type="button" id="create-new-btn" class="btn btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Create New Post
-                        </button>
-                        <div class="dashboard-search">
-                            <input type="text" id="search-posts" placeholder="Search posts...">
-                        </div>
-                        <div class="dashboard-filter">
-                            <select id="filter-category">
-                                <option value="all">All Categories</option>
-                                <option value="Batwa">Batwa</option>
-                                <option value="Bwindi">Bwindi</option>
-                                <option value="Nepal">Nepal</option>
-                                <option value="Base Camp For Veterans">Base Camp For Veterans</option>
-                            </select>
+                        <div class="dashboard-actions-row">
+                            <button type="button" id="create-new-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Create New Post
+                            </button>
+                            <div class="dashboard-search">
+                                <input type="text" id="search-posts" placeholder="Search posts...">
+                            </div>
+                            <div class="dashboard-filter">
+                                <select id="filter-category">
+                                    <option value="all">All Categories</option>
+                                    <option value="Batwa">Batwa</option>
+                                    <option value="Bwindi">Bwindi</option>
+                                    <option value="Nepal">Nepal</option>
+                                    <option value="Base Camp For Veterans">Base Camp For Veterans</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -403,7 +405,7 @@
                         <div class="modal-backdrop"></div>
                         <div class="modal-content">
                             <button type="button" class="modal-close" aria-label="Close">&times;</button>
-                            <h2 id="album-editor-title">Create New Album</h2>
+                            <h2 class="title" id="album-editor-title">Create New Album</h2>
                             <form id="album-form">
                                 <div class="form-section">
                                     <div class="form-row">
@@ -466,7 +468,7 @@
                         <div class="modal-backdrop"></div>
                         <div class="modal-content">
                             <button type="button" class="modal-close" aria-label="Close">&times;</button>
-                            <h2 id="image-editor-title">Add Image</h2>
+                            <h2 class="title" id="image-editor-title">Add Image</h2>
                             <form id="image-form">
                                 <div class="form-section">
                                     <div class="form-row">
@@ -474,13 +476,13 @@
                                             <label for="image-file">Upload Image</label>
                                             <div class="file-upload-wrapper">
                                                 <input type="file" id="image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
-                                                <div class="file-upload-btn">
+                                                <label for="image-file" class="file-upload-btn">
                                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                         <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                         <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                     </svg>
                                                     <span>Choose File</span>
-                                                </div>
+                                                </label>
                                                 <span class="file-name" id="image-file-name">No file chosen</span>
                                             </div>
                                         </div>
@@ -584,7 +586,7 @@
                     <div id="delete-album-modal" class="modal" hidden>
                         <div class="modal-backdrop"></div>
                         <div class="modal-content delete-modal-content">
-                            <h2>Delete Album?</h2>
+                            <h2 class="title">Delete Album?</h2>
                             <div id="delete-album-message">
                                 <!-- Message populated by JS -->
                             </div>
@@ -599,7 +601,7 @@
                     <div id="delete-image-modal" class="modal" hidden>
                         <div class="modal-backdrop"></div>
                         <div class="modal-content delete-modal-content">
-                            <h2>Delete Image?</h2>
+                            <h2 class="title">Delete Image?</h2>
                             <p id="delete-image-title">Are you sure you want to delete this image?</p>
                             <div class="delete-actions">
                                 <button type="button" id="cancel-image-delete" class="btn btn-outline">Cancel</button>
@@ -618,26 +620,28 @@
 
                     <!-- Progress Actions -->
                     <div class="dashboard-actions">
-                        <button type="button" id="add-progress-goal-btn" class="btn btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Add Goal
-                        </button>
-                        <button type="button" id="save-all-progress-btn" class="btn btn-outline">
-                            <svg class="btn-icon default-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 2V14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <svg class="btn-icon spinner-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: none;">
-                                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="12" stroke-linecap="round">
-                                    <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/>
-                                </circle>
-                            </svg>
-                            <svg class="btn-icon success-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: none;">
-                                <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="btn-text">Publish Changes</span>
-                        </button>
+                        <div class="dashboard-actions-buttons">
+                            <button type="button" id="add-progress-goal-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Goal
+                            </button>
+                            <button type="button" id="save-all-progress-btn" class="btn btn-outline">
+                                <svg class="btn-icon default-icon" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 2V14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <svg class="btn-icon spinner-icon" viewBox="0 0 16 16" fill="none" style="display: none;">
+                                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="12" stroke-linecap="round">
+                                        <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/>
+                                    </circle>
+                                </svg>
+                                <svg class="btn-icon success-icon" viewBox="0 0 16 16" fill="none" style="display: none;">
+                                    <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span class="btn-text">Publish Changes</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Progress Goals List -->
