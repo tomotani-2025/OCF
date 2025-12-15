@@ -3360,6 +3360,15 @@ class MissionManager {
         this.statementModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeStatementEditor());
         this.goalCardModal.querySelector('.modal-close').addEventListener('click', () => this.closeGoalCardEditor());
         this.goalCardModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeGoalCardEditor());
+
+        // Go to Goal Pages button
+        document.getElementById('go-to-goal-pages-btn').addEventListener('click', () => {
+            // Switch to Goals tab
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="goals"]').classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.hidden = true);
+            document.getElementById('goals-tab').hidden = false;
+        });
     }
 
     updateBreakerPreview() {
@@ -3925,6 +3934,86 @@ class GoalPagesManager {
 
         // Hero image preview
         document.getElementById('goal-page-hero').addEventListener('input', () => this.updateHeroPreview());
+
+        // Hero image file upload
+        const heroFileInput = document.getElementById('goal-page-hero-file');
+        if (heroFileInput) {
+            heroFileInput.addEventListener('change', (e) => this.handleHeroUpload(e));
+        }
+    }
+
+    async handleHeroUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        document.getElementById('goal-page-hero-file-name').textContent = file.name;
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    folder: 'images'
+                })
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const result = await response.json();
+            document.getElementById('goal-page-hero').value = result.path;
+            this.updateHeroPreview();
+        } catch (error) {
+            console.error('Error uploading hero image:', error);
+            alert('Error uploading image: ' + error.message);
+        }
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+        });
+    }
+
+    async handleGalleryImageUpload(e, index) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileNameEl = document.getElementById(`gallery-file-name-${index}`);
+        if (fileNameEl) fileNameEl.textContent = file.name;
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    folder: 'images'
+                })
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const result = await response.json();
+            const srcInput = document.querySelector(`[name="gallery-src-${index}"]`);
+            if (srcInput) srcInput.value = result.path;
+
+            // Update preview
+            const preview = document.getElementById(`gallery-preview-${index}`);
+            if (preview) {
+                preview.innerHTML = `<img src="${result.path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            }
+        } catch (error) {
+            console.error('Error uploading gallery image:', error);
+            alert('Error uploading image: ' + error.message);
+        }
     }
 
     updateHeroPreview() {
@@ -4085,6 +4174,15 @@ class GoalPagesManager {
         const index = this.fundingItemCount++;
         const html = `
             <div class="funding-item media-item" data-index="${index}">
+                <div class="media-item-header">
+                    <span class="media-item-number">Phase ${index + 1}</span>
+                    <button type="button" class="btn-remove-item" onclick="this.closest('.funding-item').remove()" title="Remove this phase">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M1 3.5H13M5.5 6.5V10.5M8.5 6.5V10.5M2 3.5L3 12C3 12.5523 3.44772 13 4 13H10C10.5523 13 11 12.5523 11 12L12 3.5M4.5 3.5V2C4.5 1.44772 4.94772 1 5.5 1H8.5C9.05228 1 9.5 1.44772 9.5 2V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Remove
+                    </button>
+                </div>
                 <div class="form-row two-col">
                     <div class="form-group">
                         <label>Phase Label</label>
@@ -4095,11 +4193,6 @@ class GoalPagesManager {
                         <input type="text" name="funding-amount-${index}" value="${data.amount || ''}" placeholder="$23,000 USD">
                     </div>
                 </div>
-                <button type="button" class="btn-remove-media" onclick="this.closest('.funding-item').remove()">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
             </div>
         `;
         this.fundingContainer.insertAdjacentHTML('beforeend', html);
@@ -4107,23 +4200,46 @@ class GoalPagesManager {
 
     addGalleryImage(data = {}) {
         const index = this.galleryImageCount++;
+        const previewHtml = data.src
+            ? `<img src="${data.src}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`
+            : '<span class="image-preview-placeholder">Image preview</span>';
         const html = `
             <div class="gallery-image-item media-item" data-index="${index}">
-                <div class="form-row two-col">
-                    <div class="form-group">
-                        <label>Image Path</label>
-                        <input type="text" name="gallery-src-${index}" value="${data.src || ''}" placeholder="images/photo.jpg">
+                <div class="media-item-header">
+                    <span class="media-item-number">Image ${index + 1}</span>
+                    <button type="button" class="btn-remove-item" onclick="this.closest('.gallery-image-item').remove()" title="Remove this image">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M1 3.5H13M5.5 6.5V10.5M8.5 6.5V10.5M2 3.5L3 12C3 12.5523 3.44772 13 4 13H10C10.5523 13 11 12.5523 11 12L12 3.5M4.5 3.5V2C4.5 1.44772 4.94772 1 5.5 1H8.5C9.05228 1 9.5 1.44772 9.5 2V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Remove
+                    </button>
+                </div>
+                <div class="form-row gallery-image-row">
+                    <div class="image-preview gallery-item-preview" id="gallery-preview-${index}">
+                        ${previewHtml}
                     </div>
-                    <div class="form-group">
-                        <label>Alt Text</label>
-                        <input type="text" name="gallery-alt-${index}" value="${data.alt || ''}" placeholder="Description">
+                    <div class="gallery-image-fields">
+                        <div class="form-group">
+                            <label>Image Path</label>
+                            <input type="text" name="gallery-src-${index}" value="${data.src || ''}" placeholder="images/photo.jpg" oninput="document.getElementById('gallery-preview-${index}').innerHTML = this.value ? '<img src=\\'' + this.value + '\\' alt=\\'Preview\\' onerror=\\'this.parentNode.innerHTML=&quot;<span class=image-preview-placeholder>Failed to load</span>&quot;\\'>' : '<span class=image-preview-placeholder>Image preview</span>'">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Text</label>
+                            <input type="text" name="gallery-alt-${index}" value="${data.alt || ''}" placeholder="Description of the image">
+                        </div>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="gallery-file-${index}" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input" onchange="window.goalPagesManager.handleGalleryImageUpload(event, ${index})">
+                            <div class="file-upload-btn">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Upload</span>
+                            </div>
+                            <span class="file-name" id="gallery-file-name-${index}">No file chosen</span>
+                        </div>
                     </div>
                 </div>
-                <button type="button" class="btn-remove-media" onclick="this.closest('.gallery-image-item').remove()">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
             </div>
         `;
         this.galleryContainer.insertAdjacentHTML('beforeend', html);
@@ -4217,5 +4333,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new ProgressManager();
     new AboutManager();
     new MissionManager();
-    new GoalPagesManager();
+    // Expose goalPagesManager globally for inline handlers
+    window.goalPagesManager = new GoalPagesManager();
 });

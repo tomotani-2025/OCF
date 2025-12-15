@@ -1064,7 +1064,16 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                     <!-- Goal Cards Section -->
                     <div class="form-section">
                         <h2>Goal Overview Cards</h2>
-                        <p class="form-help">These are the goal preview cards shown in the "Our Mission Goals" grid.</p>
+                        <p class="form-help">These are the goal preview cards shown in the "Our Mission Goals" grid. To add a new goal or edit full goal page content, go to the Goal Pages tab.</p>
+                        <div class="goal-pages-link-box">
+                            <p>Want to add a new goal or edit full goal page content?</p>
+                            <button type="button" id="go-to-goal-pages-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Go to Goal Pages
+                            </button>
+                        </div>
                         <div id="goal-cards-list" class="goal-cards-list">
                             <div class="loading-message">Loading goal cards...</div>
                         </div>
@@ -1220,6 +1229,17 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                                         <div class="form-group">
                                             <label for="goal-page-hero">Hero Image Path *</label>
                                             <input type="text" id="goal-page-hero" required placeholder="images/batwa+farm+lead+photo+news+and+update.jpg">
+                                            <div class="file-upload-wrapper" style="margin-top: 8px;">
+                                                <input type="file" id="goal-page-hero-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                                <div class="file-upload-btn">
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Upload Image</span>
+                                                </div>
+                                                <span class="file-name" id="goal-page-hero-file-name">No file chosen</span>
+                                            </div>
                                         </div>
                                         <div class="image-preview" id="goal-page-hero-preview">
                                             <span class="image-preview-placeholder">Image preview</span>
