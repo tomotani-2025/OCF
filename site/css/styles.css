@@ -231,6 +231,7 @@ a {
     gap: 6px;
     height: 24px;
     padding: 0 12px;
+    padding-bottom: 0;
     background-color: var(--color-accent-red);
     color: var(--color-paragraph-2) !important;
     border-radius: 500px;
