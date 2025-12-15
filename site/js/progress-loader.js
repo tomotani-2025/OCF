@@ -26,6 +26,10 @@
             container.appendChild(card);
         });
 
+        // Show CTA section after charts are loaded
+        const ctaSection = document.getElementById('progress-cta');
+        if (ctaSection) ctaSection.style.display = '';
+
     } catch (error) {
         console.error('Error loading progress:', error);
         container.innerHTML = '<p class="error-message">Unable to load progress data. Please try again later.</p>';

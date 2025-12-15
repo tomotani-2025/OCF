@@ -232,34 +232,51 @@ a {
 }
 
 /* Donate button in nav */
-.btn-donate {
+.btn.btn-donate {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    height: 24px;
-    padding: 0 12px;
-    padding-bottom: 0;
+    padding: 6px 14px;
     background-color: var(--color-accent-red);
     color: var(--color-paragraph-2) !important;
     border-radius: 500px;
     font-size: 13px;
     font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
     border-bottom: none !important;
 }
 
-.btn-donate .donate-icon {
+.btn.btn-donate .donate-icon {
     display: inline-block;
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: var(--color-paragraph-2);
-    fill: currentColor;
+    color: #000000;
+    fill: #000000;
 }
 
-.btn-donate:hover {
+.btn.btn-donate .donate-icon-filled {
+    display: none;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #000000;
+    fill: #000000;
+}
+
+.btn.btn-donate:hover {
     background-color: #d42e40;
     color: var(--color-paragraph-2) !important;
+}
+
+.btn.btn-donate:hover .donate-icon {
+    display: none;
+}
+
+.btn.btn-donate:hover .donate-icon-filled {
+    display: inline-block;
 }
 
 /* =========================================
@@ -1980,7 +1997,7 @@ body.menu-open {
         margin-top: 16px;
     }
 
-    .main-nav .nav-list .btn-donate {
+    .main-nav .nav-list .btn.btn-donate {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1993,7 +2010,7 @@ body.menu-open {
         border-radius: 500px;
     }
 
-    .main-nav .nav-list .btn-donate .donate-icon {
+    .main-nav .nav-list .btn.btn-donate .donate-icon {
         display: inline-block;
         width: 20px;
         height: 20px;
