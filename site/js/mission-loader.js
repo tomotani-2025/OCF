@@ -55,6 +55,11 @@
                 });
             }
         }
+        // Re-initialize reveal animations for dynamically loaded content
+        if (typeof window.initRevealAnimations === 'function') {
+            window.initRevealAnimations();
+        }
+
     } catch (error) {
         console.error('Error loading mission content:', error);
     }

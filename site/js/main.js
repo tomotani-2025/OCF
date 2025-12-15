@@ -5,6 +5,40 @@
 // Add js-enabled class immediately for reveal animations
 document.documentElement.classList.add('js-enabled');
 
+// Global function to initialize reveal animations (can be called after dynamic content loads)
+window.initRevealAnimations = function() {
+    const revealItems = document.querySelectorAll('.reveal-on-scroll:not(.revealed), .offering-item:not(.revealed)');
+
+    if ('IntersectionObserver' in window && revealItems.length > 0) {
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '50px 0px 50px 0px'
+        });
+
+        revealItems.forEach(function(item) {
+            const rect = item.getBoundingClientRect();
+            const inViewport = rect.top < window.innerHeight && rect.bottom > 0;
+            if (inViewport) {
+                // Instantly reveal elements already in viewport (no animation pop)
+                item.classList.add('revealed', 'revealed-instant');
+            } else {
+                revealObserver.observe(item);
+            }
+        });
+    } else {
+        revealItems.forEach(function(item) {
+            item.classList.add('revealed', 'revealed-instant');
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile menu toggle
     const menuToggle = document.querySelector('.mobile-menu-toggle');
@@ -127,40 +161,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Scroll reveal animation for offering items and reveal-on-scroll elements
-    const revealItems = document.querySelectorAll('.offering-item, .reveal-on-scroll');
-
-    if ('IntersectionObserver' in window && revealItems.length > 0) {
-        const revealObserver = new IntersectionObserver(function(entries, observer) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.05,
-            rootMargin: '0px 0px 0px 0px'
-        });
-
-        revealItems.forEach(function(item) {
-            revealObserver.observe(item);
-        });
-
-        // Fallback: reveal all items after a short delay if observer doesn't trigger
-        setTimeout(function() {
-            revealItems.forEach(function(item) {
-                if (!item.classList.contains('revealed')) {
-                    item.classList.add('revealed');
-                }
-            });
-        }, 2000);
-    } else {
-        // Fallback for browsers without IntersectionObserver
-        revealItems.forEach(function(item) {
-            item.classList.add('revealed');
-        });
-    }
+    // Initialize scroll reveal animations
+    window.initRevealAnimations();
 
     // Gallery lightbox (matching news post style)
     const galleryItems = document.querySelectorAll('.gallery-item');

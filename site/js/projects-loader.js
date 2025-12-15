@@ -23,6 +23,11 @@
                     const tile = createProjectTile(page);
                     projectsGrid.appendChild(tile);
                 });
+
+                // Re-initialize reveal animations for dynamically loaded content
+                if (typeof window.initRevealAnimations === 'function') {
+                    window.initRevealAnimations();
+                }
             }
         }
     } catch (error) {

@@ -40,6 +40,11 @@
                     const card = createAdvisorCard(data);
                     advisorsBlock.appendChild(card);
                 });
+
+                // Re-initialize reveal animations for dynamically loaded content
+                if (typeof window.initRevealAnimations === 'function') {
+                    window.initRevealAnimations();
+                }
             }
         }
     } catch (error) {
