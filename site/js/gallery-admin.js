@@ -97,8 +97,16 @@ class GalleryAdmin {
         document.getElementById('cancel-image-delete')?.addEventListener('click', () => this.hideDeleteImageModal());
         document.getElementById('confirm-image-delete')?.addEventListener('click', () => this.confirmDeleteImage());
 
+        // Image actions modal
+        document.querySelector('#image-actions-modal .image-actions-close')?.addEventListener('click', () => this.hideImageActionsModal());
+
         // Cover image selector
         document.getElementById('select-cover-image-btn')?.addEventListener('click', () => this.showCoverImageSelector());
+
+        // Bulk selection mode
+        document.getElementById('bulk-select-mode')?.addEventListener('change', (e) => this.toggleBulkSelectMode(e.target.checked));
+        document.getElementById('bulk-move-btn')?.addEventListener('click', () => this.bulkMoveImages());
+        document.getElementById('bulk-delete-btn')?.addEventListener('click', () => this.bulkDeleteImages());
 
         // Search and filter
         document.getElementById('search-images')?.addEventListener('input', (e) => this.filterImages(e.target.value));
@@ -233,7 +241,7 @@ class GalleryAdmin {
         }
 
         this.imagesList.innerHTML = this.currentImages.map(image => `
-            <div class="image-card" data-image-id="${image.id}">
+            <div class="image-card-admin" data-image-id="${image.id}">
                 <div class="image-card-image" style="background-image: url('${image.file_path}');">
                     ${this.currentAlbum && this.currentAlbum.cover_image === image.file_path ?
                         '<span class="cover-badge">Cover</span>' : ''}
@@ -599,6 +607,90 @@ class GalleryAdmin {
         } catch (error) {
             console.error('Error deleting image:', error);
             this.showError('Failed to delete image');
+        }
+    }
+
+    hideImageActionsModal() {
+        document.getElementById('image-actions-modal').hidden = true;
+    }
+
+    // ========================================
+    // Bulk Selection
+    // ========================================
+
+    toggleBulkSelectMode(enabled) {
+        const bulkActionsMenu = document.getElementById('bulk-actions-menu');
+        bulkActionsMenu.hidden = !enabled;
+
+        // Toggle checkboxes on image cards
+        const imageCards = document.querySelectorAll('.image-card-admin');
+        imageCards.forEach(card => {
+            let checkbox = card.querySelector('.bulk-select-checkbox');
+            if (enabled) {
+                if (!checkbox) {
+                    checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'bulk-select-checkbox';
+                    checkbox.dataset.imageId = card.dataset.imageId;
+                    card.appendChild(checkbox);
+                }
+                checkbox.style.display = 'block';
+            } else if (checkbox) {
+                checkbox.style.display = 'none';
+                checkbox.checked = false;
+            }
+        });
+    }
+
+    getSelectedImageIds() {
+        const checkboxes = document.querySelectorAll('.bulk-select-checkbox:checked');
+        return Array.from(checkboxes).map(cb => parseInt(cb.dataset.imageId));
+    }
+
+    async bulkMoveImages() {
+        const selectedIds = this.getSelectedImageIds();
+        if (selectedIds.length === 0) {
+            this.showError('Please select at least one image');
+            return;
+        }
+
+        const targetAlbumId = prompt('Enter target album ID:');
+        if (!targetAlbumId) return;
+
+        try {
+            for (const imageId of selectedIds) {
+                await galleryAPI.moveImage(imageId, parseInt(targetAlbumId));
+            }
+            this.showSuccess(`Moved ${selectedIds.length} image(s) successfully`);
+            await this.loadAlbumImages(this.currentAlbum.id);
+            this.renderImages();
+        } catch (error) {
+            console.error('Error moving images:', error);
+            this.showError('Failed to move images');
+        }
+    }
+
+    async bulkDeleteImages() {
+        const selectedIds = this.getSelectedImageIds();
+        if (selectedIds.length === 0) {
+            this.showError('Please select at least one image');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to delete ${selectedIds.length} image(s)?`)) {
+            return;
+        }
+
+        try {
+            for (const imageId of selectedIds) {
+                await galleryAPI.deleteImage(imageId);
+            }
+            this.showSuccess(`Deleted ${selectedIds.length} image(s) successfully`);
+            await this.loadAlbumImages(this.currentAlbum.id);
+            this.renderImages();
+        } catch (error) {
+            console.error('Error deleting images:', error);
+            this.showError('Failed to delete images');
         }
     }
 
