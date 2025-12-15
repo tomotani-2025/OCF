@@ -1901,7 +1901,7 @@ body.menu-open {
         height: 100vh;
         flex-direction: column;
         background-color: var(--color-background-2);
-        padding: calc(var(--nav-height) + 10px) 24px 24px;
+        padding: calc(var(--nav-height) + 10px) 24px 64px;
         gap: 0;
         z-index: 1000;
         overflow-y: auto;
