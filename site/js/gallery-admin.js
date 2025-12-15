@@ -574,9 +574,16 @@ class GalleryAdmin {
             await galleryAPI.updateAlbum(this.currentAlbum.id, {
                 cover_image: image.file_path
             });
+
+            // Update the cached album data with the new cover image
+            this.currentAlbum.cover_image = image.file_path;
+            const albumIndex = this.albums.findIndex(a => a.id === this.currentAlbum.id);
+            if (albumIndex !== -1) {
+                this.albums[albumIndex].cover_image = image.file_path;
+            }
+
             this.showSuccess('Cover image updated');
             document.getElementById('image-actions-modal').hidden = true;
-            await this.loadAlbumImages(this.currentAlbum.id);
             this.renderImages();
         } catch (error) {
             console.error('Error setting cover image:', error);
