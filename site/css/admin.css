@@ -827,7 +827,7 @@
 .bulk-select-checkbox {
     position: absolute;
     top: 8px;
-    left: 8px;
+    right: 8px;
     width: 20px;
     height: 20px;
     cursor: pointer;
@@ -1955,18 +1955,25 @@
 }
 
 /* Button icons and states for publish button */
-.btn .btn-icon {
-    width: 28px;
-    height: 28px;
+/* Override .btn-outline svg rule from styles.css that sets svg to 18x14 */
+#save-all-progress-btn svg {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+    flex-shrink: 0 !important;
+    transform: none !important; /* Don't rotate like arrow icons */
 }
 
-/* Reduce padding to keep button same height with larger icon */
+/* Reduce padding to compensate for larger 28px icons and match button height */
 #save-all-progress-btn {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
-.btn .btn-icon.spinner-icon {
+#save-all-progress-btn .btn-icon.spinner-icon {
     animation: none; /* SVG has internal animation */
 }
 
@@ -1985,6 +1992,19 @@
 .btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+}
+
+/* Donate button icon swap on hover */
+.btn-donate .donate-icon-filled {
+    display: none;
+}
+
+.btn-donate:hover .donate-icon-outline {
+    display: none;
+}
+
+.btn-donate:hover .donate-icon-filled {
+    display: block;
 }
 
 
