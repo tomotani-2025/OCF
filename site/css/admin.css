@@ -2097,6 +2097,58 @@
     overflow-y: auto;
 }
 
+/* Partner Logos Section in Advisor Editor */
+#partner-logos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.partner-logo-item {
+    background: #F7F4EB;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.partner-logo-header {
+    margin-bottom: 12px;
+}
+
+.partner-logo-number {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #EF3A4F;
+}
+
+.partner-logo-preview-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-top: 12px;
+}
+
+.partner-logo-preview {
+    width: 100px;
+    height: 60px;
+    background: #FFFFFF;
+    border: 2px dashed rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.partner-logo-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
 
 /* =========================================
    Mission Tab Styles

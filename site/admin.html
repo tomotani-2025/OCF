@@ -878,14 +878,118 @@
 Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                                     </div>
                                 </div>
-                                <div class="form-row two-col">
+                                <!-- Partner Logos Section -->
+                                <div class="form-row">
                                     <div class="form-group">
-                                        <label for="advisor-partner-logo">Partner Logo Path</label>
-                                        <input type="text" id="advisor-partner-logo" placeholder="images/AboutUs/logo.webp">
+                                        <label>Partner Logos (up to 3)</label>
+                                        <p class="form-hint">Add logos for partner organizations. Each logo needs a path and alt text/name.</p>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="advisor-partner-name">Partner Name</label>
-                                        <input type="text" id="advisor-partner-name" placeholder="Natural Habitat Adventures">
+                                </div>
+                                <div id="partner-logos-container">
+                                    <!-- Partner Logo 1 -->
+                                    <div class="partner-logo-item" data-index="0">
+                                        <div class="partner-logo-header">
+                                            <span class="partner-logo-number">Logo 1</span>
+                                        </div>
+                                        <div class="form-row two-col">
+                                            <div class="form-group">
+                                                <label for="advisor-partner-logo-0">Logo Path or URL</label>
+                                                <input type="text" id="advisor-partner-logo-0" placeholder="images/AboutUs/logo.webp">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="advisor-partner-name-0">Partner Name (alt text)</label>
+                                                <input type="text" id="advisor-partner-name-0" placeholder="Natural Habitat Adventures">
+                                            </div>
+                                        </div>
+                                        <div class="partner-logo-preview-row">
+                                            <div class="partner-logo-preview" id="partner-logo-preview-0">
+                                                <span class="image-preview-placeholder">Logo preview</span>
+                                            </div>
+                                            <div class="form-group" style="flex: 1;">
+                                                <label for="advisor-partner-logo-file-0">Upload Logo</label>
+                                                <div class="file-upload-wrapper">
+                                                    <input type="file" id="advisor-partner-logo-file-0" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" class="file-input">
+                                                    <div class="file-upload-btn">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                            <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        <span>Choose File</span>
+                                                    </div>
+                                                    <span class="file-name" id="advisor-partner-logo-file-name-0">No file chosen</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Partner Logo 2 -->
+                                    <div class="partner-logo-item" data-index="1">
+                                        <div class="partner-logo-header">
+                                            <span class="partner-logo-number">Logo 2</span>
+                                        </div>
+                                        <div class="form-row two-col">
+                                            <div class="form-group">
+                                                <label for="advisor-partner-logo-1">Logo Path or URL</label>
+                                                <input type="text" id="advisor-partner-logo-1" placeholder="images/AboutUs/logo2.webp">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="advisor-partner-name-1">Partner Name (alt text)</label>
+                                                <input type="text" id="advisor-partner-name-1" placeholder="Partner Organization">
+                                            </div>
+                                        </div>
+                                        <div class="partner-logo-preview-row">
+                                            <div class="partner-logo-preview" id="partner-logo-preview-1">
+                                                <span class="image-preview-placeholder">Logo preview</span>
+                                            </div>
+                                            <div class="form-group" style="flex: 1;">
+                                                <label for="advisor-partner-logo-file-1">Upload Logo</label>
+                                                <div class="file-upload-wrapper">
+                                                    <input type="file" id="advisor-partner-logo-file-1" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" class="file-input">
+                                                    <div class="file-upload-btn">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                            <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        <span>Choose File</span>
+                                                    </div>
+                                                    <span class="file-name" id="advisor-partner-logo-file-name-1">No file chosen</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Partner Logo 3 -->
+                                    <div class="partner-logo-item" data-index="2">
+                                        <div class="partner-logo-header">
+                                            <span class="partner-logo-number">Logo 3</span>
+                                        </div>
+                                        <div class="form-row two-col">
+                                            <div class="form-group">
+                                                <label for="advisor-partner-logo-2">Logo Path or URL</label>
+                                                <input type="text" id="advisor-partner-logo-2" placeholder="images/AboutUs/logo3.webp">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="advisor-partner-name-2">Partner Name (alt text)</label>
+                                                <input type="text" id="advisor-partner-name-2" placeholder="Partner Organization">
+                                            </div>
+                                        </div>
+                                        <div class="partner-logo-preview-row">
+                                            <div class="partner-logo-preview" id="partner-logo-preview-2">
+                                                <span class="image-preview-placeholder">Logo preview</span>
+                                            </div>
+                                            <div class="form-group" style="flex: 1;">
+                                                <label for="advisor-partner-logo-file-2">Upload Logo</label>
+                                                <div class="file-upload-wrapper">
+                                                    <input type="file" id="advisor-partner-logo-file-2" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" class="file-input">
+                                                    <div class="file-upload-btn">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                            <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        <span>Choose File</span>
+                                                    </div>
+                                                    <span class="file-name" id="advisor-partner-logo-file-name-2">No file chosen</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-row">

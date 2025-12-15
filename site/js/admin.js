@@ -2726,13 +2726,109 @@ class AboutManager {
             if (trusteesItem) {
                 this.trustees = trusteesItem;
                 this.trusteesTextarea.value = trusteesItem.content || '';
+            } else {
+                // Seed default trustees content from HTML
+                this.trusteesTextarea.value = 'The two trustees are Drs. Les and Barbara Omotani. We are lifelong teachers and educational leaders [successfully and happily retired] who have supported the education, health and well being of local children in North America and throughout the world. The trustees have extensive experience serving on advisory boards for IBM, Xerox Canada, the Grammy Foundation, several national professional associations, Division I Alumni associations, national and international charities and a private bank. The two trustees have personally provided over 90% of the funding for the Omotani Caring Foundation\'s activities.';
             }
 
             // Find advisors
             this.advisors = content.filter(c => c.type === 'advisor').sort((a, b) => a.sort_order - b.sort_order);
+
+            // If no advisors in database, seed default advisors from HTML
+            if (this.advisors.length === 0) {
+                await this.seedDefaultAdvisors();
+            }
         } catch (error) {
             console.error('Error loading about content:', error);
             this.advisors = [];
+        }
+    }
+
+    async seedDefaultAdvisors() {
+        const defaultAdvisors = [
+            {
+                id: 'advisor-paul-kirui',
+                type: 'advisor',
+                sort_order: 0,
+                data: JSON.stringify({
+                    name: 'Paul Kirui',
+                    title: 'Senior Advisor',
+                    photo: 'images/AboutUs/Paul-Kirui-Hero.webp',
+                    bio: 'Paul Kirui serves as a senior advisor to the Omotani Caring Foundation. He grew up on the Masai Mara National Reserve in Kenya and is one of Africa\'s most experienced, knowledgeable and distinguished safari guides and professional photographers. Paul is an amazing and caring advocate for the children of Bwindi [and all of Africa], a personal supporter of the porters, rangers, guides, local families (including the Batwa) in the Bwindi region and a lead supporter for the Bwindi Plus School.',
+                    links: [
+                        { label: 'Natural Habitat Adventures Bio', url: 'https://www.nathab.com/guides-and-staff/guide-bios/paul-kirui/' },
+                        { label: 'Paul Kirui Photography', url: 'http://www.paulkirui-photography.com/' }
+                    ],
+                    partnerLogo: 'images/AboutUs/natHab-small.webp',
+                    partnerName: 'Natural Habitat Adventures',
+                    tallCard: false
+                })
+            },
+            {
+                id: 'advisor-koen-van-rompay',
+                type: 'advisor',
+                sort_order: 1,
+                data: JSON.stringify({
+                    name: 'Koen Van Rompay',
+                    title: 'D.V.M., Ph.D., USA Advisor',
+                    photo: 'images/AboutUs/Koen.jpg',
+                    bio: 'Koen Van Rompay is a collaborative partner based in the USA. He is a medical researcher in infectious diseases at the University of California, Davis. He is also the founder and executive director of the volunteer-based 501(c)3 nonprofit organization Sahaya International, which supports local initiatives in several developing countries. Koen is the original supporter and facilitator for the Rafiki Wildlife Conservation Initiative based in Bwindi, Uganda.',
+                    links: [
+                        { label: 'Sahaya International', url: 'http://www.sahaya.org/' },
+                        { label: 'Rafiki Memorial Wildlife Conservation Initiative', url: 'http://rafikiwildlife.org/partners/' },
+                        { label: 'UC Davis Research Profile', url: 'https://cnprc.ucdavis.edu/wp-content/uploads/2015/08/KKVanRompay.pdf' }
+                    ],
+                    partnerLogo: 'images/AboutUs/cropped-Rafiki-logo-square.webp',
+                    partnerName: 'Rafiki Wildlife',
+                    tallCard: false
+                })
+            },
+            {
+                id: 'advisor-brad-josephs',
+                type: 'advisor',
+                sort_order: 2,
+                data: JSON.stringify({
+                    name: 'Brad Josephs',
+                    title: 'USA and International Advisor',
+                    photo: 'images/AboutUs/Screenshot 2025-12-12 191523.png',
+                    bio: 'The Omotani Caring Foundation welcomes Brad Josephs to serve as its USA and International Advisor. Specifically, Brad will share his knowledge, expertise and insights that support the conservation of brown bears and the training of local people to work as guides, spotters, local tourism support and other roles in the high Himalayan mountains of India and throughout the USA. We believe that Brad can lead the conservation efforts of the high Himalayan brown bear as a keystone umbrella species and engage the local people as full participants in the development of a successful and comprehensive nature tourism initiative.\n\nBrad has been a professional naturalist guide, wildlife photographer and wildlife expedition leader since he graduated from the University of Alaska, Fairbanks with a B.S. in wildlife biology in 1999. For over two decades, Brad has guided numerous professional photographers, photography workshops, bear viewers and film crews on expeditions to view coastal brown bears along the remote Coast of Katmai National Park, Alaska, and wildlife expeditions in China and Borneo. Brad is and has always been obsessed with encouraging wildlife and wilderness conservation in all corners of the world.\n\nMost recently, Brad has chased his life-long fantasy of seeing snow leopards in the wild in the Indian Himalayas and Qinghai-Tibetan Plateau of China. He guides and leads Voygr\'s snow leopard expeditions and helps local herders build predator proof corrals to keep their cattle safe. The OCF is supporting THE HIGH ASIA HABITAT FUND and its mission of protecting the Himalayan snow leopards, the local people and the future successful conservation of the high Himalayan brown bears through responsible tourism. https://highasiafund.org\n\nWhen not traveling for work, Brad keeps busy as a freelance wildlife writer/photographer/videographer, consultant for wildlife film projects, and lectures at schools, government agencies and organizations on natural history and bear biology and safety. Brad\'s hobbies include botany, gardening, bird watching, fly fishing and canoeing in the Ozarks of Arkansas where he recently moved from Alaska. Brad is also a former EMT with the Homer, Alaska fire department, and is a certified Wilderness First Responder.',
+                    links: [
+                        { label: 'YouTube', url: 'https://www.youtube.com/@bradjosephs' },
+                        { label: 'Voygr Team', url: 'https://voygr.com/team/brad-josephs/' },
+                        { label: 'Voygr Expeditions', url: 'https://voygr.com' }
+                    ],
+                    partnerLogo: 'images/AboutUs/Voygr.webp',
+                    partnerName: 'Voygr Expeditions',
+                    tallCard: true
+                })
+            },
+            {
+                id: 'advisor-ang-rita-sherpa',
+                type: 'advisor',
+                sort_order: 3,
+                data: JSON.stringify({
+                    name: 'Ang Rita Sherpa',
+                    title: 'Nepal Advisor',
+                    photo: 'images/AboutUs/AngRitaSherpa.jpg',
+                    bio: 'We first met Ang Rita Sherpa in 2013 during a National Geographic Expedition to South Georgia Island and Antarctica. Ang and his wife, Nawang were traveling with Ang\'s childhood friend Peter Hillary. The Omotani Caring Foundation is proud of its support of many projects implemented by THE PARTNERS NEPAL. We appreciate the willingness of Ang Rita Sherpa to serve as our Advisor for Nepal.\n\nAng Rita Sherpa, of Khunde village in Nepal, has served as the Chairman of THE PARTNERS NEPAL since 2012. Ang has extensive experience in conservation, tourism, sustainability, and supporting the people in the most remote villages of Nepal. He was worked with members of the USA national parks service and was a key leader with the Himalayan Trust established by Sir Edmund Hillary in 1964.',
+                    links: [
+                        { label: 'The Partners Nepal - Ang Rita Sherpa', url: 'https://thepartnersnepal.org/team/ang-rita-sherpa/' },
+                        { label: 'The Partners Nepal', url: 'https://thepartnersnepal.org' }
+                    ],
+                    partnerLogo: 'images/AboutUs/The-Partners-Nepal-Logo.png',
+                    partnerName: 'The Partners Nepal',
+                    tallCard: false
+                })
+            }
+        ];
+
+        try {
+            for (const advisor of defaultAdvisors) {
+                await aboutAPI.upsert(advisor);
+            }
+            this.advisors = defaultAdvisors;
+        } catch (error) {
+            console.error('Error seeding default advisors:', error);
         }
     }
 
@@ -2765,6 +2861,19 @@ class AboutManager {
         const fileInput = document.getElementById('advisor-photo-file');
         if (fileInput) {
             fileInput.addEventListener('change', (e) => this.handlePhotoUpload(e));
+        }
+
+        // Partner logo inputs and file uploads
+        for (let i = 0; i < 3; i++) {
+            const logoInput = document.getElementById(`advisor-partner-logo-${i}`);
+            if (logoInput) {
+                logoInput.addEventListener('input', () => this.updatePartnerLogoPreviews());
+            }
+
+            const logoFileInput = document.getElementById(`advisor-partner-logo-file-${i}`);
+            if (logoFileInput) {
+                logoFileInput.addEventListener('change', (e) => this.handlePartnerLogoUpload(e, i));
+            }
         }
     }
 
@@ -2894,10 +3003,23 @@ class AboutManager {
                 document.getElementById('advisor-photo').value = data.photo || '';
                 document.getElementById('advisor-bio').value = data.bio || '';
                 document.getElementById('advisor-links').value = (data.links || []).map(l => `${l.label}|${l.url}`).join('\n');
-                document.getElementById('advisor-partner-logo').value = data.partnerLogo || '';
-                document.getElementById('advisor-partner-name').value = data.partnerName || '';
+
+                // Handle partner logos - support both old single format and new array format
+                const partnerLogos = data.partnerLogos || [];
+                // Migrate old single partnerLogo/partnerName to new format
+                if (!partnerLogos.length && (data.partnerLogo || data.partnerName)) {
+                    partnerLogos.push({ logo: data.partnerLogo || '', name: data.partnerName || '' });
+                }
+                // Populate the 3 logo slots
+                for (let i = 0; i < 3; i++) {
+                    const logo = partnerLogos[i] || { logo: '', name: '' };
+                    document.getElementById(`advisor-partner-logo-${i}`).value = logo.logo || '';
+                    document.getElementById(`advisor-partner-name-${i}`).value = logo.name || '';
+                }
+
                 document.getElementById('advisor-tall-card').checked = data.tallCard || false;
                 this.updatePhotoPreview();
+                this.updatePartnerLogoPreviews();
             }
         } else {
             title.textContent = 'Add Advisor';
@@ -2920,11 +3042,16 @@ class AboutManager {
         document.getElementById('advisor-photo').value = '';
         document.getElementById('advisor-bio').value = '';
         document.getElementById('advisor-links').value = '';
-        document.getElementById('advisor-partner-logo').value = '';
-        document.getElementById('advisor-partner-name').value = '';
+        // Reset all 3 partner logo slots
+        for (let i = 0; i < 3; i++) {
+            document.getElementById(`advisor-partner-logo-${i}`).value = '';
+            document.getElementById(`advisor-partner-name-${i}`).value = '';
+            document.getElementById(`advisor-partner-logo-file-name-${i}`).textContent = 'No file chosen';
+        }
         document.getElementById('advisor-tall-card').checked = false;
         document.getElementById('advisor-photo-file-name').textContent = 'No file chosen';
         this.updatePhotoPreview();
+        this.updatePartnerLogoPreviews();
     }
 
     updatePhotoPreview() {
@@ -2975,6 +3102,47 @@ class AboutManager {
         });
     }
 
+    updatePartnerLogoPreviews() {
+        for (let i = 0; i < 3; i++) {
+            const logoPath = document.getElementById(`advisor-partner-logo-${i}`).value;
+            const preview = document.getElementById(`partner-logo-preview-${i}`);
+            if (logoPath) {
+                preview.innerHTML = `<img src="${logoPath}" alt="Logo preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            } else {
+                preview.innerHTML = '<span class="image-preview-placeholder">Logo preview</span>';
+            }
+        }
+    }
+
+    async handlePartnerLogoUpload(e, index) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = file.name;
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    folder: 'images/AboutUs'
+                })
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const result = await response.json();
+            document.getElementById(`advisor-partner-logo-${index}`).value = result.path;
+            this.updatePartnerLogoPreviews();
+        } catch (error) {
+            console.error('Error uploading logo:', error);
+            alert('Error uploading logo: ' + error.message);
+        }
+    }
+
     async saveAdvisor(e) {
         e.preventDefault();
 
@@ -2984,14 +3152,26 @@ class AboutManager {
             return { label: label?.trim() || '', url: url?.trim() || '' };
         });
 
+        // Collect partner logos (filter out empty ones)
+        const partnerLogos = [];
+        for (let i = 0; i < 3; i++) {
+            const logo = document.getElementById(`advisor-partner-logo-${i}`).value.trim();
+            const name = document.getElementById(`advisor-partner-name-${i}`).value.trim();
+            if (logo || name) {
+                partnerLogos.push({ logo, name });
+            }
+        }
+
         const data = {
             name: document.getElementById('advisor-name').value,
             title: document.getElementById('advisor-title').value,
             photo: document.getElementById('advisor-photo').value,
             bio: document.getElementById('advisor-bio').value,
             links: links,
-            partnerLogo: document.getElementById('advisor-partner-logo').value,
-            partnerName: document.getElementById('advisor-partner-name').value,
+            partnerLogos: partnerLogos,
+            // Keep backward compatibility - first logo also stored in old fields
+            partnerLogo: partnerLogos[0]?.logo || '',
+            partnerName: partnerLogos[0]?.name || '',
             tallCard: document.getElementById('advisor-tall-card').checked
         };
 
@@ -3085,11 +3265,71 @@ class MissionManager {
             if (this.settings?.breaker_image) {
                 document.getElementById('mission-breaker-image').value = this.settings.breaker_image;
                 this.updateBreakerPreview();
+            } else {
+                // Seed default breaker image
+                document.getElementById('mission-breaker-image').value = 'images/mission-breaker.jpg';
+                this.updateBreakerPreview();
+            }
+
+            // Seed default statements if empty
+            if (this.statements.length === 0) {
+                await this.seedDefaultStatements();
+            }
+
+            // Seed default goal cards if empty
+            if (this.goalCards.length === 0) {
+                await this.seedDefaultGoalCards();
             }
         } catch (error) {
             console.error('Error loading mission content:', error);
             this.statements = [];
             this.goalCards = [];
+        }
+    }
+
+    async seedDefaultStatements() {
+        const defaultStatements = [
+            { id: 'statement-1', content: 'We provide basic food and other supplies for many families (including the Batwa) and porters in rural villages.', full_width: false, sort_order: 0 },
+            { id: 'statement-2', content: 'We support the self-identified needs of schools that serve local and native children in the USA and throughout the world. We are advocates for children with special needs and talents.', full_width: false, sort_order: 1 },
+            { id: 'statement-3', content: 'We support projects that promote the ability of local people to meet the challenges of food scarcity and to preserve their indigenous cultures.', full_width: false, sort_order: 2 },
+            { id: 'statement-4', content: 'We support the dreams and visions of charitable leaders who seek to provide care and support to children and families in local communities throughout the world.', full_width: false, sort_order: 3 },
+            { id: 'statement-5', content: 'We support servant leaders who provide caring services, education and mentoring for military veterans and their families, first responders, prison inmates, native peoples, equine trainers and ranchers, and others as they learn modern horsemanship to gentle and train wild mustangs. We also support those who help provide forever homes for the mustangs.', full_width: true, sort_order: 4 },
+            { id: 'statement-6', content: 'We support the conservation efforts of local, national and international individuals and groups who work to ensure the future health of natural environments, marine life and wildlife.', full_width: false, sort_order: 5 }
+        ];
+
+        try {
+            for (const statement of defaultStatements) {
+                await missionAPI.upsertStatement(statement);
+            }
+            this.statements = defaultStatements;
+        } catch (error) {
+            console.error('Error seeding default statements:', error);
+        }
+    }
+
+    async seedDefaultGoalCards() {
+        const defaultGoalCards = [
+            { id: 'goal-1', label: 'Goal One:', title: 'Sustainability', subtitle: 'Batwa Farms at Matanda, Uganda', description: 'The Omotani Caring Foundation [OCF] has purchased approximately 10 acres of very fertile and productive farmland at Matanda [near Kihihi] Uganda. In collaboration with the Rafiki Memorial Wildlife Conservation Initiative this new farming project will involve and support Batwa families from the Kibirangwe, Nyabisiika, Mukongoro and Karehe settlements.', image: 'images/batwa+visit+farm+ocf.jpg', link: 'goalone.html', sort_order: 0 },
+            { id: 'goal-2', label: 'Goal Two:', title: 'Porters at Bwindi', subtitle: '', description: 'Support the development and expansion of food related sustainability project that will allow the porters in one of the four major porter\'s association to supplement the income they receive from tourism. This project will be coordinated with the support and project accountability controls of the Rafiki Wildlife Conservation Initiative.', image: 'images/porters+in+field.jpg', link: 'goaltwo.html', sort_order: 1 },
+            { id: 'goal-3', label: 'Goal Three:', title: 'Health', subtitle: '', description: 'Develop an emergency reserve fund of $5,000 to be used for future purchases and distribution of foods rich in protein such as maize / corn flour, beans and fruits. Also provide for the purchase of soap, masks, medicine and other emergency supplies.', image: 'images/img_20211206_100240_1+2.jpg', link: 'goalthree.html', sort_order: 2 },
+            { id: 'goal-4', label: 'Goal Four:', title: 'Technology', subtitle: '', description: 'In 2019 - 2022 the OCF provided over $3,500 USD in funding to support the first computers, printers and digital cameras to be used by school children in Bwindi, Uganda. In the future grants will be made to support similar projects in the USA, Canada and other regions of the world.', image: 'images/whatsapp+image+2021-09-16+at+10.39.46+pm.jpg', link: 'goalfour.html', sort_order: 3 },
+            { id: 'goal-5', label: 'Goal Five:', title: 'Fresh Water', subtitle: '', description: 'Access to daily fresh drinking water remains a challenge for underserved Native American families throughout the USA and villages throughout the world. The foundation provides support to local families and groups who address this need by drilling fresh water wells, providing water treatment systems, and other alternative strategies.', image: 'images/water.jpg', link: 'goalfive.html', sort_order: 4 },
+            { id: 'goal-6', label: 'Goal Six:', title: 'Education', subtitle: '', description: 'K-12 and Higher education for children who live in poverty and/or require special education support services exist throughout the United States and the world. The OCF has provided tuition fees for orphan students in Bwindi for their entire elementary education.', image: 'images/unified+basketball+hhs2023.jpg', link: 'goalsix.html', sort_order: 5 },
+            { id: 'goal-7', label: 'Goal Seven:', title: 'Dreams & Visions - Donor Requests', subtitle: '', description: 'Donors who wish to submit a specific request to the OMOTANI CARING FOUNDATION in support of a project or initiative that is meaningful and personal are encouraged to submit a description of the proposal and potential level of funding. DREAMS AND VISIONS = $ UNLIMITED', image: 'images/linda+mercyjpeg.jpg', link: 'goalseven.html', sort_order: 6 },
+            { id: 'goal-8', label: 'Goal Eight:', title: 'The Partners Nepal', subtitle: 'Strengthen Relationships', description: 'Drs. Les and Barbara Omotani [The Omotani Caring Foundation] met Ang Rita Sherpa and Peter Hillary during a 2014 National Geographic Expedition adventure. Throughout the years, Barbara and Les Omotani have provided private donations to support the work of THE PARTNERS NEPAL [TPN].', image: 'images/tpn.jpg', link: 'goaleight.html', sort_order: 7 },
+            { id: 'goal-9', label: 'Goal Nine:', title: 'Women In Gorilla Conservation', subtitle: '', description: 'The Omotani Caring Foundation is pleased to collaborate with Sahaya International and the Rafiki Memorial Wildlife Conservation Initiative to support a project initiated by Robinah Gangiriba [Warden of Tourism of the Ugandan Wildlife Authority].', image: 'images/womengorilla.png', link: 'goalnine.html', sort_order: 8 },
+            { id: 'goal-10', label: 'Goal Ten:', title: 'Base Camp for Veterans BCI', subtitle: '', description: 'BaseCamp for Veterans, Inc. ("BCI") was founded by life-long friends Deborah Plum & Theo Windish. The Omotani Caring Foundation [OCF] has been pleased to provide support to BCI for 2024, 2025 and beyond.', image: 'images/img_8308.jpg', link: 'goalten.html', sort_order: 9 },
+            { id: 'goal-11', label: 'Goal Eleven:', title: 'Randy Helm Horsemanship', subtitle: '', description: 'We are pleased to support Randy Helm and his continuing work to train wild mustangs and to support a wide variety of people to learn how to be good and great horsemanship learners and riders. Randy has successfully led the State of Arizona\'s Wild Horse Inmate program and is a facilitator with Base Camp for Veterans.', image: 'images/randyhelm.jpg', link: 'goaleleven.html', sort_order: 10 },
+            { id: 'goal-12', label: 'Goal Twelve:', title: 'High Asia Habitat Fund', subtitle: '', description: 'The Omotani Caring Foundation is pleased to become a supporter of the High Asia Habitat Fund. The founder of HAHF, Behzad Larry, is committed to the conservation of the snow leopards and other wildlife in the region. HAHF is also supporting the training of local people to help them and their cattle coexist with wildlife in the remote regions of the high Himalayan mountains.', image: 'images/goal12.jpg', link: 'goaltwelve.html', sort_order: 11 }
+        ];
+
+        try {
+            for (const card of defaultGoalCards) {
+                await missionAPI.upsertGoalCard(card);
+            }
+            this.goalCards = defaultGoalCards;
+        } catch (error) {
+            console.error('Error seeding default goal cards:', error);
         }
     }
 
@@ -3479,9 +3719,185 @@ class GoalPagesManager {
     async loadPages() {
         try {
             this.pages = await goalPagesAPI.getAll();
+
+            // Seed default goal pages if empty
+            if (this.pages.length === 0) {
+                await this.seedDefaultGoalPages();
+            }
         } catch (error) {
             console.error('Error loading goal pages:', error);
             this.pages = [];
+        }
+    }
+
+    async seedDefaultGoalPages() {
+        const defaultPages = [
+            {
+                id: 'goal-page-1',
+                label: 'Goal One:',
+                title: 'Batwa Farm at Matanda, Uganda',
+                slug: 'goalone.html',
+                hero_image: 'images/batwa+farm+lead+photo+news+and+update.jpg',
+                content: 'In 2022 approximately 10 acres of very fertile farm land was purchased at Matanda [near Kihihi] Uganda. Elders, families, youth and other members of four Batwa communities were asked if they wanted to participate in a new farming project. After visiting the land with Tweheyo Robert and Mushamba Moses of the Rafiki Memorial Wildlife Conservation Initiative the Batwa people supported the new farm project. In February and March of 2023 the farm project is proceeding with the clearing and plowing and preparation of the land. The first crops will be planted this spring.\n\nIt is our hope for the future that this farm project will provide a sustainable food source for the Batwa families and settlements. Additional farm land may be purchased and farmed by the Batwa families in future years.',
+                funding: JSON.stringify([
+                    { label: 'Phase one:', amount: 'land purchase $23,000 USD' },
+                    { label: 'Phase two:', amount: 'clearing and planting $4,000 USD' }
+                ]),
+                gallery: JSON.stringify([
+                    { src: 'images/batwa+farming.jpg', alt: 'Batwa Farming' },
+                    { src: 'images/batwa+farming-4.jpg', alt: 'Batwa Farming' },
+                    { src: 'images/group+farm.jpg', alt: 'Group at Farm' },
+                    { src: 'images/farming.jpg', alt: 'Farming' },
+                    { src: 'images/three+hoes+farm.jpg', alt: 'Farm Work' },
+                    { src: 'images/field+walk+farm.jpg', alt: 'Field Walk' },
+                    { src: 'images/batwafarm+tractor+clearing+m723.jpg', alt: 'Tractor Clearing' },
+                    { src: 'images/batwa+farm+clearing+m723.jpg', alt: 'Farm Clearing' },
+                    { src: 'images/batwa+visit+farm+ocf.jpg', alt: 'Batwa Visit Farm' }
+                ]),
+                sort_order: 0
+            },
+            {
+                id: 'goal-page-2',
+                label: 'Goal Two:',
+                title: 'Porters at Bwindi',
+                slug: 'goaltwo.html',
+                hero_image: 'images/porters-03-cropped-1180x437.jpg',
+                content: 'Support the development and expansion of food related sustainability project that will allow the porters in one of the four major porter\'s association to supplement the income they receive from tourism.\n\nThis project will be coordinated with the support and project accountability controls of the Rafiki Wildlife Conservation Initiative.\n\nhttp://rafikiwildlife.org/\n\nThe OCF will provide small annual grants to purchase bees for honey and chickens for eggs. A few of the porters have already established 35 bee hives that are producing honey. This project will start with one porter association [Bwindi Bujengwe Porters Association] and if the first project is successful, we may expand to include members of additional porter associations in the future.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([
+                    { src: 'images/porters+in+field.jpg', alt: 'Porters in Field' },
+                    { src: 'images/porters+covid+food+2022.jpg', alt: 'Porters COVID Food' },
+                    { src: 'images/two+porters+with+hive.jpg', alt: 'Porters with Hive' },
+                    { src: 'images/milton+enoth+caleb+porters.jpg', alt: 'Milton Enoth Caleb Porters' }
+                ]),
+                sort_order: 1
+            },
+            {
+                id: 'goal-page-3',
+                label: 'Goal Three:',
+                title: 'Health',
+                slug: 'goalthree.html',
+                hero_image: 'images/img_20211206_100240_1+2.jpg',
+                content: 'Develop an emergency reserve fund of $5,000 to be used for future purchases and distribution of foods rich in protein such as maize / corn flour, beans and fruits. Also provide for the purchase of soap, masks, medicine and other emergency supplies.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 2
+            },
+            {
+                id: 'goal-page-4',
+                label: 'Goal Four:',
+                title: 'Technology',
+                slug: 'goalfour.html',
+                hero_image: 'images/whatsapp+image+2021-09-16+at+10.39.46+pm.jpg',
+                content: 'In 2019 - 2022 the OCF provided over $3,500 USD in funding to support the first computers, printers and digital cameras to be used by school children in Bwindi, Uganda. In the future grants will be made to support similar projects in the USA, Canada and other regions of the world.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 3
+            },
+            {
+                id: 'goal-page-5',
+                label: 'Goal Five:',
+                title: 'Fresh Water',
+                slug: 'goalfive.html',
+                hero_image: 'images/water.jpg',
+                content: 'Access to daily fresh drinking water remains a challenge for underserved Native American families throughout the USA and villages throughout the world. The foundation provides support to local families and groups who address this need by drilling fresh water wells, providing water treatment systems, and other alternative strategies.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 4
+            },
+            {
+                id: 'goal-page-6',
+                label: 'Goal Six:',
+                title: 'Education',
+                slug: 'goalsix.html',
+                hero_image: 'images/unified+basketball+hhs2023.jpg',
+                content: 'K-12 and Higher education for children who live in poverty and/or require special education support services exist throughout the United States and the world. The OCF has provided tuition fees for orphan students in Bwindi for their entire elementary education.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 5
+            },
+            {
+                id: 'goal-page-7',
+                label: 'Goal Seven:',
+                title: 'Dreams & Visions - Donor Requests',
+                slug: 'goalseven.html',
+                hero_image: 'images/linda+mercyjpeg.jpg',
+                content: 'Donors who wish to submit a specific request to the OMOTANI CARING FOUNDATION in support of a project or initiative that is meaningful and personal are encouraged to submit a description of the proposal and potential level of funding. DREAMS AND VISIONS = $ UNLIMITED',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 6
+            },
+            {
+                id: 'goal-page-8',
+                label: 'Goal Eight:',
+                title: 'The Partners Nepal',
+                slug: 'goaleight.html',
+                hero_image: 'images/tpn.jpg',
+                content: 'Drs. Les and Barbara Omotani [The Omotani Caring Foundation] met Ang Rita Sherpa and Peter Hillary during a 2014 National Geographic Expedition adventure. Throughout the years, Barbara and Les Omotani have provided private donations to support the work of THE PARTNERS NEPAL [TPN].',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 7
+            },
+            {
+                id: 'goal-page-9',
+                label: 'Goal Nine:',
+                title: 'Women In Gorilla Conservation',
+                slug: 'goalnine.html',
+                hero_image: 'images/womengorilla.png',
+                content: 'The Omotani Caring Foundation is pleased to collaborate with Sahaya International and the Rafiki Memorial Wildlife Conservation Initiative to support a project initiated by Robinah Gangiriba [Warden of Tourism of the Ugandan Wildlife Authority].',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 8
+            },
+            {
+                id: 'goal-page-10',
+                label: 'Goal Ten:',
+                title: 'Base Camp for Veterans',
+                slug: 'goalten.html',
+                hero_image: 'images/img_8315.jpg',
+                content: 'BaseCamp for Veterans, Inc. ("BCI") was founded by life-long friends Deborah Plum & Theo Windish, who each have experience in both the private and public sectors, and who have spent a significant portion of their professional lives connecting people, being a part of charitable groups, and investing their time in projects that served a variety of communities.\n\nThe desire to create something sustainable that truly gives back to generations of people, combined with a palpable awareness of the noticeable decline in comprehensive veteran services, particularly ones that include families as part of the process, led Theo and Deborah to conclude that the veteran community was where they needed to focus their energy.\n\nOur Mission: To respond to the needs of those who serve our nation and protect its values, by promoting personal and professional growth, and contributing to an effective, sustainable path towards reintegration.\n\nhttps://www.bcampinc.com/about\n\nFacebook: BaseCamp for Veterans - https://www.facebook.com/BaseCampforVeteransInc\n\nThe Omotani Caring Foundation [OCF] has been pleased to provide support to BCI for 2024, 2025 and beyond. In particular we have supported the work of the mustang trainer, Randy Helm, and his work with introducing the veterans to the unique connection available with mustangs.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([
+                    { src: 'images/img_8308.jpg', alt: 'Base Camp for Veterans' },
+                    { src: 'images/bcfv.png', alt: 'BCI Logo' },
+                    { src: 'images/basecampveterans-picture6.jpg', alt: 'Veterans Program' },
+                    { src: 'images/basecampveterans-picture7.jpg', alt: 'Mustang Training' },
+                    { src: 'images/basecampveterans-picture9.jpg', alt: 'Veterans Training' },
+                    { src: 'images/basecampveterans-picture11.jpg', alt: 'BCI Program' }
+                ]),
+                sort_order: 9
+            },
+            {
+                id: 'goal-page-11',
+                label: 'Goal Eleven:',
+                title: 'Randy Helm Horsemanship',
+                slug: 'goaleleven.html',
+                hero_image: 'images/randyhelm.jpg',
+                content: 'We are pleased to support Randy Helm and his continuing work to train wild mustangs and to support a wide variety of people to learn how to be good and great horsemanship learners and riders. Randy has successfully led the State of Arizona\'s Wild Horse Inmate program and is a facilitator with Base Camp for Veterans.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 10
+            },
+            {
+                id: 'goal-page-12',
+                label: 'Goal Twelve:',
+                title: 'High Asia Habitat Fund',
+                slug: 'goaltwelve.html',
+                hero_image: 'images/goal12.jpg',
+                content: 'The Omotani Caring Foundation is pleased to become a supporter of the High Asia Habitat Fund. The founder of HAHF, Behzad Larry, is committed to the conservation of the snow leopards and other wildlife in the region. HAHF is also supporting the training of local people to help them and their cattle coexist with wildlife in the remote regions of the high Himalayan mountains.',
+                funding: JSON.stringify([]),
+                gallery: JSON.stringify([]),
+                sort_order: 11
+            }
+        ];
+
+        try {
+            for (const page of defaultPages) {
+                await goalPagesAPI.upsert(page);
+            }
+            this.pages = defaultPages;
+        } catch (error) {
+            console.error('Error seeding default goal pages:', error);
         }
     }
 
