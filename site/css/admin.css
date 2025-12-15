@@ -734,36 +734,44 @@
 /* Dashboard Actions */
 .dashboard-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 16px;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: 24px;
 }
 
-.dashboard-actions-left {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
-    flex: 1;
-}
-
-.dashboard-actions-right {
+.dashboard-actions-row {
     display: flex;
     gap: 16px;
     align-items: center;
+    justify-content: space-between;
 }
 
-.dashboard-actions .btn-primary {
+.dashboard-actions-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.dashboard-actions .btn-primary,
+.dashboard-actions .btn-outline {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+}
+
+/* Upload button - no icon rotation */
+.btn-upload svg {
+    transform: none !important;
 }
 
 .dashboard-search {
     flex: 1;
     min-width: 200px;
+}
+
+.dashboard-filter {
+    min-width: 180px;
 }
 
 /* Bulk Selection */
@@ -776,6 +784,7 @@
     color: #31110F;
     cursor: pointer;
     user-select: none;
+    white-space: nowrap;
 }
 
 .bulk-select-label input[type="checkbox"] {
@@ -787,6 +796,12 @@
 .bulk-actions-menu {
     display: flex;
     gap: 8px;
+    align-items: center;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
 }
 
 .bulk-select-checkbox {

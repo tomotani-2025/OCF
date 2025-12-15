@@ -353,19 +353,28 @@
                         </div>
 
                         <div class="dashboard-actions">
-                            <div class="dashboard-actions-left">
-                                <button type="button" id="add-images-btn" class="btn btn-primary">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                    Add Images
-                                </button>
-                                <button type="button" id="bulk-add-images-btn" class="btn btn-outline">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M2 10L2 12C2 13.1046 2.89543 14 4 14L12 14C13.1046 14 14 13.1046 14 12L14 10M11 5L8 2M8 2L5 5M8 2L8 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    Bulk Upload
-                                </button>
+                            <div class="dashboard-actions-row">
+                                <div class="dashboard-actions-buttons">
+                                    <button type="button" id="add-images-btn" class="btn btn-primary">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        Add Images
+                                    </button>
+                                    <button type="button" id="bulk-add-images-btn" class="btn btn-outline btn-upload">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M2 10L2 12C2 13.1046 2.89543 14 4 14L12 14C13.1046 14 14 13.1046 14 12L14 10M11 5L8 2M8 2L5 5M8 2L8 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        Bulk Upload
+                                    </button>
+                                </div>
+                                <label class="bulk-select-label">
+                                    <input type="checkbox" id="bulk-select-mode">
+                                    <span>Select Multiple</span>
+                                </label>
+                            </div>
+
+                            <div class="dashboard-actions-row">
                                 <div class="dashboard-search">
                                     <input type="text" id="search-images" placeholder="Search images...">
                                 </div>
@@ -378,15 +387,9 @@
                                         <option value="Veterans">Veterans</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="dashboard-actions-right">
-                                <label class="bulk-select-label">
-                                    <input type="checkbox" id="bulk-select-mode">
-                                    <span>Select Multiple</span>
-                                </label>
                                 <div id="bulk-actions-menu" class="bulk-actions-menu" hidden>
-                                    <button type="button" id="bulk-move-btn" class="btn btn-outline">Move Selected</button>
-                                    <button type="button" id="bulk-delete-btn" class="btn btn-outline">Delete Selected</button>
+                                    <button type="button" id="bulk-move-btn" class="btn btn-outline btn-sm">Move Selected</button>
+                                    <button type="button" id="bulk-delete-btn" class="btn btn-outline btn-sm">Delete Selected</button>
                                 </div>
                             </div>
                         </div>
