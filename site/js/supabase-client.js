@@ -219,39 +219,138 @@ const postsAPI = {
 
 // Gallery API
 const galleryAPI = {
-    async getImages(options = {}) {
-        return supabase.query('gallery_images', {
+    // Album operations
+    async getAllAlbums(options = {}) {
+        return supabase.query('albums', {
             select: '*',
             order: 'sort_order.asc',
             ...options
         });
     },
 
-    async getByCategory(category) {
-        return supabase.query('gallery_images', {
+    async getActiveAlbums() {
+        return supabase.query('albums', {
             select: '*',
-            eq: { category },
+            eq: { is_active: true },
             order: 'sort_order.asc'
         });
     },
 
-    async getCategories() {
-        return supabase.query('gallery_categories', {
+    async getAlbumById(id) {
+        const results = await supabase.query('albums', {
+            select: '*',
+            eq: { id }
+        });
+        return results[0] || null;
+    },
+
+    async getAlbumBySlug(slug) {
+        const results = await supabase.query('albums', {
+            select: '*',
+            eq: { slug }
+        });
+        return results[0] || null;
+    },
+
+    async createAlbum(album) {
+        return supabase.insert('albums', album);
+    },
+
+    async updateAlbum(id, data) {
+        return supabase.update('albums', data, { id });
+    },
+
+    async deleteAlbum(id) {
+        return supabase.delete('albums', { id });
+    },
+
+    async getAlbumImageCount(albumId) {
+        return supabase.count('album_images', { album_id: albumId });
+    },
+
+    // Image operations
+    async getImagesByAlbum(albumId, options = {}) {
+        return supabase.query('album_images', {
+            select: '*',
+            eq: { album_id: albumId },
+            order: 'sort_order.asc',
+            ...options
+        });
+    },
+
+    async getImageById(id) {
+        const results = await supabase.query('album_images', {
+            select: '*',
+            eq: { id }
+        });
+        return results[0] || null;
+    },
+
+    async searchImages(searchParams = {}) {
+        let options = {
             select: '*',
             order: 'sort_order.asc'
-        });
+        };
+
+        // Add filters based on search params
+        if (searchParams.category) {
+            options.eq = { ...options.eq, category: searchParams.category };
+        }
+        if (searchParams.photographer) {
+            options.eq = { ...options.eq, photographer: searchParams.photographer };
+        }
+        if (searchParams.location) {
+            options.eq = { ...options.eq, location: searchParams.location };
+        }
+
+        return supabase.query('album_images', options);
     },
 
     async createImage(image) {
-        return supabase.insert('gallery_images', image);
+        return supabase.insert('album_images', image);
+    },
+
+    async createImages(images) {
+        // Bulk insert multiple images
+        return supabase.insert('album_images', images);
     },
 
     async updateImage(id, data) {
-        return supabase.update('gallery_images', data, { id });
+        return supabase.update('album_images', data, { id });
     },
 
     async deleteImage(id) {
-        return supabase.delete('gallery_images', { id });
+        return supabase.delete('album_images', { id });
+    },
+
+    async moveImage(imageId, newAlbumId) {
+        return supabase.update('album_images', { album_id: newAlbumId }, { id: imageId });
+    },
+
+    async duplicateImage(imageId, targetAlbumId) {
+        // Get the source image
+        const sourceImage = await this.getImageById(imageId);
+        if (!sourceImage) {
+            throw new Error('Source image not found');
+        }
+
+        // Create duplicate with new album_id
+        const duplicate = { ...sourceImage };
+        delete duplicate.id; // Remove id so Supabase generates new one
+        delete duplicate.created_at;
+        delete duplicate.updated_at;
+        duplicate.album_id = targetAlbumId;
+
+        return this.createImage(duplicate);
+    },
+
+    async reorderImages(albumId, imageOrders) {
+        // Update sort_order for multiple images
+        // imageOrders is array of {id, sort_order}
+        const promises = imageOrders.map(({ id, sort_order }) =>
+            this.updateImage(id, { sort_order })
+        );
+        return Promise.all(promises);
     }
 };
 

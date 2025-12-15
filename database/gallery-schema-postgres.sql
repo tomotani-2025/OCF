@@ -24,12 +24,25 @@ CREATE TABLE IF NOT EXISTS album_images (
     album_id INTEGER NOT NULL,
     filename VARCHAR(500) NOT NULL,                -- e.g., "img_0049.webp"
     file_path VARCHAR(500) NOT NULL,               -- full path: "images/gallery/2017-2024/img_0049.webp"
+
+    -- Basic metadata
+    title VARCHAR(500),                            -- image title for search/display
     alt_text VARCHAR(500) DEFAULT 'Gallery image', -- alt text for accessibility
     caption TEXT,                                  -- optional image caption
+
+    -- Search/filter metadata
+    category VARCHAR(255),                         -- e.g., "Batwa", "Nepal", "Wildlife"
+    photographer VARCHAR(255),                     -- photographer name/credit
+    photo_date DATE,                               -- date photo was taken
+    location VARCHAR(500),                         -- location where photo was taken
+    tags TEXT,                                     -- comma-separated tags for search
+
+    -- Technical metadata
     sort_order INTEGER DEFAULT 0,                  -- order images appear in gallery (from WordPress export)
     width INTEGER,                                 -- image width in pixels (optional, for optimization)
     height INTEGER,                                -- image height in pixels (optional, for optimization)
     file_size INTEGER,                             -- file size in bytes (optional)
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_album
@@ -44,6 +57,12 @@ CREATE INDEX IF NOT EXISTS idx_albums_is_active ON albums(is_active);
 CREATE INDEX IF NOT EXISTS idx_albums_sort_order ON albums(sort_order);
 CREATE INDEX IF NOT EXISTS idx_album_images_album_id ON album_images(album_id);
 CREATE INDEX IF NOT EXISTS idx_album_images_sort_order ON album_images(sort_order);
+
+-- Indexes for metadata search/filter
+CREATE INDEX IF NOT EXISTS idx_album_images_category ON album_images(category);
+CREATE INDEX IF NOT EXISTS idx_album_images_photographer ON album_images(photographer);
+CREATE INDEX IF NOT EXISTS idx_album_images_photo_date ON album_images(photo_date);
+CREATE INDEX IF NOT EXISTS idx_album_images_location ON album_images(location);
 
 -- Insert existing albums
 INSERT INTO albums (name, label, title, slug, directory_name, cover_image, sort_order, is_active) VALUES

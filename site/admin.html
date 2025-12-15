@@ -314,103 +314,281 @@
 
                 <!-- Gallery Tab -->
                 <div id="gallery-tab" class="tab-content" hidden>
-                    <div class="admin-header">
-                        <h1>Manage Gallery</h1>
-                        <p>Add, edit, arrange, or delete gallery images.</p>
-                    </div>
+                    <!-- Albums View -->
+                    <div id="gallery-albums-view">
+                        <div class="admin-header">
+                            <h1>Manage Gallery Albums</h1>
+                            <p>Create, organize, and manage your photo albums</p>
+                        </div>
 
-                    <!-- Gallery Actions -->
-                    <div class="dashboard-actions">
-                        <button type="button" id="add-gallery-image-btn" class="btn btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Add Image
-                        </button>
-                        <div class="dashboard-filter">
-                            <select id="gallery-filter-category">
-                                <option value="all">All Categories</option>
-                            </select>
+                        <div class="dashboard-actions">
+                            <button type="button" id="create-album-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Create New Album
+                            </button>
+                        </div>
+
+                        <div id="albums-list" class="albums-grid-admin">
+                            <!-- Album cards rendered by JS -->
+                            <div class="loading-message">Loading albums...</div>
                         </div>
                     </div>
 
-                    <!-- Gallery Grid -->
-                    <div id="gallery-grid" class="admin-gallery-grid">
-                        <!-- Gallery items will be loaded here -->
-                        <div class="loading-message">Loading gallery...</div>
+                    <!-- Images View (for specific album) -->
+                    <div id="gallery-images-view" hidden>
+                        <div class="admin-header" id="images-view-header">
+                            <button type="button" id="back-to-albums" class="btn-back">
+                                <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                                    <path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M1 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Back to Albums
+                            </button>
+                            <h1>Album Title</h1>
+                            <p>0 images</p>
+                        </div>
+
+                        <div class="dashboard-actions">
+                            <button type="button" id="add-images-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Add Images
+                            </button>
+                            <button type="button" id="bulk-add-images-btn" class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M2 10L2 12C2 13.1046 2.89543 14 4 14L12 14C13.1046 14 14 13.1046 14 12L14 10M11 5L8 2M8 2L5 5M8 2L8 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Bulk Upload
+                            </button>
+                            <div class="dashboard-search">
+                                <input type="text" id="search-images" placeholder="Search images...">
+                            </div>
+                            <div class="dashboard-filter">
+                                <select id="filter-category">
+                                    <option value="all">All Categories</option>
+                                    <option value="Batwa">Batwa</option>
+                                    <option value="Nepal">Nepal</option>
+                                    <option value="Wildlife">Wildlife</option>
+                                    <option value="Veterans">Veterans</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="images-list" class="images-grid-admin">
+                            <!-- Image cards rendered by JS -->
+                            <div class="loading-message">Loading images...</div>
+                        </div>
                     </div>
 
-                    <!-- Gallery Image Editor Modal -->
-                    <div id="gallery-editor-modal" class="modal" hidden>
+                    <!-- Album Editor Modal -->
+                    <div id="album-editor-modal" class="modal" hidden>
                         <div class="modal-backdrop"></div>
-                        <div class="modal-content gallery-editor-content">
+                        <div class="modal-content">
                             <button type="button" class="modal-close" aria-label="Close">&times;</button>
-                            <h2 id="gallery-editor-title">Add Gallery Image</h2>
-                            <form id="gallery-image-form">
-                                <input type="hidden" id="gallery-image-id" value="">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="gallery-image-file">Upload Image</label>
-                                        <div class="file-upload-wrapper">
-                                            <input type="file" id="gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
-                                            <div class="file-upload-btn">
-                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                </svg>
-                                                <span>Choose File</span>
-                                            </div>
-                                            <span class="file-name" id="gallery-file-name">No file chosen</span>
+                            <h2 id="album-editor-title">Create New Album</h2>
+                            <form id="album-form">
+                                <div class="form-section">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="album-name">Album Name *</label>
+                                            <input type="text" id="album-name" required placeholder="e.g., 2017-2024">
+                                        </div>
+                                    </div>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="album-label">Label *</label>
+                                            <input type="text" id="album-label" required placeholder="e.g., Archive, Global">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="album-title">Title *</label>
+                                            <input type="text" id="album-title" required placeholder="e.g., Gallery 2017-2024">
+                                        </div>
+                                    </div>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="album-slug">Slug (URL) *</label>
+                                            <input type="text" id="album-slug" required placeholder="e.g., gallery-2017-2024">
+                                            <small>Used for the HTML filename</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="album-directory">Directory Name *</label>
+                                            <input type="text" id="album-directory" required placeholder="e.g., 2017-2024">
+                                            <small>Folder name under images/gallery/</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="album-description">Description</label>
+                                            <textarea id="album-description" rows="3" placeholder="Optional album description"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="album-sort-order">Sort Order</label>
+                                            <input type="number" id="album-sort-order" value="0" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="album-is-active" checked>
+                                                <span>Active (visible on gallery page)</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-row two-col">
-                                    <div class="form-group">
-                                        <label for="gallery-image-src">Image Path (or enter URL)</label>
-                                        <input type="text" id="gallery-image-src" placeholder="images/gallery/photo.jpg">
-                                    </div>
-                                    <div class="image-preview" id="gallery-image-preview">
-                                        <span class="image-preview-placeholder">Image preview</span>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="gallery-image-caption">Caption *</label>
-                                        <input type="text" id="gallery-image-caption" required placeholder="Image caption">
-                                    </div>
-                                </div>
-                                <div class="form-row two-col">
-                                    <div class="form-group">
-                                        <label for="gallery-image-alt">Alt Text</label>
-                                        <input type="text" id="gallery-image-alt" placeholder="Describe the image">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="gallery-image-category">Category *</label>
-                                        <select id="gallery-image-category" required>
-                                            <option value="">Select a category</option>
-                                            <option value="uganda">Uganda</option>
-                                            <option value="nepal">Nepal</option>
-                                            <option value="usa">USA</option>
-                                        </select>
-                                    </div>
-                                </div>
                                 <div class="form-actions">
-                                    <button type="button" id="cancel-gallery-edit" class="btn btn-outline">Cancel</button>
+                                    <button type="button" id="cancel-album-edit" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Album</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Image Editor Modal -->
+                    <div id="image-editor-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="image-editor-title">Add Image</h2>
+                            <form id="image-form">
+                                <div class="form-section">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="image-file">Upload Image</label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" id="image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                                <div class="file-upload-btn">
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Choose File</span>
+                                                </div>
+                                                <span class="file-name" id="image-file-name">No file chosen</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div id="image-preview" class="image-preview-large">
+                                            <span class="image-preview-placeholder">Image preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3>Basic Information</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="image-title">Title</label>
+                                            <input type="text" id="image-title" placeholder="Image title">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="image-caption">Caption</label>
+                                            <textarea id="image-caption" rows="2" placeholder="Image caption"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="image-alt">Alt Text</label>
+                                            <input type="text" id="image-alt" placeholder="Describe the image for accessibility">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3>Metadata (for search & filter)</h3>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="image-category">Category</label>
+                                            <input type="text" id="image-category" placeholder="e.g., Batwa, Nepal, Wildlife">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="image-photographer">Photographer</label>
+                                            <input type="text" id="image-photographer" placeholder="Photographer name">
+                                        </div>
+                                    </div>
+                                    <div class="form-row two-col">
+                                        <div class="form-group">
+                                            <label for="image-date">Photo Date</label>
+                                            <input type="date" id="image-date">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="image-location">Location</label>
+                                            <input type="text" id="image-location" placeholder="e.g., Uganda, Nepal">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="image-tags">Tags (comma-separated)</label>
+                                            <input type="text" id="image-tags" placeholder="e.g., community, farming, education">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-image-edit" class="btn btn-outline">Cancel</button>
                                     <button type="submit" class="btn btn-primary">Save Image</button>
                                 </div>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Delete Gallery Image Modal -->
-                    <div id="delete-gallery-modal" class="modal" hidden>
+                    <!-- Image Actions Modal (move/duplicate/delete) -->
+                    <div id="image-actions-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="image-actions-title">Image Actions</h2>
+                            <div class="form-section">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="target-album">Move or Duplicate to Album:</label>
+                                        <select id="target-album">
+                                            <!-- Populated by JS -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="action-buttons">
+                                    <button type="button" id="move-image-btn" class="btn btn-outline">Move to Album</button>
+                                    <button type="button" id="duplicate-image-btn" class="btn btn-outline">Duplicate to Album</button>
+                                </div>
+                                <hr style="margin: 24px 0; border: none; border-top: 1px solid #e0e0e0;">
+                                <div class="action-buttons">
+                                    <button type="button" id="set-cover-btn" class="btn btn-outline">Set as Album Cover</button>
+                                    <button type="button" id="delete-image-btn" class="btn btn-danger">Delete Image</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Album Modal -->
+                    <div id="delete-album-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content delete-modal-content">
+                            <h2>Delete Album?</h2>
+                            <div id="delete-album-message">
+                                <!-- Message populated by JS -->
+                            </div>
+                            <div class="delete-actions">
+                                <button type="button" id="cancel-album-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-album-delete" class="btn btn-danger">Delete Album</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Image Modal -->
+                    <div id="delete-image-modal" class="modal" hidden>
                         <div class="modal-backdrop"></div>
                         <div class="modal-content delete-modal-content">
                             <h2>Delete Image?</h2>
-                            <p id="delete-gallery-title">Are you sure you want to delete this image?</p>
+                            <p id="delete-image-title">Are you sure you want to delete this image?</p>
                             <div class="delete-actions">
-                                <button type="button" id="cancel-gallery-delete" class="btn btn-outline">Cancel</button>
-                                <button type="button" id="confirm-gallery-delete" class="btn btn-danger">Delete Image</button>
+                                <button type="button" id="cancel-image-delete" class="btn btn-outline">Cancel</button>
+                                <button type="button" id="confirm-image-delete" class="btn btn-danger">Delete Image</button>
                             </div>
                         </div>
                     </div>
@@ -1021,6 +1199,7 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
 
     <script src="js/main.js?v=2"></script>
     <script src="js/supabase-client.js"></script>
+    <script src="js/gallery-admin.js?v=1"></script>
     <script src="js/admin.js?v=12"></script>
 </body>
 </html>
