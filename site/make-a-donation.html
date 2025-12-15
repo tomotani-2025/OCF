@@ -176,7 +176,7 @@
         }
 
         .donation-intro-content {
-            max-width: 800px;
+            max-width: 976px;
             margin: 0 auto;
         }
 
@@ -192,10 +192,12 @@
 
         .donation-intro-content p {
             font-family: var(--font-primary);
-            font-size: 18px;
-            line-height: 170%;
-            color: var(--color-paragraph-1);
-            margin-bottom: 16px;
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 140%;
+            letter-spacing: -0.04em;
+            color: #1F0808;
+            margin: 0 0 16px 0;
         }
 
         .donation-intro-content .highlight-box {
@@ -328,6 +330,12 @@
             }
         }
 
+        @media (max-width: 1100px) {
+            .donation-intro-content p {
+                font-size: 20px;
+            }
+        }
+
         @media (max-width: 768px) {
             .donation-intro-section {
                 padding: 40px 0 24px;
@@ -338,7 +346,8 @@
             }
 
             .donation-intro-content p {
-                font-size: 16px;
+                font-size: 18px;
+                line-height: 140%;
             }
 
             .donation-methods-section {
@@ -351,6 +360,12 @@
 
             .donation-method-card h3 {
                 font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .donation-intro-content p {
+                font-size: 16px;
             }
         }
     </style>
