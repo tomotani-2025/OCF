@@ -13,12 +13,23 @@
     }
 
     try {
-        // Load all content in parallel
-        const [statements, goalCards, settings] = await Promise.all([
+        // Load all content in parallel (including goal pages for hero images)
+        const [statements, goalCards, settings, goalPages] = await Promise.all([
             missionAPI.getStatements(),
             missionAPI.getGoalCards(),
-            missionAPI.getSettings()
+            missionAPI.getSettings(),
+            goalPagesAPI.getAll()
         ]);
+
+        // Create a map of goal page slugs to hero images
+        const goalPageHeroImages = {};
+        if (goalPages && goalPages.length > 0) {
+            goalPages.forEach(page => {
+                if (page.slug && page.hero_image) {
+                    goalPageHeroImages[page.slug] = page.hero_image;
+                }
+            });
+        }
 
         // Update mission breaker image
         if (settings?.breaker_image) {
@@ -50,7 +61,7 @@
             if (goalsGrid) {
                 goalsGrid.innerHTML = '';
                 goalCards.forEach(card => {
-                    const goalCard = createGoalCard(card);
+                    const goalCard = createGoalCard(card, goalPageHeroImages);
                     goalsGrid.appendChild(goalCard);
                 });
             }
@@ -64,15 +75,17 @@
         console.error('Error loading mission content:', error);
     }
 
-    function createGoalCard(card) {
+    function createGoalCard(card, goalPageHeroImages) {
         const div = document.createElement('div');
         div.className = 'goal-card reveal-on-scroll';
 
-        // Image
+        // Image - prefer hero image from goal page, fall back to card's own image
         const imageDiv = document.createElement('div');
         imageDiv.className = 'goal-image';
         const img = document.createElement('img');
-        img.src = card.image || '';
+        // Use hero image from goal page if available (match by link/slug)
+        const heroImage = card.link ? goalPageHeroImages[card.link] : null;
+        img.src = heroImage || card.image || '';
         img.alt = card.title || '';
         imageDiv.appendChild(img);
         div.appendChild(imageDiv);

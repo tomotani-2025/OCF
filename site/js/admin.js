@@ -2712,9 +2712,16 @@ class AboutManager {
     }
 
     async init() {
-        await this.loadContent();
-        this.renderAdvisorsList();
+        console.log('AboutManager init starting');
+        try {
+            await this.loadContent();
+            this.renderAdvisorsList();
+        } catch (error) {
+            console.error('Error initializing AboutManager:', error);
+        }
+        // Always setup event listeners even if loading fails
         this.setupEventListeners();
+        console.log('AboutManager init complete');
     }
 
     async loadContent() {
@@ -2834,22 +2841,43 @@ class AboutManager {
 
     setupEventListeners() {
         // Save trustees
-        document.getElementById('save-trustees-btn').addEventListener('click', () => this.saveTrustees());
+        const saveTrusteesBtn = document.getElementById('save-trustees-btn');
+        if (saveTrusteesBtn) {
+            saveTrusteesBtn.addEventListener('click', () => this.saveTrustees());
+        }
 
         // Add advisor
-        document.getElementById('add-advisor-btn').addEventListener('click', () => this.showEditor());
+        const addAdvisorBtn = document.getElementById('add-advisor-btn');
+        if (addAdvisorBtn) {
+            addAdvisorBtn.addEventListener('click', () => this.showEditor());
+        }
 
         // Form
-        this.form.addEventListener('submit', (e) => this.saveAdvisor(e));
-        document.getElementById('cancel-advisor-edit').addEventListener('click', () => this.closeEditor());
+        if (this.form) {
+            this.form.addEventListener('submit', (e) => this.saveAdvisor(e));
+        }
+        const cancelAdvisorEdit = document.getElementById('cancel-advisor-edit');
+        if (cancelAdvisorEdit) {
+            cancelAdvisorEdit.addEventListener('click', () => this.closeEditor());
+        }
 
         // Delete modal
-        document.getElementById('cancel-advisor-delete').addEventListener('click', () => this.closeDeleteModal());
-        document.getElementById('confirm-advisor-delete').addEventListener('click', () => this.confirmDelete());
+        const cancelAdvisorDelete = document.getElementById('cancel-advisor-delete');
+        if (cancelAdvisorDelete) {
+            cancelAdvisorDelete.addEventListener('click', () => this.closeDeleteModal());
+        }
+        const confirmAdvisorDelete = document.getElementById('confirm-advisor-delete');
+        if (confirmAdvisorDelete) {
+            confirmAdvisorDelete.addEventListener('click', () => this.confirmDelete());
+        }
 
         // Close modals
-        this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
-        this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
+        if (this.editorModal) {
+            const closeBtn = this.editorModal.querySelector('.modal-close');
+            if (closeBtn) closeBtn.addEventListener('click', () => this.closeEditor());
+            const backdrop = this.editorModal.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.addEventListener('click', () => this.closeEditor());
+        }
 
         // Photo preview
         const photoInput = document.getElementById('advisor-photo');
@@ -2989,8 +3017,14 @@ class AboutManager {
     }
 
     showEditor(advisorId = null) {
+        console.log('showEditor called with advisorId:', advisorId);
         this.editingAdvisorId = advisorId;
         const title = document.getElementById('advisor-editor-title');
+
+        if (!this.editorModal) {
+            console.error('Editor modal not found');
+            return;
+        }
 
         if (advisorId) {
             title.textContent = 'Edit Advisor';
@@ -3340,6 +3374,12 @@ class MissionManager {
         // Breaker image preview
         document.getElementById('mission-breaker-image').addEventListener('input', () => this.updateBreakerPreview());
 
+        // Breaker image file upload
+        const breakerFileInput = document.getElementById('mission-breaker-file');
+        if (breakerFileInput) {
+            breakerFileInput.addEventListener('change', (e) => this.handleBreakerImageUpload(e));
+        }
+
         // Add statement
         document.getElementById('add-mission-statement-btn').addEventListener('click', () => this.showStatementEditor());
 
@@ -3379,6 +3419,44 @@ class MissionManager {
         } else {
             preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
         }
+    }
+
+    async handleBreakerImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        document.getElementById('mission-breaker-file-name').textContent = file.name;
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    folder: 'images'
+                })
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const result = await response.json();
+            document.getElementById('mission-breaker-image').value = result.path;
+            this.updateBreakerPreview();
+        } catch (error) {
+            console.error('Error uploading breaker image:', error);
+            alert('Error uploading image: ' + error.message);
+        }
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+        });
     }
 
     async saveBreakerImage() {
@@ -4229,13 +4307,13 @@ class GoalPagesManager {
                         </div>
                         <div class="file-upload-wrapper">
                             <input type="file" id="gallery-file-${index}" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input" onchange="window.goalPagesManager.handleGalleryImageUpload(event, ${index})">
-                            <div class="file-upload-btn">
+                            <label for="gallery-file-${index}" class="file-upload-btn">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                     <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 <span>Upload</span>
-                            </div>
+                            </label>
                             <span class="file-name" id="gallery-file-name-${index}">No file chosen</span>
                         </div>
                     </div>
