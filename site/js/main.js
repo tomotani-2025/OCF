@@ -7,21 +7,32 @@ document.documentElement.classList.add('js-enabled');
 
 // Font loading with localStorage caching (prevents FOUT/layout shift)
 (function() {
+    function showPage() {
+        document.documentElement.classList.add('fonts-loaded');
+    }
+
     // Check if fonts were previously loaded (instant on repeat visits)
     if (localStorage.getItem('fontsLoaded')) {
-        document.documentElement.classList.add('fonts-loaded');
+        showPage();
         return;
     }
+
+    // Timeout fallback - always show page after 2 seconds max
+    var timeout = setTimeout(function() {
+        showPage();
+    }, 2000);
 
     // Wait for fonts to load, then reveal page
     if ('fonts' in document) {
         document.fonts.ready.then(function() {
-            document.documentElement.classList.add('fonts-loaded');
+            clearTimeout(timeout);
+            showPage();
             localStorage.setItem('fontsLoaded', 'true');
         });
     } else {
         // Fallback for older browsers
-        document.documentElement.classList.add('fonts-loaded');
+        clearTimeout(timeout);
+        showPage();
     }
 })();
 
