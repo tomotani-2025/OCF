@@ -30,6 +30,8 @@
                 }
             });
         }
+        console.log('Goal pages loaded:', goalPages?.length || 0);
+        console.log('Hero images map:', goalPageHeroImages);
 
         // Update mission breaker image
         if (settings?.breaker_image) {
@@ -85,6 +87,7 @@
         const img = document.createElement('img');
         // Use hero image from goal page if available (match by link/slug)
         const heroImage = card.link ? goalPageHeroImages[card.link] : null;
+        console.log(`Card "${card.title}" link: "${card.link}" -> hero: "${heroImage}" (fallback: "${card.image}")`);
         img.src = heroImage || card.image || '';
         img.alt = card.title || '';
         imageDiv.appendChild(img);
