@@ -3292,6 +3292,7 @@ class MissionManager {
         this.apiBase = '/.netlify/functions';
         this.statements = [];
         this.goalCards = [];
+        this.goalPageHeroImages = {};
         this.settings = null;
         this.editingStatementId = null;
         this.editingGoalCardId = null;
@@ -3318,6 +3319,17 @@ class MissionManager {
 
     async loadContent() {
         try {
+            // Load goal pages for hero images
+            const goalPages = await goalPagesAPI.getAll();
+            this.goalPageHeroImages = {};
+            if (goalPages && goalPages.length > 0) {
+                goalPages.forEach(page => {
+                    if (page.slug && page.hero_image) {
+                        this.goalPageHeroImages[page.slug] = page.hero_image;
+                    }
+                });
+            }
+
             this.statements = await missionAPI.getStatements();
             this.goalCards = await missionAPI.getGoalCards();
             this.settings = await missionAPI.getSettings();
@@ -3663,7 +3675,11 @@ class MissionManager {
             return;
         }
 
-        this.goalCardsList.innerHTML = this.goalCards.map(card => `
+        this.goalCardsList.innerHTML = this.goalCards.map(card => {
+            // Use hero image from goal page if available, fall back to card's own image
+            const heroImage = card.link ? this.goalPageHeroImages[card.link] : null;
+            const displayImage = heroImage || card.image || '';
+            return `
             <div class="goal-card-admin" data-id="${card.id}" draggable="true">
                 <div class="goal-card-drag-handle">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -3671,7 +3687,7 @@ class MissionManager {
                     </svg>
                 </div>
                 <div class="goal-card-preview">
-                    <div class="goal-card-preview-image" style="background-image: url('${card.image || ''}');"></div>
+                    <div class="goal-card-preview-image" style="background-image: url('${displayImage}');"></div>
                     <div class="goal-card-preview-info">
                         <h4>${card.label || ''} ${card.title || 'Untitled'}</h4>
                         <p>${card.subtitle || ''}</p>
@@ -3680,8 +3696,8 @@ class MissionManager {
                 <div class="goal-card-actions">
                     <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${card.id}">Edit</button>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
 
         // Add click handlers
         this.goalCardsList.querySelectorAll('[data-action="edit"]').forEach(btn => {
