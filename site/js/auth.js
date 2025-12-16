@@ -141,6 +141,11 @@ class AdminAuth {
         this.createLoginModal();
         this.adminContent = document.querySelector('.admin-container');
 
+        // Hide admin content initially until auth is checked
+        if (this.adminContent) {
+            this.adminContent.style.display = 'none';
+        }
+
         // Check authentication on page load
         this.checkAuth();
 
@@ -158,6 +163,7 @@ class AdminAuth {
         const modal = document.createElement('div');
         modal.id = 'login-modal';
         modal.className = 'modal login-modal';
+        modal.hidden = true; // Start hidden, will be shown by checkAuth if needed
         modal.innerHTML = `
             <div class="modal-backdrop login-backdrop"></div>
             <div class="modal-content login-modal-content">
