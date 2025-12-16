@@ -1277,10 +1277,12 @@ class GalleryManager {
     }
 
     populateCategoryFilter() {
+        if (!this.filterSelect) return;
+
         // Keep "All Categories" option
         const allOption = this.filterSelect.querySelector('option[value="all"]');
         this.filterSelect.innerHTML = '';
-        this.filterSelect.appendChild(allOption);
+        if (allOption) this.filterSelect.appendChild(allOption);
 
         // Add categories from data
         this.gallery.categories.forEach(cat => {
@@ -1295,33 +1297,50 @@ class GalleryManager {
 
     setupEventListeners() {
         // Add image button
-        document.getElementById('add-gallery-image-btn').addEventListener('click', () => this.showEditor());
+        const addBtn = document.getElementById('add-gallery-image-btn');
+        if (addBtn) addBtn.addEventListener('click', () => this.showEditor());
 
         // Filter
-        this.filterSelect.addEventListener('change', (e) => this.filterByCategory(e.target.value));
+        if (this.filterSelect) {
+            this.filterSelect.addEventListener('change', (e) => this.filterByCategory(e.target.value));
+        }
 
         // Form
-        this.form.addEventListener('submit', (e) => this.saveImage(e));
-        document.getElementById('cancel-gallery-edit').addEventListener('click', () => this.closeEditor());
+        if (this.form) {
+            this.form.addEventListener('submit', (e) => this.saveImage(e));
+        }
+        const cancelBtn = document.getElementById('cancel-gallery-edit');
+        if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeEditor());
 
         // File input
         const galleryFileInput = document.getElementById('gallery-image-file');
-        galleryFileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        if (galleryFileInput) {
+            galleryFileInput.addEventListener('change', (e) => this.handleFileSelect(e));
 
-        // Make the custom button trigger the hidden file input
-        const galleryFileBtn = this.editorModal.querySelector('.file-upload-btn');
-        galleryFileBtn.addEventListener('click', () => galleryFileInput.click());
+            // Make the custom button trigger the hidden file input
+            if (this.editorModal) {
+                const galleryFileBtn = this.editorModal.querySelector('.file-upload-btn');
+                if (galleryFileBtn) galleryFileBtn.addEventListener('click', () => galleryFileInput.click());
+            }
+        }
 
         // Image path input preview
-        document.getElementById('gallery-image-src').addEventListener('input', (e) => this.updatePreview(e.target.value));
+        const srcInput = document.getElementById('gallery-image-src');
+        if (srcInput) srcInput.addEventListener('input', (e) => this.updatePreview(e.target.value));
 
         // Delete modal
-        document.getElementById('cancel-gallery-delete').addEventListener('click', () => this.closeDeleteModal());
-        document.getElementById('confirm-gallery-delete').addEventListener('click', () => this.confirmDelete());
+        const cancelDeleteBtn = document.getElementById('cancel-gallery-delete');
+        if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => this.closeDeleteModal());
+        const confirmDeleteBtn = document.getElementById('confirm-gallery-delete');
+        if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', () => this.confirmDelete());
 
         // Close modals
-        this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
-        this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
+        if (this.editorModal) {
+            const closeBtn = this.editorModal.querySelector('.modal-close');
+            if (closeBtn) closeBtn.addEventListener('click', () => this.closeEditor());
+            const backdrop = this.editorModal.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.addEventListener('click', () => this.closeEditor());
+        }
     }
 
     filterByCategory(category) {
