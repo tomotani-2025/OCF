@@ -3237,6 +3237,7 @@
 .btn-logout svg {
     width: 16px;
     height: 16px;
+    transform: none;
 }
 
 /* When header is scrolled (sticky with dark background) */
