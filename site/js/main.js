@@ -5,6 +5,63 @@
 // Add js-enabled class immediately for reveal animations
 document.documentElement.classList.add('js-enabled');
 
+// ========================================
+// Utility Functions
+// ========================================
+
+// Simple HTML sanitization to prevent XSS attacks
+window.sanitizeHTML = function(str) {
+    if (!str) return '';
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+};
+
+// Escape HTML entities for safe insertion
+window.escapeHTML = function(str) {
+    if (!str) return '';
+    const escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;'
+    };
+    return String(str).replace(/[&<>"'/]/g, char => escapeMap[char]);
+};
+
+// Debounce function to limit execution frequency
+window.debounce = function(func, wait, immediate) {
+    let timeout;
+    return function executedFunction() {
+        const context = this;
+        const args = arguments;
+        const later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+// Throttle function to limit execution rate
+window.throttle = function(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+};
+
 // Font loading with localStorage caching (prevents FOUT/layout shift)
 (function() {
     function showPage() {
@@ -168,21 +225,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Header scroll effect
+    // Header scroll effect (throttled for performance)
     const header = document.querySelector('.site-header');
-    let lastScroll = 0;
 
-    window.addEventListener('scroll', function() {
+    const handleScroll = window.throttle(function() {
         const currentScroll = window.pageYOffset;
-
         if (currentScroll > 100) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+    }, 100);
 
-        lastScroll = currentScroll;
-    });
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {

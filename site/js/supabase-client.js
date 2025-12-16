@@ -8,6 +8,22 @@
 const SUPABASE_URL = 'https://wafdatyvcgimpsetelyb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZmRhdHl2Y2dpbXBzZXRlbHliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0OTY2NjcsImV4cCI6MjA4MTA3MjY2N30.khU-SsaThjovP0H29DWHuxBraiYS0YWY2c8rTEEir4o';
 
+// Get the current auth token (if user is logged in)
+function getAuthToken() {
+    try {
+        const session = localStorage.getItem('supabase_session');
+        if (session) {
+            const parsed = JSON.parse(session);
+            if (parsed.access_token) {
+                return parsed.access_token;
+            }
+        }
+    } catch (e) {
+        // Ignore parse errors
+    }
+    return SUPABASE_ANON_KEY;
+}
+
 // Simple Supabase REST API client (no SDK needed)
 const supabase = {
     async query(table, options = {}) {
@@ -63,12 +79,13 @@ const supabase = {
 
     async insert(table, data) {
         const url = `${SUPABASE_URL}/rest/v1/${table}`;
+        const token = getAuthToken();
 
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=representation'
             },
@@ -86,6 +103,7 @@ const supabase = {
     async update(table, data, filters) {
         let url = `${SUPABASE_URL}/rest/v1/${table}`;
         const params = new URLSearchParams();
+        const token = getAuthToken();
 
         Object.entries(filters).forEach(([col, val]) => {
             params.set(col, `eq.${val}`);
@@ -97,7 +115,7 @@ const supabase = {
             method: 'PATCH',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=representation'
             },
@@ -115,6 +133,7 @@ const supabase = {
     async delete(table, filters) {
         let url = `${SUPABASE_URL}/rest/v1/${table}`;
         const params = new URLSearchParams();
+        const token = getAuthToken();
 
         Object.entries(filters).forEach(([col, val]) => {
             params.set(col, `eq.${val}`);
@@ -126,7 +145,7 @@ const supabase = {
             method: 'DELETE',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });

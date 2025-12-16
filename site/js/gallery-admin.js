@@ -166,14 +166,14 @@ class GalleryAdmin {
 
         this.albumsList.innerHTML = this.albums.map(album => `
             <div class="album-card" data-album-id="${album.id}">
-                <div class="album-card-image" style="background-image: url('${album.cover_image || 'images/placeholder.jpg'}');" onclick="galleryAdmin.showImagesView(${album.id})" role="button" tabindex="0">
+                <div class="album-card-image" style="background-image: url('${escapeHTML(album.cover_image) || 'images/placeholder.jpg'}');" onclick="galleryAdmin.showImagesView(${album.id})" role="button" tabindex="0">
                     ${!album.is_active ? '<span class="album-status-badge">Hidden</span>' : ''}
                 </div>
                 <div class="album-card-content">
                     <div class="album-card-header">
                         <div>
-                            <span class="album-label">${album.label}</span>
-                            <h3 class="album-title">${album.title}</h3>
+                            <span class="album-label">${escapeHTML(album.label)}</span>
+                            <h3 class="album-title">${escapeHTML(album.title)}</h3>
                         </div>
                         <div class="album-actions">
                             <button type="button" class="btn-icon" onclick="galleryAdmin.showImagesView(${album.id})" title="View images">
@@ -210,7 +210,7 @@ class GalleryAdmin {
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
-                            ${album.slug}
+                            ${escapeHTML(album.slug)}
                         </span>
                     </div>
                 </div>
@@ -242,15 +242,15 @@ class GalleryAdmin {
 
         this.imagesList.innerHTML = this.currentImages.map(image => `
             <div class="image-card-admin" data-image-id="${image.id}">
-                <div class="image-card-image" style="background-image: url('${image.file_path}');">
+                <div class="image-card-image" style="background-image: url('${escapeHTML(image.file_path || '')}');">
                     ${this.currentAlbum && this.currentAlbum.cover_image === image.file_path ?
                         '<span class="cover-badge">Cover</span>' : ''}
                 </div>
                 <div class="image-card-content">
                     <div class="image-card-header">
                         <div>
-                            <h4 class="image-title">${image.title || image.filename}</h4>
-                            ${image.caption ? `<p class="image-caption">${image.caption}</p>` : ''}
+                            <h4 class="image-title">${escapeHTML(image.title || image.filename || '')}</h4>
+                            ${image.caption ? `<p class="image-caption">${escapeHTML(image.caption)}</p>` : ''}
                         </div>
                         <div class="image-actions">
                             <button type="button" class="btn-icon" onclick="galleryAdmin.editImage(${image.id})" title="Edit">
@@ -269,9 +269,9 @@ class GalleryAdmin {
                         </div>
                     </div>
                     <div class="image-card-meta">
-                        ${image.category ? `<span class="meta-tag">${image.category}</span>` : ''}
-                        ${image.photographer ? `<span class="meta-tag">${image.photographer}</span>` : ''}
-                        ${image.location ? `<span class="meta-tag">${image.location}</span>` : ''}
+                        ${image.category ? `<span class="meta-tag">${escapeHTML(image.category)}</span>` : ''}
+                        ${image.photographer ? `<span class="meta-tag">${escapeHTML(image.photographer)}</span>` : ''}
+                        ${image.location ? `<span class="meta-tag">${escapeHTML(image.location)}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -414,8 +414,220 @@ class GalleryAdmin {
     }
 
     showBulkUploader() {
-        // TODO: Implement bulk upload modal with file upload integration
-        alert('Bulk upload functionality is coming soon! This feature will allow you to upload multiple images at once with batch metadata input.');
+        // Create bulk upload modal if it doesn't exist
+        let modal = document.getElementById('bulk-upload-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'bulk-upload-modal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-backdrop"></div>
+                <div class="modal-content bulk-upload-content">
+                    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                    <h2 class="title">Bulk Upload Images</h2>
+                    <form id="bulk-upload-form">
+                        <div class="form-section">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Select Images</label>
+                                    <div class="bulk-upload-dropzone" id="bulk-dropzone">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        <p>Drag & drop images here, or click to select</p>
+                                        <input type="file" id="bulk-files-input" multiple accept="image/jpeg,image/png,image/gif,image/webp" class="bulk-file-input">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="bulk-preview-container" class="bulk-preview-container" hidden>
+                                <h3>Selected Images (<span id="bulk-count">0</span>)</h3>
+                                <div id="bulk-preview-grid" class="bulk-preview-grid"></div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <h3>Default Metadata (Optional)</h3>
+                            <p class="form-help">These values will be applied to all uploaded images. You can edit individual images after upload.</p>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="bulk-category">Category</label>
+                                    <input type="text" id="bulk-category" placeholder="e.g., Batwa, Nepal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bulk-photographer">Photographer</label>
+                                    <input type="text" id="bulk-photographer" placeholder="Photographer name">
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="bulk-location">Location</label>
+                                    <input type="text" id="bulk-location" placeholder="e.g., Uganda, Nepal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bulk-date">Photo Date</label>
+                                    <input type="date" id="bulk-date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancel-bulk-upload" class="btn btn-outline">Cancel</button>
+                            <button type="submit" id="submit-bulk-upload" class="btn btn-primary" disabled>Upload Images</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Setup event listeners for bulk upload modal
+            this.setupBulkUploadListeners(modal);
+        }
+
+        // Reset the form
+        document.getElementById('bulk-upload-form').reset();
+        document.getElementById('bulk-preview-container').hidden = true;
+        document.getElementById('bulk-preview-grid').innerHTML = '';
+        document.getElementById('submit-bulk-upload').disabled = true;
+        this.bulkFiles = [];
+
+        modal.hidden = false;
+    }
+
+    setupBulkUploadListeners(modal) {
+        const closeBtn = modal.querySelector('.modal-close');
+        const cancelBtn = document.getElementById('cancel-bulk-upload');
+        const backdrop = modal.querySelector('.modal-backdrop');
+        const fileInput = document.getElementById('bulk-files-input');
+        const dropzone = document.getElementById('bulk-dropzone');
+        const form = document.getElementById('bulk-upload-form');
+
+        // Close handlers
+        const closeBulkModal = () => {
+            modal.hidden = true;
+            this.bulkFiles = [];
+        };
+
+        closeBtn.addEventListener('click', closeBulkModal);
+        cancelBtn.addEventListener('click', closeBulkModal);
+        backdrop.addEventListener('click', closeBulkModal);
+
+        // File selection
+        fileInput.addEventListener('change', (e) => this.handleBulkFileSelect(e.target.files));
+
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            this.handleBulkFileSelect(e.dataTransfer.files);
+        });
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // Form submit
+        form.addEventListener('submit', (e) => this.submitBulkUpload(e));
+    }
+
+    handleBulkFileSelect(files) {
+        this.bulkFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+
+        const previewContainer = document.getElementById('bulk-preview-container');
+        const previewGrid = document.getElementById('bulk-preview-grid');
+        const countSpan = document.getElementById('bulk-count');
+        const submitBtn = document.getElementById('submit-bulk-upload');
+
+        if (this.bulkFiles.length === 0) {
+            previewContainer.hidden = true;
+            submitBtn.disabled = true;
+            return;
+        }
+
+        countSpan.textContent = this.bulkFiles.length;
+        previewContainer.hidden = false;
+        submitBtn.disabled = false;
+
+        previewGrid.innerHTML = '';
+        this.bulkFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const item = document.createElement('div');
+                item.className = 'bulk-preview-item';
+                item.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}">
+                    <span class="bulk-preview-name">${file.name}</span>
+                    <button type="button" class="bulk-preview-remove" data-index="${index}" title="Remove">&times;</button>
+                `;
+                previewGrid.appendChild(item);
+
+                // Add remove handler
+                item.querySelector('.bulk-preview-remove').addEventListener('click', () => {
+                    this.bulkFiles.splice(index, 1);
+                    this.handleBulkFileSelect(this.bulkFiles);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async submitBulkUpload(e) {
+        e.preventDefault();
+
+        if (!this.bulkFiles || this.bulkFiles.length === 0) {
+            this.showError('Please select at least one image');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-bulk-upload');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+
+        const defaultMetadata = {
+            category: document.getElementById('bulk-category').value,
+            photographer: document.getElementById('bulk-photographer').value,
+            location: document.getElementById('bulk-location').value,
+            photo_date: document.getElementById('bulk-date').value || null
+        };
+
+        try {
+            let successCount = 0;
+
+            for (const file of this.bulkFiles) {
+                // Create file path (in production, upload to storage first)
+                const filePath = `images/gallery/${this.currentAlbum.directory_name}/${file.name}`;
+
+                const imageData = {
+                    album_id: this.currentAlbum.id,
+                    filename: file.name,
+                    file_path: filePath,
+                    title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+                    alt_text: 'Gallery image',
+                    ...defaultMetadata,
+                    sort_order: this.currentImages.length + successCount
+                };
+
+                await galleryAPI.createImage(imageData);
+                successCount++;
+            }
+
+            this.showSuccess(`Successfully added ${successCount} image(s)`);
+            document.getElementById('bulk-upload-modal').hidden = true;
+            this.bulkFiles = [];
+            await this.loadAlbumImages(this.currentAlbum.id);
+            this.renderImages();
+            this.updateImagesHeader();
+
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            this.showError('Failed to upload images: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload Images';
+        }
     }
 
     showImageEditor(imageId) {
@@ -467,17 +679,24 @@ class GalleryAdmin {
     async saveImage(e) {
         e.preventDefault();
 
-        // TODO: Handle file upload to storage
         const file = document.getElementById('image-file').files[0];
         let filePath = '';
+        let filename = '';
 
         if (file) {
-            // For now, just use a placeholder path
-            // In production, upload to Supabase Storage or your preferred solution
-            filePath = `images/gallery/${this.currentAlbum.directory_name}/${file.name}`;
+            // Generate file path - in production, upload to storage first
+            // For now, we assume manual file placement in the images/gallery folder
+            filename = file.name;
+            filePath = `images/gallery/${this.currentAlbum.directory_name}/${filename}`;
+
+            // Note: For full storage integration, you would upload to Supabase Storage here:
+            // const { data, error } = await supabase.storage.from('gallery').upload(filePath, file);
+            // if (error) throw error;
+            // filePath = data.path;
         } else if (this.editingImage) {
             const existing = this.currentImages.find(img => img.id === this.editingImage);
             filePath = existing.file_path;
+            filename = existing.filename;
         }
 
         const imageData = {
@@ -711,21 +930,153 @@ class GalleryAdmin {
     // ========================================
 
     showSuccess(message) {
-        // TODO: Implement toast notification
-        alert(message);
+        this.showToast(message, 'success');
     }
 
     showError(message) {
-        // TODO: Implement toast notification
-        alert('Error: ' + message);
+        this.showToast(message, 'error');
+    }
+
+    showToast(message, type = 'info') {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${type === 'success'
+                        ? '<path d="M20 6L9 17l-5-5"></path>'
+                        : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'}
+                </svg>
+                <span class="toast-message">${message}</span>
+            </div>
+            <button class="toast-close" aria-label="Close">&times;</button>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Add close handler
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            toast.classList.add('toast-hiding');
+            setTimeout(() => toast.remove(), 300);
+        });
+
+        // Trigger animation
+        requestAnimationFrame(() => {
+            toast.classList.add('toast-visible');
+        });
+
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.classList.add('toast-hiding');
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 4000);
     }
 
     filterImages(searchTerm) {
-        // TODO: Implement image search
+        if (!searchTerm || !searchTerm.trim()) {
+            // No search term - show all images
+            this.renderImages();
+            return;
+        }
+
+        const term = searchTerm.toLowerCase().trim();
+        const filteredImages = this.currentImages.filter(image => {
+            const title = (image.title || '').toLowerCase();
+            const caption = (image.caption || '').toLowerCase();
+            const filename = (image.filename || '').toLowerCase();
+            const category = (image.category || '').toLowerCase();
+            const photographer = (image.photographer || '').toLowerCase();
+            const location = (image.location || '').toLowerCase();
+            const tags = (image.tags || '').toLowerCase();
+
+            return title.includes(term) ||
+                   caption.includes(term) ||
+                   filename.includes(term) ||
+                   category.includes(term) ||
+                   photographer.includes(term) ||
+                   location.includes(term) ||
+                   tags.includes(term);
+        });
+
+        this.renderFilteredImages(filteredImages);
     }
 
     filterByCategory(category) {
-        // TODO: Implement category filter
+        if (!category || category === 'all') {
+            // No filter - show all images
+            this.renderImages();
+            return;
+        }
+
+        const filteredImages = this.currentImages.filter(image =>
+            image.category && image.category.toLowerCase() === category.toLowerCase()
+        );
+
+        this.renderFilteredImages(filteredImages);
+    }
+
+    renderFilteredImages(images) {
+        if (!this.imagesList) return;
+
+        if (images.length === 0) {
+            this.imagesList.innerHTML = `
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                    <p>No images match your search</p>
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('search-images').value=''; document.getElementById('filter-category').value='all'; galleryAdmin.renderImages();">Clear Filters</button>
+                </div>
+            `;
+            return;
+        }
+
+        this.imagesList.innerHTML = images.map(image => `
+            <div class="image-card-admin" data-image-id="${image.id}">
+                <div class="image-card-image" style="background-image: url('${escapeHTML(image.file_path || '')}');">
+                    ${this.currentAlbum && this.currentAlbum.cover_image === image.file_path ?
+                        '<span class="cover-badge">Cover</span>' : ''}
+                </div>
+                <div class="image-card-content">
+                    <div class="image-card-header">
+                        <div>
+                            <h4 class="image-title">${escapeHTML(image.title || image.filename || '')}</h4>
+                            ${image.caption ? `<p class="image-caption">${escapeHTML(image.caption)}</p>` : ''}
+                        </div>
+                        <div class="image-actions">
+                            <button type="button" class="btn-icon" onclick="galleryAdmin.editImage(${image.id})" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button type="button" class="btn-icon" onclick="galleryAdmin.showImageActions(${image.id})" title="More">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="12" cy="5" r="1"></circle>
+                                    <circle cx="12" cy="19" r="1"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-card-meta">
+                        ${image.category ? `<span class="meta-tag">${escapeHTML(image.category)}</span>` : ''}
+                        ${image.photographer ? `<span class="meta-tag">${escapeHTML(image.photographer)}</span>` : ''}
+                        ${image.location ? `<span class="meta-tag">${escapeHTML(image.location)}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 }
 
