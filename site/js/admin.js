@@ -1234,9 +1234,13 @@ class GalleryManager {
     }
 
     async init() {
-        await this.loadGallery();
-        this.renderGalleryGrid();
-        this.setupEventListeners();
+        try {
+            await this.loadGallery();
+            this.renderGalleryGrid();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('Error initializing GalleryManager:', error);
+        }
     }
 
     async loadGallery() {
@@ -1330,6 +1334,10 @@ class GalleryManager {
     }
 
     renderGalleryGrid() {
+        if (!this.grid) {
+            console.warn('Gallery grid element not found');
+            return;
+        }
         if (this.filteredImages.length === 0) {
             this.grid.innerHTML = '<div class="loading-message">No images found</div>';
             return;
