@@ -3,10 +3,10 @@
  *
  * Provides secure login/logout functionality using Supabase Auth.
  * Only authenticated users can access the admin panel.
+ *
+ * Note: SUPABASE_URL and SUPABASE_ANON_KEY are defined in supabase-client.js
+ * which must be loaded before this script.
  */
-
-const SUPABASE_URL = 'https://wafdatyvcgimpsetelyb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZmRhdHl2Y2dpbXBzZXRlbHliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0OTY2NjcsImV4cCI6MjA4MTA3MjY2N30.khU-SsaThjovP0H29DWHuxBraiYS0YWY2c8rTEEir4o';
 
 // Auth API using Supabase Auth REST endpoints
 const authAPI = {
