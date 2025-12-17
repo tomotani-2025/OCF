@@ -48,6 +48,10 @@
             if (heroImg) {
                 heroImg.src = pageData.hero_image;
                 heroImg.alt = pageData.title || '';
+                // Apply crop position if specified
+                if (pageData.hero_position) {
+                    heroImg.style.objectPosition = pageData.hero_position;
+                }
             }
         }
 

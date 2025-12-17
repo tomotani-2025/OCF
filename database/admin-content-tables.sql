@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS goal_pages (
     title TEXT NOT NULL,     -- e.g., "Batwa Farm at Matanda, Uganda"
     slug TEXT NOT NULL,      -- e.g., "goalone.html"
     hero_image TEXT,         -- Hero image path
+    hero_position TEXT DEFAULT 'center', -- Image crop position: top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right
     content TEXT,            -- Body content (paragraphs)
     funding JSONB,           -- Array of {label, amount} objects
     gallery JSONB,           -- Array of {src, alt} objects
@@ -146,6 +147,14 @@ CREATE TABLE IF NOT EXISTS goal_pages (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add hero_position column if it doesn't exist (for existing installations)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'goal_pages' AND column_name = 'hero_position') THEN
+        ALTER TABLE goal_pages ADD COLUMN hero_position TEXT DEFAULT 'center';
+    END IF;
+END $$;
 
 -- Index for slug lookups and ordering
 CREATE INDEX IF NOT EXISTS idx_goal_pages_slug ON goal_pages(slug);

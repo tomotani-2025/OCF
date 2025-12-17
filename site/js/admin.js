@@ -4251,6 +4251,7 @@ class GoalPagesManager {
                 document.getElementById('goal-page-title').value = page.title || '';
                 document.getElementById('goal-page-slug').value = page.slug || '';
                 document.getElementById('goal-page-hero').value = page.hero_image || '';
+                document.getElementById('goal-page-hero-position').value = page.hero_position || 'center';
                 document.getElementById('goal-page-content').value = page.content || '';
 
                 // Load funding items
@@ -4304,6 +4305,7 @@ class GoalPagesManager {
         document.getElementById('goal-page-title').value = '';
         document.getElementById('goal-page-slug').value = '';
         document.getElementById('goal-page-hero').value = '';
+        document.getElementById('goal-page-hero-position').value = 'center';
         document.getElementById('goal-page-content').value = '';
         this.fundingContainer.innerHTML = '';
         this.fundingItemCount = 0;
@@ -4422,6 +4424,7 @@ class GoalPagesManager {
             title: document.getElementById('goal-page-title').value,
             slug: document.getElementById('goal-page-slug').value,
             hero_image: document.getElementById('goal-page-hero').value,
+            hero_position: document.getElementById('goal-page-hero-position').value,
             content: document.getElementById('goal-page-content').value,
             funding: JSON.stringify(this.collectFundingItems()),
             gallery: JSON.stringify(this.collectGalleryImages()),
