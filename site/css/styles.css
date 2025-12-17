@@ -758,15 +758,33 @@ a {
     margin-top: 16px;
 }
 
-.footer-contact-info {
+.footer-content {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 45px;
+    gap: 48px;
     width: 100%;
     max-width: 976px;
     margin-top: 32px;
+}
+
+.footer-image {
+    flex-shrink: 0;
+    width: 360px;
+}
+
+.footer-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
 }
 
 .footer-column {
@@ -775,8 +793,6 @@ a {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 2px;
-    flex: 1;
-    max-width: 280px;
 }
 
 .footer-column p,
@@ -797,21 +813,6 @@ a {
     font-weight: 600;
 }
 
-/* Donate button in footer - regular button size */
-.footer-column .btn.btn-donate {
-    padding: 18px 24px;
-    font-size: 18px;
-    font-weight: 400;
-    gap: 10px;
-    margin-top: 8px;
-}
-
-.footer-column .btn.btn-donate .donate-icon,
-.footer-column .btn.btn-donate .donate-icon-filled {
-    width: 20px;
-    height: 20px;
-}
-
 .footer-copyright {
     display: flex;
     flex-direction: column;
@@ -825,78 +826,6 @@ a {
     font-size: 14px;
     line-height: 140%;
     color: var(--color-paragraph-1);
-}
-
-/* Legacy footer styles for backwards compatibility */
-.footer-content {
-    display: flex;
-    flex-direction: row;
-    gap: 45px;
-    width: 100%;
-    max-width: 976px;
-}
-
-.footer-info {
-    flex: 1;
-}
-
-.footer-info .footer-logo {
-    margin-bottom: var(--spacing-sm);
-}
-
-.footer-info p {
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-paragraph-1);
-}
-
-.footer-nav h4,
-.footer-contact h4 {
-    font-family: var(--font-primary);
-    font-weight: 500;
-    font-size: 16px;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-paragraph-1);
-}
-
-.footer-nav ul {
-    list-style: none;
-}
-
-.footer-nav li {
-    margin-bottom: 4px;
-}
-
-.footer-nav a {
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-paragraph-1);
-}
-
-.footer-nav a:hover {
-    color: var(--color-accent);
-}
-
-.footer-contact p {
-    font-size: 14px;
-    line-height: 140%;
-}
-
-.footer-contact a {
-    color: var(--color-accent);
-}
-
-.footer-bottom {
-    width: 100%;
-    padding-top: var(--spacing-md);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.footer-bottom p {
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-paragraph-1);
-    margin: 0;
 }
 
 /* =========================================
@@ -2085,9 +2014,14 @@ body.menu-open {
         gap: 48px;
     }
 
-    .footer-contact-info {
+    .footer-content {
         flex-direction: column;
-        gap: 24px;
+        gap: 32px;
+    }
+
+    .footer-image {
+        width: 100%;
+        max-width: 400px;
     }
 
     .two-column-grid {
@@ -2140,11 +2074,6 @@ body.menu-open {
 
     .quote-attribution {
         font-size: 20px;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 32px;
     }
 
     .projects-grid,
