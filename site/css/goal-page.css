@@ -134,6 +134,16 @@
     margin-bottom: 0;
 }
 
+.goal-body a {
+    color: #EF3A4F;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.goal-body a:hover {
+    color: #312121;
+}
+
 /* Goal Funding Box */
 .goal-funding {
     background: #FFFFFF;
