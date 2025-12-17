@@ -3849,6 +3849,7 @@ class GoalPagesManager {
     async loadPages() {
         try {
             this.pages = await goalPagesAPI.getAll();
+            console.log('Loaded goal pages:', this.pages);
 
             // Seed default goal pages if empty
             if (this.pages.length === 0) {
@@ -4106,23 +4107,31 @@ class GoalPagesManager {
         if (!file) return;
 
         const fileNameEl = document.getElementById(`gallery-file-name-${index}`);
-        if (fileNameEl) fileNameEl.textContent = file.name;
+        if (fileNameEl) fileNameEl.textContent = 'Uploading...';
 
         try {
             const base64 = await this.fileToBase64(file);
+            // Get the current page slug for folder organization
+            const slug = document.getElementById('goal-page-slug').value || 'goal-images';
+
             const response = await fetch(`${this.apiBase}/upload-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     file: base64,
                     filename: file.name,
-                    folder: 'images'
+                    mimeType: file.type,
+                    postId: slug,
+                    fileType: 'image'
                 })
             });
 
-            if (!response.ok) throw new Error('Upload failed');
-
             const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
             const srcInput = document.querySelector(`[name="gallery-src-${index}"]`);
             if (srcInput) srcInput.value = result.path;
 
@@ -4131,9 +4140,12 @@ class GoalPagesManager {
             if (preview) {
                 preview.innerHTML = `<img src="${result.path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
             }
+
+            if (fileNameEl) fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading gallery image:', error);
             alert('Error uploading image: ' + error.message);
+            if (fileNameEl) fileNameEl.textContent = 'Upload failed';
         }
     }
 
@@ -4256,10 +4268,27 @@ class GoalPagesManager {
                 funding.forEach(item => this.addFundingItem(item));
 
                 // Load gallery images
-                const gallery = typeof page.gallery === 'string' ? JSON.parse(page.gallery || '[]') : (page.gallery || []);
+                let gallery = [];
+                try {
+                    if (page.gallery) {
+                        gallery = typeof page.gallery === 'string' ? JSON.parse(page.gallery) : page.gallery;
+                        // Handle case where it might be double-encoded
+                        if (typeof gallery === 'string') {
+                            gallery = JSON.parse(gallery);
+                        }
+                    }
+                    console.log('Loading gallery for page:', page.title, 'Gallery data:', gallery);
+                } catch (e) {
+                    console.error('Error parsing gallery data:', e, 'Raw data:', page.gallery);
+                    gallery = [];
+                }
                 this.galleryContainer.innerHTML = '';
                 this.galleryImageCount = 0;
-                gallery.forEach(img => this.addGalleryImage(img));
+                if (Array.isArray(gallery) && gallery.length > 0) {
+                    gallery.forEach(img => this.addGalleryImage(img));
+                } else {
+                    console.log('No gallery images found for this page. Gallery data was:', page.gallery);
+                }
 
                 this.updateHeroPreview();
             }
