@@ -1957,8 +1957,20 @@
     }
 }
 
-/* Button icons and states for publish button */
-/* Override .btn-outline svg rule from styles.css that sets svg to 18x14 */
+/* =========================================
+   Publish Button States
+   ========================================= */
+
+/* Base button styles */
+#save-all-progress-btn {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    background: transparent;
+    border: 2px solid #EF3A4F;
+    color: #000000;
+    transition: all 0.2s ease;
+}
+
 #save-all-progress-btn svg {
     width: 28px !important;
     height: 28px !important;
@@ -1967,19 +1979,65 @@
     max-width: 28px !important;
     max-height: 28px !important;
     flex-shrink: 0 !important;
-    transform: none !important; /* Don't rotate like arrow icons */
+    transform: none !important;
 }
 
-/* Reduce padding to compensate for larger 28px icons and match button height */
-#save-all-progress-btn {
-    padding-top: 6px;
-    padding-bottom: 6px;
+/* Icon colors - red for outline state */
+#save-all-progress-btn .btn-icon path,
+#save-all-progress-btn .btn-icon circle {
+    stroke: #EF3A4F;
+}
+
+#save-all-progress-btn .default-icon path {
+    fill: #EF3A4F;
+    stroke: none;
+}
+
+/* Disabled state - 50% opacity */
+#save-all-progress-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Publishing state - red filled, white icon */
+#save-all-progress-btn.publishing {
+    background: #EF3A4F;
+    border-color: #EF3A4F;
+    color: #000000;
+}
+
+#save-all-progress-btn.publishing .btn-icon path,
+#save-all-progress-btn.publishing .btn-icon circle {
+    stroke: #FFFFFF;
+}
+
+/* Success state - green filled, white icon */
+#save-all-progress-btn.btn-success {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: #000000 !important;
+}
+
+#save-all-progress-btn.btn-success .btn-icon path {
+    stroke: #FFFFFF;
+}
+
+/* Error state - red filled, white icon */
+#save-all-progress-btn.btn-error {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #000000 !important;
+}
+
+#save-all-progress-btn.btn-error .btn-icon path {
+    stroke: #FFFFFF;
 }
 
 #save-all-progress-btn .btn-icon.spinner-icon {
     animation: none; /* SVG has internal animation */
 }
 
+/* Generic button states (for other buttons) */
 .btn.btn-success {
     background-color: #22c55e !important;
     border-color: #22c55e !important;

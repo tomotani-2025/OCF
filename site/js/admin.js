@@ -2526,6 +2526,7 @@ class ProgressManager {
 
         // Show spinner state
         btn.disabled = true;
+        btn.classList.add('publishing');
         defaultIcon.style.display = 'none';
         spinnerIcon.style.display = 'inline';
         successIcon.style.display = 'none';
@@ -2554,36 +2555,38 @@ class ProgressManager {
             }
 
             // Show success state
+            btn.classList.remove('publishing');
+            btn.classList.add('btn-success');
             spinnerIcon.style.display = 'none';
             successIcon.style.display = 'inline';
             btnText.textContent = 'Published!';
-            btn.classList.add('btn-success');
 
             this.hasUnsavedChanges = false;
             this.updateSaveButton();
 
             // Reset button after delay
             setTimeout(() => {
+                btn.classList.remove('btn-success');
                 defaultIcon.style.display = 'inline';
                 successIcon.style.display = 'none';
                 btnText.textContent = 'Publish Changes';
-                btn.classList.remove('btn-success');
                 btn.disabled = false;
             }, 2000);
 
         } catch (error) {
             console.error('Save error:', error);
             // Show error state
+            btn.classList.remove('publishing');
+            btn.classList.add('btn-error');
             spinnerIcon.style.display = 'none';
             defaultIcon.style.display = 'inline';
             btnText.textContent = 'Error - Try Again';
-            btn.classList.add('btn-error');
             btn.disabled = false;
 
             // Reset button after delay
             setTimeout(() => {
-                btnText.textContent = 'Publish Changes';
                 btn.classList.remove('btn-error');
+                btnText.textContent = 'Publish Changes';
             }, 3000);
         }
     }
