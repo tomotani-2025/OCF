@@ -114,6 +114,11 @@
                     item.appendChild(imgEl);
                     galleryDiv.appendChild(item);
                 });
+
+                // Reinitialize lightbox for dynamically loaded gallery
+                if (typeof window.initGalleryLightbox === 'function') {
+                    window.initGalleryLightbox();
+                }
             }
         }
     } catch (error) {

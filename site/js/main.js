@@ -285,12 +285,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize scroll reveal animations
     window.initRevealAnimations();
 
-    // Gallery lightbox (matching news post style)
-    const galleryItems = document.querySelectorAll('.gallery-item');
+    // Initialize gallery lightbox
+    window.initGalleryLightbox();
+});
 
-    if (galleryItems.length > 0) {
+// Global function to initialize gallery lightbox (can be called after dynamic content loads)
+window.initGalleryLightbox = function() {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    if (galleryItems.length === 0) return;
+
+    // Check if lightbox already exists, if so just rebind events
+    let lightbox = document.querySelector('.image-lightbox');
+
+    if (!lightbox) {
         // Create lightbox elements (same style as news posts)
-        const lightbox = document.createElement('div');
+        lightbox = document.createElement('div');
         lightbox.className = 'image-lightbox';
         lightbox.innerHTML = `
             <button class="lightbox-close" aria-label="Close fullscreen">
@@ -321,81 +330,29 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(lightbox);
 
-        const lightboxImg = lightbox.querySelector('.lightbox-content img');
         const closeBtn = lightbox.querySelector('.lightbox-close');
         const prevBtn = lightbox.querySelector('.lightbox-prev');
         const nextBtn = lightbox.querySelector('.lightbox-next');
-        const lightboxCount = lightbox.querySelector('.lightbox-count');
-        const lightboxText = lightbox.querySelector('.lightbox-text');
-        let currentIndex = 0;
 
-        function formatNumber(num) {
-            return num.toString().padStart(2, '0');
-        }
-
-        function updateLightboxNav() {
-            // Hide arrows at start/end
-            prevBtn.style.display = currentIndex === 0 ? 'none' : 'flex';
-            nextBtn.style.display = currentIndex === galleryItems.length - 1 ? 'none' : 'flex';
-        }
-
-        function openLightbox(index) {
-            currentIndex = index;
-            const img = galleryItems[index].querySelector('img');
-            lightboxImg.src = img.src;
-            lightboxImg.alt = img.alt || '';
-
-            // Update count and caption
-            lightboxCount.textContent = `${formatNumber(index + 1)}/${formatNumber(galleryItems.length)}`;
-            lightboxText.textContent = img.alt || '';
-
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            updateLightboxNav();
-        }
-
-        function closeLightbox() {
+        closeBtn.addEventListener('click', function() {
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
-        }
-
-        function showPrev() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                const img = galleryItems[currentIndex].querySelector('img');
-                lightboxImg.src = img.src;
-                lightboxImg.alt = img.alt || '';
-                lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(galleryItems.length)}`;
-                lightboxText.textContent = img.alt || '';
-                updateLightboxNav();
-            }
-        }
-
-        function showNext() {
-            if (currentIndex < galleryItems.length - 1) {
-                currentIndex++;
-                const img = galleryItems[currentIndex].querySelector('img');
-                lightboxImg.src = img.src;
-                lightboxImg.alt = img.alt || '';
-                lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(galleryItems.length)}`;
-                lightboxText.textContent = img.alt || '';
-                updateLightboxNav();
-            }
-        }
-
-        galleryItems.forEach(function(item, index) {
-            item.addEventListener('click', function() {
-                openLightbox(index);
-            });
         });
 
-        closeBtn.addEventListener('click', closeLightbox);
-        prevBtn.addEventListener('click', showPrev);
-        nextBtn.addEventListener('click', showNext);
+        prevBtn.addEventListener('click', function() {
+            const event = new CustomEvent('lightbox-prev');
+            lightbox.dispatchEvent(event);
+        });
+
+        nextBtn.addEventListener('click', function() {
+            const event = new CustomEvent('lightbox-next');
+            lightbox.dispatchEvent(event);
+        });
 
         lightbox.addEventListener('click', function(e) {
             if (e.target === lightbox) {
-                closeLightbox();
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
             }
         });
 
@@ -403,11 +360,78 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(e) {
             if (!lightbox.classList.contains('active')) return;
 
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowLeft') showPrev();
-            if (e.key === 'ArrowRight') showNext();
+            if (e.key === 'Escape') {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            if (e.key === 'ArrowLeft') {
+                lightbox.dispatchEvent(new CustomEvent('lightbox-prev'));
+            }
+            if (e.key === 'ArrowRight') {
+                lightbox.dispatchEvent(new CustomEvent('lightbox-next'));
+            }
         });
     }
-});
+
+    const lightboxImg = lightbox.querySelector('.lightbox-content img');
+    const lightboxCount = lightbox.querySelector('.lightbox-count');
+    const lightboxText = lightbox.querySelector('.lightbox-text');
+    const prevBtn = lightbox.querySelector('.lightbox-prev');
+    const nextBtn = lightbox.querySelector('.lightbox-next');
+    let currentIndex = 0;
+
+    function formatNumber(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function updateLightbox() {
+        const items = document.querySelectorAll('.gallery-item');
+        const img = items[currentIndex].querySelector('img');
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || '';
+        lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(items.length)}`;
+        lightboxText.textContent = img.alt || '';
+        prevBtn.style.display = currentIndex === 0 ? 'none' : 'flex';
+        nextBtn.style.display = currentIndex === items.length - 1 ? 'none' : 'flex';
+    }
+
+    // Remove old event listeners by cloning and replacing
+    lightbox.removeEventListener('lightbox-prev', lightbox._prevHandler);
+    lightbox.removeEventListener('lightbox-next', lightbox._nextHandler);
+
+    lightbox._prevHandler = function() {
+        const items = document.querySelectorAll('.gallery-item');
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateLightbox();
+        }
+    };
+
+    lightbox._nextHandler = function() {
+        const items = document.querySelectorAll('.gallery-item');
+        if (currentIndex < items.length - 1) {
+            currentIndex++;
+            updateLightbox();
+        }
+    };
+
+    lightbox.addEventListener('lightbox-prev', lightbox._prevHandler);
+    lightbox.addEventListener('lightbox-next', lightbox._nextHandler);
+
+    // Bind click events to gallery items
+    galleryItems.forEach(function(item, index) {
+        // Remove existing listener if any
+        item.removeEventListener('click', item._lightboxHandler);
+
+        item._lightboxHandler = function() {
+            currentIndex = index;
+            updateLightbox();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        item.addEventListener('click', item._lightboxHandler);
+    });
+};
 
 // Lightbox styles are now in goal-page.css and styles.css
