@@ -91,7 +91,7 @@
                 paragraphs.forEach(text => {
                     if (text.trim()) {
                         const p = document.createElement('p');
-                        p.innerHTML = linkifyText(text.trim());
+                        p.innerHTML = formatText(text.trim());
                         goalBody.appendChild(p);
                     }
                 });
@@ -131,9 +131,20 @@
         return div.innerHTML;
     }
 
-    function linkifyText(text) {
-        // Convert URLs in text to clickable links
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+    function formatText(text) {
+        // First escape HTML to prevent XSS
+        let formatted = escapeHtml(text);
+
+        // Convert markdown-style bold: **text** or __text__
+        formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+        // Convert markdown-style links: [text](url)
+        formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+        // Auto-linkify bare URLs that aren't already linked
+        formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+
+        return formatted;
     }
 })();
