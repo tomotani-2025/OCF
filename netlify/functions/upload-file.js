@@ -1,104 +1,20 @@
 /**
- * Netlify Function: Upload File
+ * Netlify Function: Upload File to Supabase Storage
  *
- * Uploads an image or PDF to the repository via GitHub API.
- * Files are organized into appropriate folders:
- * - Images: site/images/news/{post-id}/
- * - PDFs: site/documents/news/{post-id}/
+ * Uploads images and PDFs to Supabase Storage buckets.
+ * Returns the public URL for the uploaded file.
  */
 
 const https = require('https');
 
-// Environment variables (set in Netlify dashboard)
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO || 'omotani/omotani-caring-foundation';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'master';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://wafdatyvcgimpsetelyb.supabase.co';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-// Max file sizes (in bytes)
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_PDF_SIZE = 25 * 1024 * 1024;   // 25MB
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_DOC_TYPES = ['application/pdf'];
-
-async function githubRequest(method, path, body = null) {
-    return new Promise((resolve, reject) => {
-        const options = {
-            hostname: 'api.github.com',
-            path: `/repos/${GITHUB_REPO}${path}`,
-            method: method,
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'User-Agent': 'Netlify-Function',
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            }
-        };
-
-        const req = https.request(options, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const json = data ? JSON.parse(data) : {};
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                        resolve(json);
-                    } else {
-                        reject({ statusCode: res.statusCode, message: json.message || 'GitHub API error' });
-                    }
-                } catch (e) {
-                    reject({ statusCode: 500, message: 'Failed to parse GitHub response' });
-                }
-            });
-        });
-
-        req.on('error', (e) => reject({ statusCode: 500, message: e.message }));
-
-        if (body) {
-            req.write(JSON.stringify(body));
-        }
-        req.end();
-    });
-}
-
-async function getFileSha(filePath) {
-    try {
-        const response = await githubRequest('GET', `/contents/${filePath}?ref=${GITHUB_BRANCH}`);
-        return response.sha;
-    } catch (error) {
-        // File doesn't exist, return null
-        if (error.statusCode === 404) {
-            return null;
-        }
-        throw error;
-    }
-}
-
-async function uploadToGitHub(filePath, content, message) {
-    // Check if file exists and get its SHA (required for updates)
-    const existingSha = await getFileSha(filePath);
-
-    const body = {
-        message: message,
-        content: content, // Already base64 encoded
-        branch: GITHUB_BRANCH
-    };
-
-    // Include SHA if updating an existing file
-    if (existingSha) {
-        body.sha = existingSha;
-    }
-
-    return githubRequest('PUT', `/contents/${filePath}`, body);
-}
-
-function sanitizeFilename(filename) {
-    // Remove or replace unsafe characters
-    return filename
-        .replace(/[^a-zA-Z0-9.-]/g, '-')
-        .replace(/-+/g, '-')
-        .toLowerCase();
-}
 
 function getFileExtension(mimeType) {
     const extensions = {
@@ -111,8 +27,54 @@ function getFileExtension(mimeType) {
     return extensions[mimeType] || '';
 }
 
+function sanitizeFilename(filename) {
+    return filename
+        .replace(/[^a-zA-Z0-9.-]/g, '-')
+        .replace(/-+/g, '-')
+        .toLowerCase();
+}
+
+async function uploadToSupabase(bucket, filePath, fileBuffer, mimeType) {
+    return new Promise((resolve, reject) => {
+        const url = new URL(`${SUPABASE_URL}/storage/v1/object/${bucket}/${filePath}`);
+
+        const options = {
+            hostname: url.hostname,
+            path: url.pathname,
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+                'Content-Type': mimeType,
+                'Content-Length': fileBuffer.length,
+                'x-upsert': 'true'
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
+                    resolve({ url: publicUrl, path: filePath });
+                } else {
+                    try {
+                        const error = JSON.parse(data);
+                        reject({ statusCode: res.statusCode, message: error.message || 'Upload failed' });
+                    } catch {
+                        reject({ statusCode: res.statusCode, message: data || 'Upload failed' });
+                    }
+                }
+            });
+        });
+
+        req.on('error', (e) => reject({ statusCode: 500, message: e.message }));
+        req.write(fileBuffer);
+        req.end();
+    });
+}
+
 exports.handler = async (event) => {
-    // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -120,7 +82,6 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
     };
 
-    // Handle preflight
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 200, headers, body: '' };
     }
@@ -133,19 +94,17 @@ exports.handler = async (event) => {
         };
     }
 
-    // Check for GitHub token
-    if (!GITHUB_TOKEN) {
+    if (!SUPABASE_SERVICE_KEY) {
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'GitHub token not configured. Please add GITHUB_TOKEN to Netlify environment variables.' })
+            body: JSON.stringify({ error: 'SUPABASE_SERVICE_KEY not configured in Netlify environment variables' })
         };
     }
 
     try {
-        const { file, filename, mimeType, postId, fileType } = JSON.parse(event.body);
+        const { file, filename, mimeType, postId } = JSON.parse(event.body);
 
-        // Validate inputs
         if (!file || !filename || !mimeType || !postId) {
             return {
                 statusCode: 400,
@@ -154,7 +113,14 @@ exports.handler = async (event) => {
             };
         }
 
-        // Validate file type
+        if (!/^[A-Za-z0-9+/=]+$/.test(file)) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'content is not valid Base64' })
+            };
+        }
+
         const isImage = ALLOWED_IMAGE_TYPES.includes(mimeType);
         const isPdf = ALLOWED_DOC_TYPES.includes(mimeType);
 
@@ -166,35 +132,30 @@ exports.handler = async (event) => {
             };
         }
 
-        // Check file size (base64 is ~33% larger than binary)
-        const fileSize = Math.ceil(file.length * 0.75);
+        const fileBuffer = Buffer.from(file, 'base64');
+        const fileSize = fileBuffer.length;
         const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_PDF_SIZE;
 
         if (fileSize > maxSize) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({
-                    error: `File too large. Max size: ${isImage ? '10MB' : '25MB'}`
-                })
+                body: JSON.stringify({ error: `File too large. Max size: ${isImage ? '10MB' : '25MB'}` })
             };
         }
 
-        // Build file path
         const sanitizedFilename = sanitizeFilename(filename.replace(/\.[^.]+$/, '')) + getFileExtension(mimeType);
-        const folder = isImage ? 'site/images/news' : 'site/documents/news';
-        const filePath = `${folder}/${postId}/${sanitizedFilename}`;
-        const webPath = filePath.replace('site/', '');
+        const bucket = isImage ? 'images' : 'documents';
+        const filePath = `${postId}/${sanitizedFilename}`;
 
-        // Upload to GitHub
-        await uploadToGitHub(filePath, file, `Upload ${isImage ? 'image' : 'PDF'}: ${sanitizedFilename}`);
+        const result = await uploadToSupabase(bucket, filePath, fileBuffer, mimeType);
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                path: webPath,
+                path: result.url,
                 filename: sanitizedFilename,
                 message: 'File uploaded successfully'
             })
@@ -206,8 +167,7 @@ exports.handler = async (event) => {
             statusCode: error.statusCode || 500,
             headers,
             body: JSON.stringify({
-                error: error.message || 'Failed to upload file',
-                details: error
+                error: error.message || 'Failed to upload file'
             })
         };
     }
