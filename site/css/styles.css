@@ -797,6 +797,21 @@ a {
     font-weight: 600;
 }
 
+/* Donate button in footer - regular button size */
+.footer-column .btn.btn-donate {
+    padding: 18px 24px;
+    font-size: 18px;
+    font-weight: 400;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.footer-column .btn.btn-donate .donate-icon,
+.footer-column .btn.btn-donate .donate-icon-filled {
+    width: 20px;
+    height: 20px;
+}
+
 .footer-copyright {
     display: flex;
     flex-direction: column;
