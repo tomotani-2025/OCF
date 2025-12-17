@@ -1244,36 +1244,10 @@ class GalleryManager {
     }
 
     async loadGallery() {
-        try {
-            // Fetch from Supabase
-            const [images, categories] = await Promise.all([
-                galleryAPI.getImages(),
-                galleryAPI.getCategories()
-            ]);
-
-            // Transform snake_case to camelCase
-            this.gallery = {
-                categories: categories.map(cat => ({
-                    id: cat.id,
-                    label: cat.label,
-                    order: cat.sort_order
-                })),
-                images: images.map(img => ({
-                    id: img.id,
-                    src: img.src,
-                    alt: img.alt,
-                    caption: img.caption,
-                    category: img.category,
-                    order: img.sort_order
-                }))
-            };
-            this.filteredImages = [...this.gallery.images];
-            this.populateCategoryFilter();
-        } catch (error) {
-            console.error('Error loading gallery:', error);
-            this.gallery = { categories: [], images: [] };
-            this.filteredImages = [];
-        }
+        // Note: Gallery management is now handled by GalleryAdmin in gallery-admin.js
+        // This legacy GalleryManager is kept for backwards compatibility but doesn't load data
+        this.gallery = { categories: [], images: [] };
+        this.filteredImages = [];
     }
 
     populateCategoryFilter() {
@@ -4068,28 +4042,39 @@ class GoalPagesManager {
         const file = e.target.files[0];
         if (!file) return;
 
-        document.getElementById('goal-page-hero-file-name').textContent = file.name;
+        const fileNameEl = document.getElementById('goal-page-hero-file-name');
+        if (fileNameEl) fileNameEl.textContent = 'Uploading...';
 
         try {
             const base64 = await this.fileToBase64(file);
+            // Get the current page slug for folder organization
+            const slug = document.getElementById('goal-page-slug').value || 'goal-heroes';
+
             const response = await fetch(`${this.apiBase}/upload-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     file: base64,
                     filename: file.name,
-                    folder: 'images'
+                    mimeType: file.type,
+                    postId: slug,
+                    fileType: 'image'
                 })
             });
 
-            if (!response.ok) throw new Error('Upload failed');
-
             const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
             document.getElementById('goal-page-hero').value = result.path;
             this.updateHeroPreview();
+            if (fileNameEl) fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading hero image:', error);
             alert('Error uploading image: ' + error.message);
+            if (fileNameEl) fileNameEl.textContent = 'Upload failed';
         }
     }
 
