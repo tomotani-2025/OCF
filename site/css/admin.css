@@ -2022,15 +2022,16 @@
     stroke: #FFFFFF;
 }
 
-/* Error state - red filled, white icon */
+/* Error state - black filled, red border, red icon, red text */
 #save-all-progress-btn.btn-error {
-    background: #ef4444 !important;
-    border-color: #ef4444 !important;
-    color: #000000 !important;
+    background: #000000 !important;
+    border-color: #EF3A4F !important;
+    color: #EF3A4F !important;
 }
 
 #save-all-progress-btn.btn-error .btn-icon path {
-    stroke: #FFFFFF;
+    fill: #EF3A4F;
+    stroke: none;
 }
 
 #save-all-progress-btn .btn-icon.spinner-icon {
