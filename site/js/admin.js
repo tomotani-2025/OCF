@@ -4047,8 +4047,9 @@ class GoalPagesManager {
 
         try {
             const base64 = await this.fileToBase64(file);
-            // Get the current page slug for folder organization
-            const slug = document.getElementById('goal-page-slug').value || 'goal-heroes';
+            // Get the current page slug for folder organization, strip .html extension
+            const rawSlug = document.getElementById('goal-page-slug').value || 'goal-heroes';
+            const slug = rawSlug.replace('.html', '');
 
             const response = await fetch(`${this.apiBase}/upload-file`, {
                 method: 'POST',
@@ -4101,8 +4102,9 @@ class GoalPagesManager {
 
         try {
             const base64 = await this.fileToBase64(file);
-            // Get the current page slug for folder organization
-            const slug = document.getElementById('goal-page-slug').value || 'goal-images';
+            // Get the current page slug for folder organization, strip .html extension
+            const rawSlug = document.getElementById('goal-page-slug').value || 'goal-images';
+            const slug = rawSlug.replace('.html', '');
 
             const response = await fetch(`${this.apiBase}/upload-file`, {
                 method: 'POST',
