@@ -4082,7 +4082,12 @@ class GoalPagesManager {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => {
+                // Strip the data URL prefix (e.g., "data:image/jpeg;base64,")
+                const result = reader.result;
+                const base64 = result.split(',')[1] || result;
+                resolve(base64);
+            };
             reader.onerror = reject;
         });
     }
