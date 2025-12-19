@@ -2674,7 +2674,8 @@ function setupTabs() {
         progress: document.getElementById('progress-tab'),
         about: document.getElementById('about-tab'),
         mission: document.getElementById('mission-tab'),
-        goals: document.getElementById('goals-tab')
+        goals: document.getElementById('goals-tab'),
+        footer: document.getElementById('footer-tab')
     };
 
     function showTab(tabName) {
