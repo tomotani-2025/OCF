@@ -187,21 +187,27 @@
                             </div>
                         </div>
 
-                        <!-- Image Carousel -->
+                        <!-- Cover Image -->
+                        <div class="form-section">
+                            <h2>Cover Image</h2>
+                            <p class="form-help">Select an image from your gallery to use as the post cover on the news listing page.</p>
+                            <div class="cover-image-selector">
+                                <div id="post-cover-preview" class="cover-image-preview">
+                                    <span class="image-preview-placeholder">No cover selected</span>
+                                </div>
+                                <div class="cover-image-info">
+                                    <p id="cover-image-text" class="cover-source-text">Add images below, then click one to set as cover</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Gallery -->
                         <div class="form-section">
                             <h2>Images</h2>
-                            <p class="form-help">Upload images or enter URLs. Multiple images will display as a carousel.</p>
-
-                            <div id="images-container" class="media-container">
-                                <!-- Image items will be added here -->
+                            <p class="form-help">Click on an image to edit, remove, or set as cover. Multiple images will display as a carousel.</p>
+                            <div id="post-gallery-container" class="gallery-grid-container">
+                                <!-- Gallery items will be rendered as a grid by JS -->
                             </div>
-
-                            <button type="button" id="add-image-btn" class="btn btn-outline add-media-btn">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                                Add Image
-                            </button>
                         </div>
 
                         <!-- Featured Video -->
@@ -317,6 +323,63 @@
                             <button type="button" id="cancel-delete-btn" class="btn btn-outline">Cancel</button>
                             <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete Post</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Post Gallery Image Editor Modal -->
+                <div id="post-gallery-image-modal" class="modal" hidden>
+                    <div class="modal-backdrop"></div>
+                    <div class="modal-content gallery-image-editor-content">
+                        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                        <h2 id="post-gallery-image-modal-title">Edit Image</h2>
+                        <form id="post-gallery-image-form">
+                            <input type="hidden" id="post-gallery-image-index" value="">
+
+                            <div class="form-section">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="post-gallery-image-file">Upload Image</label>
+                                        <div class="file-upload-wrapper">
+                                            <input type="file" id="post-gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                            <label for="post-gallery-image-file" class="file-upload-btn">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <span>Choose File</span>
+                                            </label>
+                                            <span class="file-name" id="post-gallery-image-file-name">No file chosen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div id="post-gallery-image-preview" class="image-preview-large">
+                                        <span class="image-preview-placeholder">Image preview</span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="post-gallery-image-src">Image Path</label>
+                                        <input type="text" id="post-gallery-image-src" placeholder="images/news/photo.jpg">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="post-gallery-image-alt">Alt Text / Caption</label>
+                                        <input type="text" id="post-gallery-image-alt" placeholder="Description of the image for accessibility">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions gallery-image-modal-actions">
+                                <button type="button" id="post-gallery-image-remove" class="btn btn-danger">Remove Image</button>
+                                <div class="gallery-image-modal-right-actions">
+                                    <button type="button" id="post-gallery-set-cover" class="btn btn-outline">Set as Cover</button>
+                                    <button type="button" id="post-gallery-image-cancel" class="btn btn-outline">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Image</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 </div><!-- End Posts Tab -->

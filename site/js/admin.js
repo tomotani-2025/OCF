@@ -26,15 +26,19 @@ class AdminDashboard {
         this.dashboard = document.getElementById('posts-dashboard');
         this.editor = document.getElementById('post-editor');
         this.form = document.getElementById('post-form');
-        this.imagesContainer = document.getElementById('images-container');
+        this.galleryContainer = document.getElementById('post-gallery-container');
         this.videosContainer = document.getElementById('videos-container');
         this.pdfsContainer = document.getElementById('pdfs-container');
         this.previewModal = document.getElementById('preview-modal');
         this.previewContainer = document.getElementById('preview-container');
         this.deleteModal = document.getElementById('delete-modal');
         this.publishingModal = document.getElementById('publishing-modal');
+        this.postGalleryModal = document.getElementById('post-gallery-image-modal');
 
-        this.imageCount = 0;
+        // Post images array: [{src, alt}]
+        this.postImages = [];
+        this.coverImageIndex = -1; // Index of cover image, -1 means no cover
+
         this.videoCount = 0;
         this.pdfCount = 0;
 
@@ -97,10 +101,17 @@ class AdminDashboard {
         document.getElementById('back-to-dashboard').addEventListener('click', () => this.showDashboard());
         document.getElementById('cancel-btn').addEventListener('click', () => this.showDashboard());
         document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
-        document.getElementById('add-image-btn').addEventListener('click', () => this.addImage());
         document.getElementById('add-video-btn').addEventListener('click', () => this.addVideo());
         document.getElementById('add-pdf-btn').addEventListener('click', () => this.addPdf());
         this.form.addEventListener('submit', (e) => this.publishPost(e));
+
+        // Post gallery modal
+        document.getElementById('post-gallery-image-form').addEventListener('submit', (e) => this.savePostImage(e));
+        document.getElementById('post-gallery-image-cancel').addEventListener('click', () => this.closePostGalleryModal());
+        document.getElementById('post-gallery-image-remove').addEventListener('click', () => this.removePostImage());
+        document.getElementById('post-gallery-set-cover').addEventListener('click', () => this.setAsCover());
+        document.getElementById('post-gallery-image-src').addEventListener('input', () => this.updatePostGalleryImagePreview());
+        document.getElementById('post-gallery-image-file').addEventListener('change', (e) => this.handlePostGalleryImageUpload(e));
 
         // Featured video preview
         const featuredVideoInput = document.getElementById('featured-video-url');
@@ -266,8 +277,10 @@ class AdminDashboard {
             subtitle.textContent = 'Fill out the form below. Click Publish when ready.';
             saveBtn.textContent = 'Publish Post';
             this.resetForm();
-            this.addImage(); // Add one empty image field by default
         }
+
+        // Render post gallery grid
+        this.renderPostGalleryGrid();
     }
 
     editPost(postId) {
@@ -300,15 +313,25 @@ class AdminDashboard {
             this.updateFeaturedVideoPreview();
         }
 
-        // Load images
-        this.imagesContainer.innerHTML = '';
-        this.imageCount = 0;
-        const images = post.images || (post.image ? [{ src: post.image, alt: post.imageAlt || '' }] : []);
-        if (images.length > 0) {
-            images.forEach(img => this.addImage(img.src, img.alt));
-        } else {
-            this.addImage();
+        // Load images into postImages array
+        const images = post.images || [];
+        this.postImages = images.map(img => ({ src: img.src || '', alt: img.alt || '' }));
+
+        // Determine cover image index based on post.image matching one of the images
+        this.coverImageIndex = -1;
+        if (post.image) {
+            const coverIdx = this.postImages.findIndex(img => img.src === post.image);
+            if (coverIdx !== -1) {
+                this.coverImageIndex = coverIdx;
+            } else if (this.postImages.length === 0) {
+                // If post has a cover image but no images array, add it
+                this.postImages.push({ src: post.image, alt: post.imageAlt || '' });
+                this.coverImageIndex = 0;
+            }
         }
+
+        // Update cover preview
+        this.updateCoverImagePreview();
 
         // Load videos
         this.videosContainer.innerHTML = '';
@@ -331,10 +354,13 @@ class AdminDashboard {
         document.getElementById('post-author').value = 'Les Omotani';
         document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
 
-        this.imagesContainer.innerHTML = '';
+        // Reset post images gallery
+        this.postImages = [];
+        this.coverImageIndex = -1;
+        this.updateCoverImagePreview();
+
         this.videosContainer.innerHTML = '';
         this.pdfsContainer.innerHTML = '';
-        this.imageCount = 0;
         this.videoCount = 0;
         this.pdfCount = 0;
         this.pendingUploads = [];
@@ -344,106 +370,245 @@ class AdminDashboard {
     }
 
     // ========================================
-    // Media Management - Images
+    // Media Management - Post Gallery Grid
     // ========================================
 
-    addImage(src = '', alt = '') {
-        this.imageCount++;
-        const index = this.imageCount;
+    renderPostGalleryGrid() {
+        if (!this.galleryContainer) return;
 
-        const imageItem = document.createElement('div');
-        imageItem.className = 'media-item';
-        imageItem.dataset.index = index;
-        imageItem.innerHTML = `
-            <div class="media-item-header">
-                <span class="media-item-number">Image ${index}</span>
-                <button type="button" class="media-item-remove" data-action="remove-image">Remove</button>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="image-file-${index}">Upload Image</label>
-                    <div class="file-upload-wrapper">
-                        <input type="file" id="image-file-${index}" name="image-file-${index}"
-                               accept="image/jpeg,image/png,image/gif,image/webp"
-                               class="file-input" data-preview-target="image-preview-${index}">
-                        <div class="file-upload-btn">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Choose File</span>
-                        </div>
-                        <span class="file-name" id="file-name-image-${index}">${src ? src.split('/').pop() : 'No file chosen'}</span>
+        let html = '';
+
+        // Render existing images
+        this.postImages.forEach((img, index) => {
+            const isCover = index === this.coverImageIndex;
+            html += `
+                <div class="gallery-grid-item${isCover ? ' is-cover' : ''}" data-index="${index}">
+                    <img src="${img.src}" alt="${img.alt || ''}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 75%22%3E%3Crect fill=%22%23f7f4eb%22 width=%22100%22 height=%2275%22/%3E%3Ctext x=%2250%22 y=%2237.5%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                    <div class="gallery-grid-item-overlay">
+                        <span>Click to edit</span>
                     </div>
                 </div>
-            </div>
-            <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="image-src-${index}">Image Path (or enter URL)</label>
-                    <input type="text" id="image-src-${index}" name="image-src-${index}"
-                           placeholder="images/news/filename.jpg" value="${src}"
-                           data-preview-target="image-preview-${index}">
-                </div>
-                <div class="image-preview" id="image-preview-${index}">
-                    ${src ? `<img src="${src}" alt="Preview" onerror="this.parentElement.innerHTML='<span class=\\'image-preview-placeholder\\'>Image not found</span>'">` : '<span class="image-preview-placeholder">Image preview</span>'}
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="image-alt-${index}">Alt Text / Caption</label>
-                    <input type="text" id="image-alt-${index}" name="image-alt-${index}"
-                           placeholder="Describe the image" value="${alt}">
-                </div>
-            </div>
+            `;
+        });
+
+        // Add "Add Image" button
+        html += `
+            <button type="button" class="gallery-grid-add" id="post-gallery-add-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 5V19M5 12H19" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Add Image</span>
+            </button>
         `;
 
-        this.imagesContainer.appendChild(imageItem);
+        this.galleryContainer.innerHTML = html;
 
-        const removeBtn = imageItem.querySelector('[data-action="remove-image"]');
-        removeBtn.addEventListener('click', () => this.removeMediaItem(imageItem, 'image'));
+        // Add click handlers
+        this.galleryContainer.querySelectorAll('.gallery-grid-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.dataset.index);
+                this.openPostImageModal(index);
+            });
+        });
 
-        const srcInput = imageItem.querySelector(`#image-src-${index}`);
-        srcInput.addEventListener('input', (e) => this.updateImagePreview(e.target));
-
-        const fileInput = imageItem.querySelector(`#image-file-${index}`);
-        fileInput.addEventListener('change', (e) => this.handleImageUpload(e, index));
-
-        // Make the custom button trigger the hidden file input
-        const fileUploadBtn = imageItem.querySelector('.file-upload-btn');
-        fileUploadBtn.addEventListener('click', () => fileInput.click());
+        document.getElementById('post-gallery-add-btn').addEventListener('click', () => {
+            this.openPostImageModal(-1); // -1 = new image
+        });
     }
 
-    async handleImageUpload(event, index) {
-        const file = event.target.files[0];
+    openPostImageModal(index) {
+        const isNew = index === -1;
+        const modalTitle = document.getElementById('post-gallery-image-modal-title');
+        const indexField = document.getElementById('post-gallery-image-index');
+        const srcField = document.getElementById('post-gallery-image-src');
+        const altField = document.getElementById('post-gallery-image-alt');
+        const preview = document.getElementById('post-gallery-image-preview');
+        const fileNameEl = document.getElementById('post-gallery-image-file-name');
+        const actionsEl = document.querySelector('#post-gallery-image-modal .gallery-image-modal-actions');
+        const setCoverBtn = document.getElementById('post-gallery-set-cover');
+
+        modalTitle.textContent = isNew ? 'Add Gallery Image' : 'Edit Gallery Image';
+        indexField.value = isNew ? '' : index;
+
+        if (isNew) {
+            srcField.value = '';
+            altField.value = '';
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+            actionsEl.classList.add('is-new');
+            setCoverBtn.textContent = 'Set as Cover';
+        } else {
+            const img = this.postImages[index];
+            srcField.value = img.src || '';
+            altField.value = img.alt || '';
+            if (img.src) {
+                preview.innerHTML = `<img src="${img.src}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            } else {
+                preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+            }
+            actionsEl.classList.remove('is-new');
+            // Update set cover button text
+            setCoverBtn.textContent = index === this.coverImageIndex ? 'Remove as Cover' : 'Set as Cover';
+        }
+
+        fileNameEl.textContent = 'No file chosen';
+        document.getElementById('post-gallery-image-file').value = '';
+
+        this.postGalleryModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+
+    closePostGalleryModal() {
+        this.postGalleryModal.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    updatePostGalleryImagePreview() {
+        const path = document.getElementById('post-gallery-image-src').value;
+        const preview = document.getElementById('post-gallery-image-preview');
+        if (path) {
+            preview.innerHTML = `<img src="${path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
+    }
+
+    async handlePostGalleryImageUpload(e) {
+        const file = e.target.files[0];
         if (!file) return;
 
-        const fileNameSpan = document.getElementById(`file-name-image-${index}`);
-        const srcInput = document.getElementById(`image-src-${index}`);
-        const preview = document.getElementById(`image-preview-${index}`);
+        const fileNameEl = document.getElementById('post-gallery-image-file-name');
+        if (fileNameEl) fileNameEl.textContent = 'Uploading...';
 
-        // Update file name display
-        fileNameSpan.textContent = file.name;
+        try {
+            const base64 = await this.fileToBase64(file);
+            const postId = document.getElementById('edit-post-id').value || 'post-images';
 
-        // Show local preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-
-            // Store for upload during publish
-            this.pendingUploads.push({
-                type: 'image',
-                index: index,
-                file: file,
-                base64: e.target.result.split(',')[1], // Remove data:image... prefix
-                mimeType: file.type,
-                filename: file.name
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    postId: postId,
+                    fileType: 'image'
+                })
             });
 
-            // Clear the path input - will be set after upload
-            srcInput.value = '';
-            srcInput.placeholder = 'Will be set after upload...';
-        };
-        reader.readAsDataURL(file);
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
+            document.getElementById('post-gallery-image-src').value = result.path;
+            this.updatePostGalleryImagePreview();
+            if (fileNameEl) fileNameEl.textContent = file.name;
+        } catch (error) {
+            console.error('Error uploading post gallery image:', error);
+            alert('Error uploading image: ' + error.message);
+            if (fileNameEl) fileNameEl.textContent = 'Upload failed';
+        }
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    savePostImage(e) {
+        e.preventDefault();
+
+        const indexField = document.getElementById('post-gallery-image-index');
+        const src = document.getElementById('post-gallery-image-src').value.trim();
+        const alt = document.getElementById('post-gallery-image-alt').value.trim();
+
+        if (!src) {
+            alert('Please provide an image path or upload an image.');
+            return;
+        }
+
+        const isNew = indexField.value === '';
+        const index = isNew ? -1 : parseInt(indexField.value);
+
+        if (isNew) {
+            this.postImages.push({ src, alt });
+            // If this is the first image, set it as cover
+            if (this.postImages.length === 1) {
+                this.coverImageIndex = 0;
+                this.updateCoverImagePreview();
+            }
+        } else {
+            this.postImages[index] = { src, alt };
+            // Update cover preview if this is the cover image
+            if (index === this.coverImageIndex) {
+                this.updateCoverImagePreview();
+            }
+        }
+
+        this.closePostGalleryModal();
+        this.renderPostGalleryGrid();
+    }
+
+    removePostImage() {
+        const indexField = document.getElementById('post-gallery-image-index');
+        const index = parseInt(indexField.value);
+
+        if (!isNaN(index) && index >= 0 && index < this.postImages.length) {
+            this.postImages.splice(index, 1);
+
+            // Adjust cover image index
+            if (this.coverImageIndex === index) {
+                // Removed the cover, set to first image if available
+                this.coverImageIndex = this.postImages.length > 0 ? 0 : -1;
+            } else if (this.coverImageIndex > index) {
+                // Cover is after the removed image, adjust index
+                this.coverImageIndex--;
+            }
+
+            this.updateCoverImagePreview();
+            this.closePostGalleryModal();
+            this.renderPostGalleryGrid();
+        }
+    }
+
+    setAsCover() {
+        const indexField = document.getElementById('post-gallery-image-index');
+        const index = parseInt(indexField.value);
+
+        if (!isNaN(index) && index >= 0 && index < this.postImages.length) {
+            if (this.coverImageIndex === index) {
+                // Already cover, remove it
+                this.coverImageIndex = -1;
+            } else {
+                this.coverImageIndex = index;
+            }
+            this.updateCoverImagePreview();
+            this.closePostGalleryModal();
+            this.renderPostGalleryGrid();
+        }
+    }
+
+    updateCoverImagePreview() {
+        const coverPreview = document.getElementById('post-cover-preview');
+        const coverText = document.getElementById('cover-image-text');
+
+        if (!coverPreview) return;
+
+        if (this.coverImageIndex >= 0 && this.postImages[this.coverImageIndex]) {
+            const coverImg = this.postImages[this.coverImageIndex];
+            coverPreview.innerHTML = `<img src="${coverImg.src}" alt="${coverImg.alt || 'Cover image'}" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            coverPreview.classList.add('has-cover');
+            if (coverText) coverText.textContent = 'Cover image selected';
+        } else {
+            coverPreview.innerHTML = '<span class="image-preview-placeholder">No cover selected</span>';
+            coverPreview.classList.remove('has-cover');
+            if (coverText) coverText.textContent = 'Add images below, then click one to set as cover';
+        }
     }
 
     // ========================================
@@ -605,8 +770,10 @@ class AdminDashboard {
     }
 
     renumberItems(type) {
-        const container = type === 'image' ? this.imagesContainer :
-                         type === 'video' ? this.videosContainer : this.pdfsContainer;
+        // Images now use gallery grid, no renumbering needed
+        if (type === 'image') return;
+
+        const container = type === 'video' ? this.videosContainer : this.pdfsContainer;
         const items = container.querySelectorAll('.media-item');
 
         items.forEach((item, idx) => {
@@ -699,18 +866,20 @@ class AdminDashboard {
         // Generate ID
         const id = editId || this.generateId(title, date);
 
-        // Collect images
-        const images = [];
-        this.imagesContainer.querySelectorAll('.media-item').forEach(item => {
-            const srcInput = item.querySelector('input[id^="image-src-"]');
-            const altInput = item.querySelector('input[id^="image-alt-"]');
-            if (srcInput && srcInput.value.trim()) {
-                images.push({
-                    src: srcInput.value.trim(),
-                    alt: altInput ? altInput.value.trim() : ''
-                });
-            }
-        });
+        // Get images from postImages array (filter out empty entries)
+        const images = this.postImages.filter(img => img.src);
+
+        // Determine cover image
+        let coverImage = null;
+        let coverImageAlt = '';
+        if (this.coverImageIndex >= 0 && this.postImages[this.coverImageIndex]) {
+            coverImage = this.postImages[this.coverImageIndex].src;
+            coverImageAlt = this.postImages[this.coverImageIndex].alt || '';
+        } else if (images.length > 0) {
+            // Fall back to first image if no cover selected
+            coverImage = images[0].src;
+            coverImageAlt = images[0].alt || '';
+        }
 
         // Featured video
         const featuredVideoUrl = document.getElementById('featured-video-url')?.value.trim();
@@ -760,8 +929,8 @@ class AdminDashboard {
             year: new Date(date).getFullYear(),
             category,
             author,
-            image: images.length > 0 ? images[0].src : null,
-            imageAlt: images.length > 0 ? images[0].alt : '',
+            image: coverImage,
+            imageAlt: coverImageAlt,
             images: images.length > 0 ? images : [],
             featuredVideo: featuredVideo,
             videos: videos.length > 0 ? videos : [],
