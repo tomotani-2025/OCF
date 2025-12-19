@@ -248,3 +248,75 @@ CREATE TRIGGER update_goal_pages_updated_at
     BEFORE UPDATE ON goal_pages
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+-- =====================================================
+-- 6. FOOTER SETTINGS TABLE
+-- Stores footer content that appears on all pages
+-- =====================================================
+CREATE TABLE IF NOT EXISTS footer_settings (
+    id TEXT PRIMARY KEY DEFAULT 'main',
+    tagline TEXT,                -- Subhead text below logo
+    image TEXT,                  -- Footer image path
+    image_alt TEXT,              -- Image alt text
+    foundation_text TEXT,        -- "The Omotani Caring Foundation is a..."
+    ein TEXT,                    -- EIN number
+    email TEXT,                  -- Contact email
+    address_line1 TEXT,          -- Street address
+    address_city TEXT,           -- City, State, Country
+    address_zip TEXT,            -- Zip code
+    copyright_name TEXT,         -- Organization name for copyright
+    copyright_year TEXT,         -- Year (blank for auto-update)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE footer_settings ENABLE ROW LEVEL SECURITY;
+
+-- Public read access
+CREATE POLICY "Allow public read access on footer_settings"
+    ON footer_settings FOR SELECT
+    USING (true);
+
+-- Public write access
+CREATE POLICY "Allow public write access on footer_settings"
+    ON footer_settings FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+-- Insert default values
+INSERT INTO footer_settings (
+    id,
+    tagline,
+    image,
+    image_alt,
+    foundation_text,
+    ein,
+    email,
+    address_line1,
+    address_city,
+    address_zip,
+    copyright_name,
+    copyright_year
+) VALUES (
+    'main',
+    'Supporting charitable, educational, medical, conservation, scientific and humanitarian purposes.',
+    'images/footer-children.jpg',
+    'Children with desk donated by Omotani Caring Foundation',
+    'The Omotani Caring Foundation is a 501(c)(3) USA charity.',
+    '85-2581703',
+    'info@omotanicaringfoundation.org',
+    '8337 N Lee Trevino Drive',
+    'Tucson, Arizona, USA',
+    '85742',
+    'Omotani Caring Foundation',
+    ''
+) ON CONFLICT (id) DO NOTHING;
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_footer_settings_updated_at ON footer_settings;
+CREATE TRIGGER update_footer_settings_updated_at
+    BEFORE UPDATE ON footer_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();

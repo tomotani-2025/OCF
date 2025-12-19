@@ -57,6 +57,7 @@
                     <button type="button" class="admin-tab" data-tab="about">About Us</button>
                     <button type="button" class="admin-tab" data-tab="mission">Our Mission</button>
                     <button type="button" class="admin-tab" data-tab="goals">Goal Pages</button>
+                    <button type="button" class="admin-tab" data-tab="footer">Footer</button>
                 </div>
 
                 <!-- Posts Tab -->
@@ -633,20 +634,15 @@
                                 </svg>
                                 Add Goal
                             </button>
-                            <button type="button" id="save-all-progress-btn" class="btn btn-outline">
-                                <svg class="btn-icon default-icon" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M13,1H3A2.00229,2.00229,0,0,0,1,3V7H2V3A1.001,1.001,0,0,1,3,2H13a1.001,1.001,0,0,1,1,1V7h1V3A2.00229,2.00229,0,0,0,13,1Z"></path>
-                                    <path d="M7.647,5.14648l-4,4,.707.707L7.50006,6.70746,7.50049,15h1L8.50006,6.7066,11.647,9.85352l.707-.707-4-4A.49982.49982,0,0,0,7.647,5.14648Z"></path>
-                                </svg>
-                                <svg class="btn-icon spinner-icon" viewBox="0 0 16 16" fill="none" style="display: none;">
-                                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="12" stroke-linecap="round">
-                                        <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/>
-                                    </circle>
-                                </svg>
-                                <svg class="btn-icon success-icon" viewBox="0 0 16 16" fill="none" style="display: none;">
-                                    <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span class="btn-text">Publish Changes</span>
+                            <button type="button" id="save-all-progress-btn">
+                                <div class="progress-fill"></div>
+                                <div class="btn-content">
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M13,1H3A2.00229,2.00229,0,0,0,1,3V7H2V3A1.001,1.001,0,0,1,3,2H13a1.001,1.001,0,0,1,1,1V7h1V3A2.00229,2.00229,0,0,0,13,1Z"/>
+                                        <path d="M7.647,5.14648l-4,4,.707.707L7.50006,6.70746,7.50049,15h1L8.50006,6.7066,11.647,9.85352l.707-.707-4-4A.49982.49982,0,0,0,7.647,5.14648Z"/>
+                                    </svg>
+                                    <span class="btn-text">Publish Changes</span>
+                                </div>
                             </button>
                         </div>
                     </div>
@@ -1128,11 +1124,35 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                     <!-- Goal Card Editor Modal -->
                     <div id="goal-card-modal" class="modal" hidden>
                         <div class="modal-backdrop"></div>
-                        <div class="modal-content">
+                        <div class="modal-content goal-card-editor-content">
                             <button type="button" class="modal-close" aria-label="Close">&times;</button>
                             <h2 id="goal-card-modal-title">Edit Goal Card</h2>
                             <form id="goal-card-form">
                                 <input type="hidden" id="goal-card-id" value="">
+
+                                <!-- Hero Image Preview -->
+                                <div class="form-row">
+                                    <div class="goal-card-hero-preview-wrapper">
+                                        <div id="goal-card-hero-preview" class="goal-card-hero-preview">
+                                            <span class="image-preview-placeholder">Hero image preview</span>
+                                        </div>
+                                        <div class="goal-card-hero-info">
+                                            <p id="goal-card-hero-source" class="hero-source-text">Image from: <strong>--</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="goal-card-link">Link to Goal Page *</label>
+                                        <select id="goal-card-link" required>
+                                            <option value="">Select a goal page...</option>
+                                            <!-- Options populated by JS -->
+                                        </select>
+                                        <span class="form-hint">The card's image will automatically use the hero image from the selected goal page.</span>
+                                    </div>
+                                </div>
+
                                 <div class="form-row two-col">
                                     <div class="form-group">
                                         <label for="goal-card-label">Label (e.g., "Goal One:")</label>
@@ -1151,20 +1171,14 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="goal-card-description">Description *</label>
-                                        <textarea id="goal-card-description" required rows="4" placeholder="Enter the goal description..."></textarea>
+                                        <label for="goal-card-description">Card Description * <span class="label-hint">(shorter than goal page, max 60 words)</span></label>
+                                        <textarea id="goal-card-description" required rows="4" placeholder="Enter a brief description for the card..." maxlength="500"></textarea>
+                                        <span class="word-count" id="goal-card-description-count">0 / 60 words</span>
                                     </div>
                                 </div>
-                                <div class="form-row two-col">
-                                    <div class="form-group">
-                                        <label for="goal-card-image">Image Path *</label>
-                                        <input type="text" id="goal-card-image" required placeholder="images/batwa+visit+farm+ocf.jpg">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="goal-card-link">Link (goal page) *</label>
-                                        <input type="text" id="goal-card-link" required placeholder="goalone.html">
-                                    </div>
-                                </div>
+
+                                <input type="hidden" id="goal-card-image" value="">
+
                                 <div class="form-actions">
                                     <button type="button" id="cancel-goal-card" class="btn btn-outline">Cancel</button>
                                     <button type="submit" class="btn btn-primary">Save Goal Card</button>
@@ -1306,15 +1320,10 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                                 <!-- Gallery Section -->
                                 <div class="form-section">
                                     <h3>Gallery Images</h3>
-                                    <div id="goal-gallery-container" class="media-container">
-                                        <!-- Gallery items will be added here -->
+                                    <p class="form-help">Click on an image to edit or remove it. Click the + button to add a new image.</p>
+                                    <div id="goal-gallery-container" class="gallery-grid-container">
+                                        <!-- Gallery items will be rendered as a grid by JS -->
                                     </div>
-                                    <button type="button" id="add-goal-gallery-image-btn" class="btn btn-outline add-media-btn">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        </svg>
-                                        Add Gallery Image
-                                    </button>
                                 </div>
 
                                 <div class="form-actions">
@@ -1337,7 +1346,187 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Goal Gallery Image Editor Modal -->
+                    <div id="goal-gallery-image-modal" class="modal" hidden>
+                        <div class="modal-backdrop"></div>
+                        <div class="modal-content gallery-image-editor-content">
+                            <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                            <h2 id="goal-gallery-image-modal-title">Edit Gallery Image</h2>
+                            <form id="goal-gallery-image-form">
+                                <input type="hidden" id="goal-gallery-image-index" value="">
+
+                                <div class="form-section">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="goal-gallery-image-file">Upload Image</label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" id="goal-gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                                <label for="goal-gallery-image-file" class="file-upload-btn">
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Choose File</span>
+                                                </label>
+                                                <span class="file-name" id="goal-gallery-image-file-name">No file chosen</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div id="goal-gallery-image-preview" class="image-preview-large">
+                                            <span class="image-preview-placeholder">Image preview</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="goal-gallery-image-src">Image Path</label>
+                                            <input type="text" id="goal-gallery-image-src" placeholder="images/photo.jpg">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="goal-gallery-image-alt">Alt Text</label>
+                                            <input type="text" id="goal-gallery-image-alt" placeholder="Description of the image for accessibility">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions gallery-image-modal-actions">
+                                    <button type="button" id="goal-gallery-image-remove" class="btn btn-danger">Remove Image</button>
+                                    <div class="gallery-image-modal-right-actions">
+                                        <button type="button" id="goal-gallery-image-cancel" class="btn btn-outline">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Image</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div><!-- End Goal Pages Tab -->
+
+                <!-- Footer Tab -->
+                <div id="footer-tab" class="tab-content" hidden>
+                    <div class="admin-header">
+                        <h1>Footer Settings</h1>
+                        <p>Edit the footer content that appears on all pages.</p>
+                    </div>
+
+                    <form id="footer-settings-form" class="admin-form">
+                        <!-- Tagline -->
+                        <div class="form-section">
+                            <h2>Tagline</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="footer-tagline">Tagline Text</label>
+                                    <input type="text" id="footer-tagline" placeholder="Supporting charitable, educational, medical, conservation, scientific and humanitarian purposes.">
+                                    <span class="form-hint">This appears below the logo in the footer.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Image -->
+                        <div class="form-section">
+                            <h2>Footer Image</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Current Image</label>
+                                    <div id="footer-image-preview" class="image-preview-large">
+                                        <span class="image-preview-placeholder">Image preview</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="footer-image">Image Path</label>
+                                    <input type="text" id="footer-image" placeholder="images/footer-children.jpg">
+                                </div>
+                                <div class="form-group">
+                                    <label for="footer-image-file">Upload New Image</label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" id="footer-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                        <label for="footer-image-file" class="file-upload-btn">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span>Choose File</span>
+                                        </label>
+                                        <span class="file-name" id="footer-image-file-name">No file chosen</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="footer-image-alt">Image Alt Text</label>
+                                    <input type="text" id="footer-image-alt" placeholder="Children with desk donated by Omotani Caring Foundation">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Foundation Info -->
+                        <div class="form-section">
+                            <h2>Foundation Information</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="footer-foundation-text">Foundation Description</label>
+                                    <textarea id="footer-foundation-text" rows="2" placeholder="The Omotani Caring Foundation is a 501(c)(3) USA charity."></textarea>
+                                    <span class="form-hint">Brief description of the foundation's status.</span>
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="footer-ein">EIN Number</label>
+                                    <input type="text" id="footer-ein" placeholder="85-2581703">
+                                </div>
+                                <div class="form-group">
+                                    <label for="footer-email">Contact Email</label>
+                                    <input type="email" id="footer-email" placeholder="info@omotanicaringfoundation.org">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-section">
+                            <h2>Address</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="footer-address-line1">Street Address</label>
+                                    <input type="text" id="footer-address-line1" placeholder="8337 N Lee Trevino Drive">
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="footer-address-city">City, State</label>
+                                    <input type="text" id="footer-address-city" placeholder="Tucson, Arizona, USA">
+                                </div>
+                                <div class="form-group">
+                                    <label for="footer-address-zip">Zip Code</label>
+                                    <input type="text" id="footer-address-zip" placeholder="85742">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Copyright -->
+                        <div class="form-section">
+                            <h2>Copyright</h2>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="footer-copyright-name">Organization Name</label>
+                                    <input type="text" id="footer-copyright-name" placeholder="Omotani Caring Foundation">
+                                </div>
+                                <div class="form-group">
+                                    <label for="footer-copyright-year">Copyright Year</label>
+                                    <input type="text" id="footer-copyright-year" placeholder="2025">
+                                    <span class="form-hint">Leave blank to auto-update to current year.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Footer Settings</button>
+                        </div>
+                    </form>
+                </div><!-- End Footer Tab -->
             </div>
         </section>
     </main>

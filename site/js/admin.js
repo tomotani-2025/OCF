@@ -1995,12 +1995,8 @@ class ProgressManager {
         const saveBtn = document.getElementById('save-all-progress-btn');
         const btnText = saveBtn.querySelector('.btn-text');
         if (this.hasUnsavedChanges) {
-            saveBtn.classList.add('btn-primary');
-            saveBtn.classList.remove('btn-outline');
             if (btnText) btnText.textContent = 'Publish Changes *';
         } else {
-            saveBtn.classList.remove('btn-primary');
-            saveBtn.classList.add('btn-outline');
             if (btnText) btnText.textContent = 'Publish Changes';
         }
     }
@@ -2519,18 +2515,33 @@ class ProgressManager {
 
     async saveAllGoals() {
         const btn = document.getElementById('save-all-progress-btn');
-        const defaultIcon = btn.querySelector('.default-icon');
-        const spinnerIcon = btn.querySelector('.spinner-icon');
-        const successIcon = btn.querySelector('.success-icon');
+        const progressFill = btn.querySelector('.progress-fill');
+        const btnContent = btn.querySelector('.btn-content');
         const btnText = btn.querySelector('.btn-text');
 
-        // Show spinner state
+        // Icons for different states
+        const uploadIcon = `<svg viewBox="0 0 16 16"><path d="M13,1H3A2.00229,2.00229,0,0,0,1,3V7H2V3A1.001,1.001,0,0,1,3,2H13a1.001,1.001,0,0,1,1,1V7h1V3A2.00229,2.00229,0,0,0,13,1Z"/><path d="M7.647,5.14648l-4,4,.707.707L7.50006,6.70746,7.50049,15h1L8.50006,6.7066,11.647,9.85352l.707-.707-4-4A.49982.49982,0,0,0,7.647,5.14648Z"/></svg>`;
+        const successIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>`;
+        const errorIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>`;
+
+        // Start loading state - collapse to progress bar
         btn.disabled = true;
-        btn.classList.add('publishing');
-        defaultIcon.style.display = 'none';
-        spinnerIcon.style.display = 'inline';
-        successIcon.style.display = 'none';
-        btnText.textContent = 'Publishing...';
+        btn.classList.add('loading');
+        progressFill.style.width = '0%';
+
+        let progress = 0;
+
+        // Animate progress bar while saving
+        const animateProgress = () => {
+            if (progress >= 100) return;
+            const increment = Math.random() * 3 + 1;
+            progress = Math.min(progress + increment, 95); // Cap at 95% until actual completion
+            progressFill.style.width = progress + '%';
+            requestAnimationFrame(animateProgress);
+        };
+
+        // Start progress animation after short delay
+        setTimeout(() => requestAnimationFrame(animateProgress), 400);
 
         try {
             // Save each goal to Supabase (instant update!)
@@ -2554,40 +2565,44 @@ class ProgressManager {
                 }
             }
 
-            // Show success state
-            btn.classList.remove('publishing');
-            btn.classList.add('btn-success');
-            spinnerIcon.style.display = 'none';
-            successIcon.style.display = 'inline';
-            btnText.textContent = 'Published!';
+            // Complete progress
+            progress = 100;
+            progressFill.style.width = '100%';
 
-            this.hasUnsavedChanges = false;
-            this.updateSaveButton();
-
-            // Reset button after delay
+            // Show success state after brief delay
             setTimeout(() => {
-                btn.classList.remove('btn-success');
-                defaultIcon.style.display = 'inline';
-                successIcon.style.display = 'none';
-                btnText.textContent = 'Publish Changes';
-                btn.disabled = false;
-            }, 2000);
+                btn.classList.remove('loading');
+                btn.classList.add('btn-success');
+                progressFill.style.width = '0%';
+                btnContent.innerHTML = successIcon + '<span>Published!</span>';
+
+                this.hasUnsavedChanges = false;
+
+                // Reset button after delay
+                setTimeout(() => {
+                    btn.classList.remove('btn-success');
+                    btnContent.innerHTML = uploadIcon + '<span class="btn-text">Publish Changes</span>';
+                    btn.disabled = false;
+                }, 2500);
+            }, 300);
 
         } catch (error) {
             console.error('Save error:', error);
-            // Show error state
-            btn.classList.remove('publishing');
-            btn.classList.add('btn-error');
-            spinnerIcon.style.display = 'none';
-            defaultIcon.style.display = 'inline';
-            btnText.textContent = 'Error - Try Again';
-            btn.disabled = false;
 
-            // Reset button after delay
+            // Show error state
             setTimeout(() => {
-                btn.classList.remove('btn-error');
-                btnText.textContent = 'Publish Changes';
-            }, 3000);
+                btn.classList.remove('loading');
+                btn.classList.add('btn-error');
+                progressFill.style.width = '0%';
+                btnContent.innerHTML = errorIcon + '<span>Failed</span>';
+
+                // Reset button after delay
+                setTimeout(() => {
+                    btn.classList.remove('btn-error');
+                    btnContent.innerHTML = uploadIcon + '<span class="btn-text">Publish Changes</span>';
+                    btn.disabled = false;
+                }, 2500);
+            }, 300);
         }
     }
 
@@ -3269,6 +3284,7 @@ class MissionManager {
         this.apiBase = '/.netlify/functions';
         this.statements = [];
         this.goalCards = [];
+        this.goalPages = []; // Full goal pages data for dropdown
         this.goalPageHeroImages = {};
         this.settings = null;
         this.editingStatementId = null;
@@ -3296,11 +3312,11 @@ class MissionManager {
 
     async loadContent() {
         try {
-            // Load goal pages for hero images
-            const goalPages = await goalPagesAPI.getAll();
+            // Load goal pages for hero images and dropdown
+            this.goalPages = await goalPagesAPI.getAll() || [];
             this.goalPageHeroImages = {};
-            if (goalPages && goalPages.length > 0) {
-                goalPages.forEach(page => {
+            if (this.goalPages.length > 0) {
+                this.goalPages.forEach(page => {
                     if (page.slug && page.hero_image) {
                         this.goalPageHeroImages[page.slug] = page.hero_image;
                     }
@@ -3406,6 +3422,12 @@ class MissionManager {
         // Goal card form
         this.goalCardForm.addEventListener('submit', (e) => this.saveGoalCard(e));
         document.getElementById('cancel-goal-card').addEventListener('click', () => this.closeGoalCardEditor());
+
+        // Goal card link dropdown change - update hero image preview
+        document.getElementById('goal-card-link').addEventListener('change', () => this.updateGoalCardHeroPreview());
+
+        // Goal card description word count
+        document.getElementById('goal-card-description').addEventListener('input', () => this.updateDescriptionWordCount());
 
         // Delete statement modal
         document.getElementById('cancel-statement-delete').addEventListener('click', () => this.closeDeleteStatementModal());
@@ -3736,6 +3758,9 @@ class MissionManager {
         this.editingGoalCardId = cardId;
         document.getElementById('goal-card-modal-title').textContent = 'Edit Goal Card';
 
+        // Populate goal page dropdown
+        this.populateGoalPageDropdown();
+
         const card = this.goalCards.find(c => c.id === cardId);
         if (card) {
             document.getElementById('goal-card-id').value = cardId;
@@ -3745,6 +3770,10 @@ class MissionManager {
             document.getElementById('goal-card-description').value = card.description || '';
             document.getElementById('goal-card-image').value = card.image || '';
             document.getElementById('goal-card-link').value = card.link || '';
+
+            // Update hero preview and word count
+            this.updateGoalCardHeroPreview();
+            this.updateDescriptionWordCount();
         }
 
         this.goalCardModal.hidden = false;
@@ -3764,10 +3793,92 @@ class MissionManager {
         document.getElementById('goal-card-description').value = '';
         document.getElementById('goal-card-image').value = '';
         document.getElementById('goal-card-link').value = '';
+
+        // Reset hero preview
+        const preview = document.getElementById('goal-card-hero-preview');
+        preview.innerHTML = '<span class="image-preview-placeholder">Hero image preview</span>';
+        document.getElementById('goal-card-hero-source').innerHTML = 'Image from: <strong>--</strong>';
+
+        // Reset word count
+        const countEl = document.getElementById('goal-card-description-count');
+        countEl.textContent = '0 / 60 words';
+        countEl.classList.remove('over-limit');
+    }
+
+    populateGoalPageDropdown() {
+        const select = document.getElementById('goal-card-link');
+        select.innerHTML = '<option value="">Select a goal page...</option>';
+
+        // Sort goal pages by sort_order
+        const sortedPages = [...this.goalPages].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+        sortedPages.forEach(page => {
+            const option = document.createElement('option');
+            option.value = page.slug;
+            option.textContent = `${page.label || ''} ${page.title}`.trim();
+            select.appendChild(option);
+        });
+    }
+
+    updateGoalCardHeroPreview() {
+        const selectedSlug = document.getElementById('goal-card-link').value;
+        const preview = document.getElementById('goal-card-hero-preview');
+        const sourceText = document.getElementById('goal-card-hero-source');
+        const imageField = document.getElementById('goal-card-image');
+
+        if (!selectedSlug) {
+            preview.innerHTML = '<span class="image-preview-placeholder">Select a goal page to see the hero image</span>';
+            sourceText.innerHTML = 'Image from: <strong>--</strong>';
+            imageField.value = '';
+            return;
+        }
+
+        // Find the goal page
+        const goalPage = this.goalPages.find(p => p.slug === selectedSlug);
+
+        if (goalPage && goalPage.hero_image) {
+            preview.innerHTML = `<img src="${goalPage.hero_image}" alt="Hero preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            sourceText.innerHTML = `Image from: <strong>${goalPage.title}</strong>`;
+            // Auto-sync the image field with the hero image
+            imageField.value = goalPage.hero_image;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">No hero image set for this goal page</span>';
+            sourceText.innerHTML = `Image from: <strong>${goalPage?.title || selectedSlug}</strong> (no hero image)`;
+            imageField.value = '';
+        }
+    }
+
+    updateDescriptionWordCount() {
+        const textarea = document.getElementById('goal-card-description');
+        const countEl = document.getElementById('goal-card-description-count');
+        const text = textarea.value.trim();
+        const wordCount = text ? text.split(/\s+/).length : 0;
+        const maxWords = 60;
+
+        countEl.textContent = `${wordCount} / ${maxWords} words`;
+
+        if (wordCount > maxWords) {
+            countEl.classList.add('over-limit');
+        } else {
+            countEl.classList.remove('over-limit');
+        }
     }
 
     async saveGoalCard(e) {
         e.preventDefault();
+
+        // Check word count
+        const description = document.getElementById('goal-card-description').value.trim();
+        const wordCount = description ? description.split(/\s+/).length : 0;
+        if (wordCount > 60) {
+            alert(`Description exceeds 60 word limit (currently ${wordCount} words). Please shorten it.`);
+            return;
+        }
+
+        // Get the hero image from the linked goal page
+        const selectedSlug = document.getElementById('goal-card-link').value;
+        const goalPage = this.goalPages.find(p => p.slug === selectedSlug);
+        const heroImage = goalPage?.hero_image || document.getElementById('goal-card-image').value;
 
         const item = {
             id: this.editingGoalCardId,
@@ -3775,8 +3886,8 @@ class MissionManager {
             title: document.getElementById('goal-card-title').value,
             subtitle: document.getElementById('goal-card-subtitle').value,
             description: document.getElementById('goal-card-description').value,
-            image: document.getElementById('goal-card-image').value,
-            link: document.getElementById('goal-card-link').value,
+            image: heroImage, // Use the hero image from the goal page
+            link: selectedSlug,
             sort_order: this.goalCards.find(c => c.id === this.editingGoalCardId)?.sort_order || 0
         };
 
@@ -3804,7 +3915,7 @@ class GoalPagesManager {
         this.editingPageId = null;
         this.deletePageId = null;
         this.fundingItemCount = 0;
-        this.galleryImageCount = 0;
+        this.galleryImages = []; // Array of {src, alt} objects for the current page
 
         // DOM Elements
         this.pagesList = document.getElementById('goal-pages-list');
@@ -4020,9 +4131,6 @@ class GoalPagesManager {
         // Add funding item
         document.getElementById('add-funding-item-btn').addEventListener('click', () => this.addFundingItem());
 
-        // Add gallery image
-        document.getElementById('add-goal-gallery-image-btn').addEventListener('click', () => this.addGalleryImage());
-
         // Delete modal
         document.getElementById('cancel-goal-page-delete').addEventListener('click', () => this.closeDeleteModal());
         document.getElementById('confirm-goal-page-delete').addEventListener('click', () => this.confirmDelete());
@@ -4039,6 +4147,22 @@ class GoalPagesManager {
         if (heroFileInput) {
             heroFileInput.addEventListener('change', (e) => this.handleHeroUpload(e));
         }
+
+        // Gallery image modal events
+        this.galleryImageModal = document.getElementById('goal-gallery-image-modal');
+        this.galleryImageForm = document.getElementById('goal-gallery-image-form');
+
+        this.galleryImageModal.querySelector('.modal-close').addEventListener('click', () => this.closeGalleryImageModal());
+        this.galleryImageModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeGalleryImageModal());
+        document.getElementById('goal-gallery-image-cancel').addEventListener('click', () => this.closeGalleryImageModal());
+        document.getElementById('goal-gallery-image-remove').addEventListener('click', () => this.removeGalleryImage());
+        this.galleryImageForm.addEventListener('submit', (e) => this.saveGalleryImage(e));
+
+        // Gallery image preview on path change
+        document.getElementById('goal-gallery-image-src').addEventListener('input', () => this.updateGalleryImagePreview());
+
+        // Gallery image file upload
+        document.getElementById('goal-gallery-image-file').addEventListener('change', (e) => this.handleGalleryModalImageUpload(e));
     }
 
     async handleHeroUpload(e) {
@@ -4278,13 +4402,9 @@ class GoalPagesManager {
                     console.error('Error parsing gallery data:', e, 'Raw data:', page.gallery);
                     gallery = [];
                 }
-                this.galleryContainer.innerHTML = '';
-                this.galleryImageCount = 0;
-                if (Array.isArray(gallery) && gallery.length > 0) {
-                    gallery.forEach(img => this.addGalleryImage(img));
-                } else {
-                    console.log('No gallery images found for this page. Gallery data was:', page.gallery);
-                }
+                // Initialize gallery images array and render the grid
+                this.galleryImages = Array.isArray(gallery) ? gallery : [];
+                this.renderGalleryGrid();
 
                 this.updateHeroPreview();
             }
@@ -4312,8 +4432,9 @@ class GoalPagesManager {
         document.getElementById('goal-page-content').value = '';
         this.fundingContainer.innerHTML = '';
         this.fundingItemCount = 0;
-        this.galleryContainer.innerHTML = '';
-        this.galleryImageCount = 0;
+        // Reset gallery images and render empty grid
+        this.galleryImages = [];
+        this.renderGalleryGrid();
         this.updateHeroPreview();
     }
 
@@ -4345,51 +4466,174 @@ class GoalPagesManager {
         this.fundingContainer.insertAdjacentHTML('beforeend', html);
     }
 
-    addGalleryImage(data = {}) {
-        const index = this.galleryImageCount++;
-        const previewHtml = data.src
-            ? `<img src="${data.src}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`
-            : '<span class="image-preview-placeholder">Image preview</span>';
-        const html = `
-            <div class="gallery-image-item media-item" data-index="${index}">
-                <div class="media-item-header">
-                    <span class="media-item-number">Image ${index + 1}</span>
-                    <button type="button" class="btn-remove-item" onclick="this.closest('.gallery-image-item').remove()" title="Remove this image">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path d="M1 3.5H13M5.5 6.5V10.5M8.5 6.5V10.5M2 3.5L3 12C3 12.5523 3.44772 13 4 13H10C10.5523 13 11 12.5523 11 12L12 3.5M4.5 3.5V2C4.5 1.44772 4.94772 1 5.5 1H8.5C9.05228 1 9.5 1.44772 9.5 2V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Remove
-                    </button>
-                </div>
-                <div class="form-row gallery-image-row">
-                    <div class="image-preview gallery-item-preview" id="gallery-preview-${index}">
-                        ${previewHtml}
-                    </div>
-                    <div class="gallery-image-fields">
-                        <div class="form-group">
-                            <label>Image Path</label>
-                            <input type="text" name="gallery-src-${index}" value="${data.src || ''}" placeholder="images/photo.jpg" oninput="document.getElementById('gallery-preview-${index}').innerHTML = this.value ? '<img src=\\'' + this.value + '\\' alt=\\'Preview\\' onerror=\\'this.parentNode.innerHTML=&quot;<span class=image-preview-placeholder>Failed to load</span>&quot;\\'>' : '<span class=image-preview-placeholder>Image preview</span>'">
-                        </div>
-                        <div class="form-group">
-                            <label>Alt Text</label>
-                            <input type="text" name="gallery-alt-${index}" value="${data.alt || ''}" placeholder="Description of the image">
-                        </div>
-                        <div class="file-upload-wrapper">
-                            <input type="file" id="gallery-file-${index}" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input" onchange="window.goalPagesManager.handleGalleryImageUpload(event, ${index})">
-                            <label for="gallery-file-${index}" class="file-upload-btn">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Upload</span>
-                            </label>
-                            <span class="file-name" id="gallery-file-name-${index}">No file chosen</span>
-                        </div>
+    // Gallery Grid Methods (New Design)
+    renderGalleryGrid() {
+        // Create grid items for existing images + add button
+        let html = '';
+
+        // Render existing images
+        this.galleryImages.forEach((img, index) => {
+            html += `
+                <div class="gallery-grid-item" data-index="${index}">
+                    <img src="${img.src}" alt="${img.alt || ''}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 75%22%3E%3Crect fill=%22%23f7f4eb%22 width=%22100%22 height=%2275%22/%3E%3Ctext x=%2250%22 y=%2237.5%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                    <div class="gallery-grid-item-overlay">
+                        <span>Click to edit</span>
                     </div>
                 </div>
-            </div>
+            `;
+        });
+
+        // Add "Add Image" button
+        html += `
+            <button type="button" class="gallery-grid-add" id="gallery-grid-add-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 5V19M5 12H19" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Add Image</span>
+            </button>
         `;
-        this.galleryContainer.insertAdjacentHTML('beforeend', html);
+
+        this.galleryContainer.innerHTML = html;
+
+        // Add click handlers
+        this.galleryContainer.querySelectorAll('.gallery-grid-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.dataset.index);
+                this.openGalleryImageModal(index);
+            });
+        });
+
+        document.getElementById('gallery-grid-add-btn').addEventListener('click', () => {
+            this.openGalleryImageModal(-1); // -1 = new image
+        });
+    }
+
+    openGalleryImageModal(index) {
+        const isNew = index === -1;
+        const modalTitle = document.getElementById('goal-gallery-image-modal-title');
+        const indexField = document.getElementById('goal-gallery-image-index');
+        const srcField = document.getElementById('goal-gallery-image-src');
+        const altField = document.getElementById('goal-gallery-image-alt');
+        const preview = document.getElementById('goal-gallery-image-preview');
+        const fileNameEl = document.getElementById('goal-gallery-image-file-name');
+        const actionsEl = document.querySelector('.gallery-image-modal-actions');
+
+        modalTitle.textContent = isNew ? 'Add Gallery Image' : 'Edit Gallery Image';
+        indexField.value = isNew ? '' : index;
+
+        if (isNew) {
+            srcField.value = '';
+            altField.value = '';
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+            actionsEl.classList.add('is-new');
+        } else {
+            const img = this.galleryImages[index];
+            srcField.value = img.src || '';
+            altField.value = img.alt || '';
+            if (img.src) {
+                preview.innerHTML = `<img src="${img.src}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+            } else {
+                preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+            }
+            actionsEl.classList.remove('is-new');
+        }
+
+        fileNameEl.textContent = 'No file chosen';
+        document.getElementById('goal-gallery-image-file').value = '';
+
+        this.galleryImageModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeGalleryImageModal() {
+        this.galleryImageModal.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    updateGalleryImagePreview() {
+        const path = document.getElementById('goal-gallery-image-src').value;
+        const preview = document.getElementById('goal-gallery-image-preview');
+        if (path) {
+            preview.innerHTML = `<img src="${path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
+    }
+
+    async handleGalleryModalImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileNameEl = document.getElementById('goal-gallery-image-file-name');
+        if (fileNameEl) fileNameEl.textContent = 'Uploading...';
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const rawSlug = document.getElementById('goal-page-slug').value || 'goal-images';
+            const slug = rawSlug.replace('.html', '');
+
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    postId: slug,
+                    fileType: 'image'
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
+            document.getElementById('goal-gallery-image-src').value = result.path;
+            this.updateGalleryImagePreview();
+            if (fileNameEl) fileNameEl.textContent = file.name;
+        } catch (error) {
+            console.error('Error uploading gallery image:', error);
+            alert('Error uploading image: ' + error.message);
+            if (fileNameEl) fileNameEl.textContent = 'Upload failed';
+        }
+    }
+
+    saveGalleryImage(e) {
+        e.preventDefault();
+
+        const indexField = document.getElementById('goal-gallery-image-index');
+        const src = document.getElementById('goal-gallery-image-src').value.trim();
+        const alt = document.getElementById('goal-gallery-image-alt').value.trim();
+
+        if (!src) {
+            alert('Please provide an image path or upload an image.');
+            return;
+        }
+
+        const isNew = indexField.value === '';
+        const index = isNew ? -1 : parseInt(indexField.value);
+
+        if (isNew) {
+            this.galleryImages.push({ src, alt });
+        } else {
+            this.galleryImages[index] = { src, alt };
+        }
+
+        this.closeGalleryImageModal();
+        this.renderGalleryGrid();
+    }
+
+    removeGalleryImage() {
+        const indexField = document.getElementById('goal-gallery-image-index');
+        const index = parseInt(indexField.value);
+
+        if (!isNaN(index) && index >= 0 && index < this.galleryImages.length) {
+            this.galleryImages.splice(index, 1);
+            this.closeGalleryImageModal();
+            this.renderGalleryGrid();
+        }
     }
 
     collectFundingItems() {
@@ -4406,16 +4650,8 @@ class GoalPagesManager {
     }
 
     collectGalleryImages() {
-        const images = [];
-        this.galleryContainer.querySelectorAll('.gallery-image-item').forEach(item => {
-            const index = item.dataset.index;
-            const src = item.querySelector(`[name="gallery-src-${index}"]`)?.value || '';
-            const alt = item.querySelector(`[name="gallery-alt-${index}"]`)?.value || '';
-            if (src) {
-                images.push({ src, alt });
-            }
-        });
-        return images;
+        // Now we just return the galleryImages array directly
+        return this.galleryImages.filter(img => img.src);
     }
 
     async savePage(e) {
@@ -4473,6 +4709,182 @@ class GoalPagesManager {
 }
 
 
+// ============================================================
+// Footer Settings Manager
+// ============================================================
+
+class FooterManager {
+    constructor() {
+        this.apiBase = '/.netlify/functions';
+        this.settings = null;
+        this.form = document.getElementById('footer-settings-form');
+
+        this.init();
+    }
+
+    async init() {
+        await this.loadSettings();
+        this.setupEventListeners();
+    }
+
+    async loadSettings() {
+        try {
+            this.settings = await footerAPI.getSettings();
+
+            if (this.settings) {
+                // Populate form fields
+                document.getElementById('footer-tagline').value = this.settings.tagline || '';
+                document.getElementById('footer-image').value = this.settings.image_url || '';
+                document.getElementById('footer-image-alt').value = this.settings.image_alt || '';
+                document.getElementById('footer-foundation-text').value = this.settings.foundation_description || '';
+                document.getElementById('footer-ein').value = this.settings.ein || '';
+                document.getElementById('footer-email').value = this.settings.contact_email || '';
+                document.getElementById('footer-address-line1').value = this.settings.address_street || '';
+                document.getElementById('footer-address-city').value = this.settings.address_city_state || '';
+                document.getElementById('footer-address-zip').value = this.settings.address_zip || '';
+                document.getElementById('footer-copyright-name').value = this.settings.copyright_name || '';
+                document.getElementById('footer-copyright-year').value = this.settings.copyright_year || '';
+
+                this.updateImagePreview();
+            } else {
+                // Load defaults
+                this.loadDefaults();
+            }
+        } catch (error) {
+            console.error('Error loading footer settings:', error);
+            this.loadDefaults();
+        }
+    }
+
+    loadDefaults() {
+        document.getElementById('footer-tagline').value = 'Supporting charitable, educational, medical, conservation, scientific and humanitarian purposes.';
+        document.getElementById('footer-image').value = 'images/footer-children.jpg';
+        document.getElementById('footer-image-alt').value = 'Children with desk donated by Omotani Caring Foundation';
+        document.getElementById('footer-foundation-text').value = 'The Omotani Caring Foundation is a 501(c)(3) USA charity.';
+        document.getElementById('footer-ein').value = '85-2581703';
+        document.getElementById('footer-email').value = 'info@omotanicaringfoundation.org';
+        document.getElementById('footer-address-line1').value = '8337 N Lee Trevino Drive';
+        document.getElementById('footer-address-city').value = 'Tucson, Arizona, USA';
+        document.getElementById('footer-address-zip').value = '85742';
+        document.getElementById('footer-copyright-name').value = 'Omotani Caring Foundation';
+        document.getElementById('footer-copyright-year').value = new Date().getFullYear().toString();
+
+        this.updateImagePreview();
+    }
+
+    setupEventListeners() {
+        // Form submit
+        this.form.addEventListener('submit', (e) => this.saveSettings(e));
+
+        // Image path change
+        document.getElementById('footer-image').addEventListener('input', () => this.updateImagePreview());
+
+        // Image file upload
+        document.getElementById('footer-image-file').addEventListener('change', (e) => this.handleImageUpload(e));
+    }
+
+    updateImagePreview() {
+        const path = document.getElementById('footer-image').value;
+        const preview = document.getElementById('footer-image-preview');
+
+        if (path) {
+            preview.innerHTML = `<img src="${path}" alt="Preview" onerror="this.parentNode.innerHTML='<span class=\\'image-preview-placeholder\\'>Failed to load</span>'">`;
+        } else {
+            preview.innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        }
+    }
+
+    async handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileNameEl = document.getElementById('footer-image-file-name');
+        fileNameEl.textContent = 'Uploading...';
+
+        try {
+            const base64 = await this.fileToBase64(file);
+
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    postId: 'footer',
+                    fileType: 'image'
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
+            document.getElementById('footer-image').value = result.path;
+            this.updateImagePreview();
+            fileNameEl.textContent = file.name;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image: ' + error.message);
+            fileNameEl.textContent = 'Upload failed';
+        }
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async saveSettings(e) {
+        e.preventDefault();
+
+        const submitBtn = this.form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        const data = {
+            tagline: document.getElementById('footer-tagline').value,
+            image_url: document.getElementById('footer-image').value,
+            image_alt: document.getElementById('footer-image-alt').value,
+            foundation_description: document.getElementById('footer-foundation-text').value,
+            ein: document.getElementById('footer-ein').value,
+            contact_email: document.getElementById('footer-email').value,
+            address_street: document.getElementById('footer-address-line1').value,
+            address_city_state: document.getElementById('footer-address-city').value,
+            address_zip: document.getElementById('footer-address-zip').value,
+            copyright_name: document.getElementById('footer-copyright-name').value,
+            copyright_year: document.getElementById('footer-copyright-year').value
+        };
+
+        try {
+            await footerAPI.updateSettings(data);
+            this.settings = data;
+
+            submitBtn.textContent = 'Saved!';
+            submitBtn.classList.add('btn-success');
+
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.classList.remove('btn-success');
+                submitBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            console.error('Error saving footer settings:', error);
+            alert('Error saving footer settings: ' + error.message);
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
@@ -4483,4 +4895,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new MissionManager();
     // Expose goalPagesManager globally for inline handlers
     window.goalPagesManager = new GoalPagesManager();
+    new FooterManager();
 });

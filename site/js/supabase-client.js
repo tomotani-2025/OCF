@@ -543,6 +543,26 @@ const goalPagesAPI = {
     }
 };
 
+// Footer Settings API
+const footerAPI = {
+    async getSettings() {
+        const results = await supabase.query('footer_settings', {
+            select: '*',
+            limit: 1
+        });
+        return results[0] || null;
+    },
+
+    async updateSettings(data) {
+        const existing = await this.getSettings();
+        if (existing) {
+            return supabase.update('footer_settings', data, { id: existing.id });
+        } else {
+            return supabase.insert('footer_settings', { id: 'main', ...data });
+        }
+    }
+};
+
 // Export for use
 window.supabase = supabase;
 window.postsAPI = postsAPI;
@@ -551,3 +571,4 @@ window.progressAPI = progressAPI;
 window.aboutAPI = aboutAPI;
 window.missionAPI = missionAPI;
 window.goalPagesAPI = goalPagesAPI;
+window.footerAPI = footerAPI;
