@@ -3291,7 +3291,7 @@ class AboutManager {
         const file = e.target.files[0];
         if (!file) return;
 
-        document.getElementById('advisor-photo-file-name').textContent = file.name;
+        document.getElementById('advisor-photo-file-name').textContent = 'Uploading...';
 
         try {
             const base64 = await this.fileToBase64(file);
@@ -3301,17 +3301,20 @@ class AboutManager {
                 body: JSON.stringify({
                     file: base64,
                     filename: file.name,
-                    folder: 'images/AboutUs'
+                    mimeType: file.type,
+                    postId: 'AboutUs'
                 })
             });
 
-            if (!response.ok) throw new Error('Upload failed');
-
             const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+            document.getElementById('advisor-photo-file-name').textContent = file.name;
             document.getElementById('advisor-photo').value = result.path;
             this.updatePhotoPreview();
         } catch (error) {
             console.error('Error uploading photo:', error);
+            document.getElementById('advisor-photo-file-name').textContent = 'Upload failed';
             alert('Error uploading photo: ' + error.message);
         }
     }
@@ -3320,7 +3323,7 @@ class AboutManager {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => resolve(reader.result.split(',')[1]); // Extract base64 portion only
             reader.onerror = reject;
         });
     }
@@ -3341,7 +3344,7 @@ class AboutManager {
         const file = e.target.files[0];
         if (!file) return;
 
-        document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = file.name;
+        document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = 'Uploading...';
 
         try {
             const base64 = await this.fileToBase64(file);
@@ -3351,17 +3354,20 @@ class AboutManager {
                 body: JSON.stringify({
                     file: base64,
                     filename: file.name,
-                    folder: 'images/AboutUs'
+                    mimeType: file.type,
+                    postId: 'AboutUs'
                 })
             });
 
-            if (!response.ok) throw new Error('Upload failed');
-
             const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+            document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = file.name;
             document.getElementById(`advisor-partner-logo-${index}`).value = result.path;
             this.updatePartnerLogoPreviews();
         } catch (error) {
             console.error('Error uploading logo:', error);
+            document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = 'Upload failed';
             alert('Error uploading logo: ' + error.message);
         }
     }
