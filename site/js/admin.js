@@ -3076,12 +3076,8 @@ class AboutManager {
 
         // File upload
         const fileInput = document.getElementById('advisor-photo-file');
-        console.log('Setting up advisor photo file input:', fileInput);
         if (fileInput) {
             fileInput.addEventListener('change', (e) => this.handlePhotoUpload(e));
-            console.log('Event listener attached to advisor-photo-file');
-        } else {
-            console.error('Could not find advisor-photo-file element');
         }
 
         // Partner logo inputs and file uploads
@@ -3292,9 +3288,7 @@ class AboutManager {
     }
 
     async handlePhotoUpload(e) {
-        console.log('handlePhotoUpload called', e);
         const file = e.target.files[0];
-        console.log('File selected:', file);
         if (!file) return;
 
         document.getElementById('advisor-photo-file-name').textContent = 'Uploading...';
