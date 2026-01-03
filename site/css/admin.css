@@ -3716,9 +3716,8 @@
 /* Toolbar styling - sticky at top when scrolling */
 .ql-toolbar.ql-snow {
     border: none;
-    border-bottom: 1px solid #e8e4db;
-    background: #faf9f6;
-    padding: 8px 12px;
+    background: #C8102E;
+    padding: 10px 14px;
     position: sticky;
     top: 80px; /* Below the header */
     z-index: 100;
@@ -3727,47 +3726,75 @@
     flex-wrap: wrap;
     gap: 4px;
     align-items: center;
+    box-shadow: 0 2px 8px rgba(200, 16, 46, 0.3);
 }
 
 /* Consistent spacing for toolbar groups */
 .ql-toolbar.ql-snow .ql-formats {
-    margin-right: 12px;
+    margin-right: 16px;
     display: inline-flex;
     align-items: center;
     gap: 2px;
+    padding-right: 16px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .ql-toolbar.ql-snow .ql-formats:last-child {
     margin-right: 0;
+    padding-right: 0;
+    border-right: none;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label,
 .ql-toolbar.ql-snow button {
-    color: #31110F;
-    width: 28px;
-    height: 28px;
-    padding: 4px;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    padding: 5px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.15s;
 }
 
 .ql-toolbar.ql-snow button:hover,
 .ql-toolbar.ql-snow .ql-picker-label:hover {
-    color: #C8102E;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .ql-toolbar.ql-snow button.ql-active,
 .ql-toolbar.ql-snow .ql-picker-label.ql-active {
-    color: #C8102E;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .ql-toolbar.ql-snow .ql-stroke {
-    stroke: currentColor;
+    stroke: #fff;
 }
 
 .ql-toolbar.ql-snow .ql-fill {
-    fill: currentColor;
+    fill: #fff;
+}
+
+.ql-toolbar.ql-snow .ql-picker {
+    color: #fff;
+}
+
+.ql-toolbar.ql-snow .ql-picker-options {
+    background: #fff;
+    border: 1px solid #e8e4db;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ql-toolbar.ql-snow .ql-picker-options .ql-picker-item {
+    color: #31110F;
+}
+
+.ql-toolbar.ql-snow .ql-picker-options .ql-picker-item:hover {
+    color: #C8102E;
 }
 
 /* Editor area */
