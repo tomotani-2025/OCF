@@ -851,7 +851,7 @@ class AdminDashboard {
         }
 
         // Update the gallery grid
-        this.renderPostImagesGallery();
+        this.renderPostGalleryGrid();
         this.updateCoverImagePreview();
 
         // Show completion message
