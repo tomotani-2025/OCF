@@ -3718,16 +3718,38 @@
     border: none;
     border-bottom: 1px solid #e8e4db;
     background: #faf9f6;
-    padding: 12px;
+    padding: 8px 12px;
     position: sticky;
     top: 80px; /* Below the header */
     z-index: 100;
     border-radius: 8px 8px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+/* Consistent spacing for toolbar groups */
+.ql-toolbar.ql-snow .ql-formats {
+    margin-right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.ql-toolbar.ql-snow .ql-formats:last-child {
+    margin-right: 0;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label,
 .ql-toolbar.ql-snow button {
     color: #31110F;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ql-toolbar.ql-snow button:hover,
@@ -3901,14 +3923,88 @@
     color: #fff;
 }
 
-/* Custom file-download button in toolbar */
-.ql-file-download {
+/* Custom toolbar buttons */
+.ql-file-download,
+.ql-gallery-pick {
     width: 28px !important;
 }
 
-.ql-file-download svg {
+.ql-file-download svg,
+.ql-gallery-pick svg {
     width: 18px;
     height: 18px;
+}
+
+/* Gallery Picker Modal */
+.gallery-picker-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-picker-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.gallery-picker-content {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-picker-content h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #31110F;
+}
+
+.gallery-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.gallery-picker-item {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.gallery-picker-item:hover {
+    border-color: #C8102E;
+    transform: scale(1.05);
+}
+
+.gallery-picker-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-picker-cancel {
+    width: 100%;
 }
 
 /* Responsive Quill */

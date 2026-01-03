@@ -73,15 +73,17 @@ class AdminDashboard {
         const self = this;
         const toolbarOptions = {
             container: [
-                ['bold', 'italic'],                            // Text formatting
-                ['blockquote'],                                // Quote text
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Lists
-                ['link'],                                      // Links
-                ['image', 'video', 'file-download'],           // Media (file-download is custom)
-                ['clean']                                      // Clear formatting
+                ['bold', 'italic'],                                    // Text formatting
+                ['blockquote'],                                        // Quote text
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],          // Lists
+                [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }],  // Text alignment
+                ['link'],                                              // Links
+                ['image', 'gallery-pick', 'video', 'file-download'],   // Media
+                ['clean']                                              // Clear formatting
             ],
             handlers: {
                 image: function() { self.quillImageHandler(); },
+                'gallery-pick': function() { self.quillGalleryPickHandler(); },
                 video: function() { self.quillVideoHandler(); },
                 'file-download': function() { self.quillFileHandler(); }
             }
@@ -95,9 +97,10 @@ class AdminDashboard {
             placeholder: 'Write your post content here. Use the toolbar to format text, add images, videos, and files...'
         });
 
-        // Add custom file-download button to toolbar
+        // Add custom button icons and tooltips to toolbar
         const toolbar = document.querySelector('.ql-toolbar');
         if (toolbar) {
+            // File download button
             const fileBtn = toolbar.querySelector('.ql-file-download');
             if (fileBtn) {
                 fileBtn.innerHTML = `
@@ -107,9 +110,83 @@ class AdminDashboard {
                         <path d="M3,15 L15,15" stroke="currentColor" stroke-width="2" fill="none"/>
                     </svg>
                 `;
-                fileBtn.title = 'Insert downloadable file';
+                fileBtn.title = 'Upload downloadable file';
+            }
+
+            // Gallery pick button (select from post gallery)
+            const galleryBtn = toolbar.querySelector('.ql-gallery-pick');
+            if (galleryBtn) {
+                galleryBtn.innerHTML = `
+                    <svg viewBox="0 0 18 18">
+                        <rect x="2" y="2" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <rect x="4" y="4" width="4" height="4" fill="currentColor"/>
+                        <rect x="10" y="4" width="4" height="4" fill="currentColor"/>
+                        <rect x="4" y="10" width="4" height="4" fill="currentColor"/>
+                        <rect x="10" y="10" width="4" height="4" fill="currentColor"/>
+                    </svg>
+                `;
+                galleryBtn.title = 'Insert from gallery';
+            }
+
+            // Add tooltip to image button
+            const imageBtn = toolbar.querySelector('.ql-image');
+            if (imageBtn) {
+                imageBtn.title = 'Upload new image';
+            }
+
+            // Add tooltip to video button
+            const videoBtn = toolbar.querySelector('.ql-video');
+            if (videoBtn) {
+                videoBtn.title = 'Embed YouTube/Vimeo video';
             }
         }
+    }
+
+    quillGalleryPickHandler() {
+        // Show a picker with images from the post gallery
+        if (!this.postImages || this.postImages.length === 0) {
+            alert('No images in gallery yet. Add images to the gallery below first, or use the image button to upload a new one.');
+            return;
+        }
+
+        // Create a simple picker modal
+        const picker = document.createElement('div');
+        picker.className = 'gallery-picker-modal';
+        picker.innerHTML = `
+            <div class="gallery-picker-backdrop"></div>
+            <div class="gallery-picker-content">
+                <h3>Select from Gallery</h3>
+                <div class="gallery-picker-grid">
+                    ${this.postImages.map((img, index) => `
+                        <div class="gallery-picker-item" data-index="${index}">
+                            <img src="${img.src}" alt="${img.alt || ''}" />
+                        </div>
+                    `).join('')}
+                </div>
+                <button type="button" class="btn btn-outline gallery-picker-cancel">Cancel</button>
+            </div>
+        `;
+
+        document.body.appendChild(picker);
+
+        // Handle selection
+        picker.querySelectorAll('.gallery-picker-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.dataset.index);
+                const img = this.postImages[index];
+                if (img && this.quill) {
+                    const range = this.quill.getSelection(true);
+                    const insertIndex = range ? range.index : this.quill.getLength();
+                    this.quill.insertEmbed(insertIndex, 'image', img.src);
+                    this.quill.setSelection(insertIndex + 1);
+                }
+                picker.remove();
+            });
+        });
+
+        // Handle cancel
+        picker.querySelector('.gallery-picker-cancel').addEventListener('click', () => picker.remove());
+        picker.querySelector('.gallery-picker-backdrop').addEventListener('click', () => picker.remove());
     }
 
     registerFileDownloadBlot() {
