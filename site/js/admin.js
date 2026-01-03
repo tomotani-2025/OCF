@@ -42,6 +42,9 @@ class AdminDashboard {
         this.videoCount = 0;
         this.pdfCount = 0;
 
+        // Quill rich text editor instance
+        this.quill = null;
+
         this.init();
     }
 
@@ -49,6 +52,282 @@ class AdminDashboard {
         await this.loadPosts();
         this.renderPostsTable();
         this.setupEventListeners();
+        this.initQuillEditor();
+    }
+
+    // ========================================
+    // Quill Rich Text Editor
+    // ========================================
+
+    initQuillEditor() {
+        const editorContainer = document.getElementById('post-content-editor');
+        if (!editorContainer || typeof Quill === 'undefined') {
+            console.warn('Quill editor container or library not found');
+            return;
+        }
+
+        // Register custom file download blot
+        this.registerFileDownloadBlot();
+
+        // Custom toolbar handlers
+        const self = this;
+        const toolbarOptions = {
+            container: [
+                ['bold', 'italic'],                            // Text formatting
+                ['blockquote'],                                // Quote text
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Lists
+                ['link'],                                      // Links
+                ['image', 'video', 'file-download'],           // Media (file-download is custom)
+                ['clean']                                      // Clear formatting
+            ],
+            handlers: {
+                image: function() { self.quillImageHandler(); },
+                video: function() { self.quillVideoHandler(); },
+                'file-download': function() { self.quillFileHandler(); }
+            }
+        };
+
+        this.quill = new Quill('#post-content-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: 'Write your post content here. Use the toolbar to format text, add images, videos, and files...'
+        });
+
+        // Add custom file-download button to toolbar
+        const toolbar = document.querySelector('.ql-toolbar');
+        if (toolbar) {
+            const fileBtn = toolbar.querySelector('.ql-file-download');
+            if (fileBtn) {
+                fileBtn.innerHTML = `
+                    <svg viewBox="0 0 18 18">
+                        <path d="M9,13 L9,3" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M5,9 L9,13 L13,9" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M3,15 L15,15" stroke="currentColor" stroke-width="2" fill="none"/>
+                    </svg>
+                `;
+                fileBtn.title = 'Insert downloadable file';
+            }
+        }
+    }
+
+    registerFileDownloadBlot() {
+        const BlockEmbed = Quill.import('blots/block/embed');
+
+        class FileDownloadBlot extends BlockEmbed {
+            static create(value) {
+                const node = super.create();
+                node.setAttribute('class', 'file-download-embed');
+                node.setAttribute('contenteditable', 'false');
+
+                // Determine icon based on file type
+                const ext = value.filename.split('.').pop().toLowerCase();
+                let iconClass = 'file-icon-generic';
+                if (ext === 'pdf') iconClass = 'file-icon-pdf';
+                else if (['doc', 'docx'].includes(ext)) iconClass = 'file-icon-word';
+                else if (['xls', 'xlsx'].includes(ext)) iconClass = 'file-icon-excel';
+                else if (['ppt', 'pptx'].includes(ext)) iconClass = 'file-icon-powerpoint';
+                else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) iconClass = 'file-icon-image';
+                else if (['zip', 'rar', '7z'].includes(ext)) iconClass = 'file-icon-archive';
+
+                node.innerHTML = `
+                    <div class="file-download-card">
+                        <div class="file-icon ${iconClass}"></div>
+                        <div class="file-info">
+                            <span class="file-name">${this.escapeHtml(value.filename)}</span>
+                            <span class="file-size">${value.filesize || ''}</span>
+                        </div>
+                        <a href="${value.url}" class="file-download-btn" download="${this.escapeHtml(value.filename)}" target="_blank">
+                            Download
+                        </a>
+                    </div>
+                `;
+
+                node.setAttribute('data-url', value.url);
+                node.setAttribute('data-filename', value.filename);
+                node.setAttribute('data-filesize', value.filesize || '');
+
+                return node;
+            }
+
+            static value(node) {
+                return {
+                    url: node.getAttribute('data-url'),
+                    filename: node.getAttribute('data-filename'),
+                    filesize: node.getAttribute('data-filesize')
+                };
+            }
+
+            static escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        FileDownloadBlot.blotName = 'file-download';
+        FileDownloadBlot.tagName = 'div';
+        FileDownloadBlot.className = 'file-download-embed';
+
+        Quill.register(FileDownloadBlot);
+    }
+
+    async quillImageHandler() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Check file size
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 4.5) {
+                alert(`Image too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`);
+                return;
+            }
+
+            // Show uploading indicator
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, 'Uploading image...', { italic: true, color: '#999' });
+
+            try {
+                const base64 = await this.fileToBase64(file);
+                const postId = document.getElementById('edit-post-id').value || 'draft-' + Date.now();
+
+                const result = await this.uploadFile({
+                    base64: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    type: 'image'
+                }, postId);
+
+                // Remove placeholder
+                this.quill.deleteText(range.index, 'Uploading image...'.length);
+
+                if (result.success && result.path) {
+                    this.quill.insertEmbed(range.index, 'image', result.path);
+                    this.quill.setSelection(range.index + 1);
+                } else {
+                    alert('Failed to upload image: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                this.quill.deleteText(range.index, 'Uploading image...'.length);
+                alert('Failed to upload image: ' + error.message);
+            }
+        };
+    }
+
+    quillVideoHandler() {
+        const url = prompt('Enter YouTube or Vimeo video URL:');
+        if (!url) return;
+
+        const embedUrl = this.getVideoEmbedUrl(url);
+        if (!embedUrl) {
+            alert('Please enter a valid YouTube or Vimeo URL.');
+            return;
+        }
+
+        const range = this.quill.getSelection(true);
+        this.quill.insertEmbed(range.index, 'video', embedUrl);
+        this.quill.setSelection(range.index + 1);
+    }
+
+    async quillFileHandler() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', '*/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Check file size
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 4.5) {
+                alert(`File too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`);
+                return;
+            }
+
+            // Show uploading indicator
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, 'Uploading file...', { italic: true, color: '#999' });
+
+            try {
+                const base64 = await this.fileToBase64(file);
+                const postId = document.getElementById('edit-post-id').value || 'draft-' + Date.now();
+
+                const result = await this.uploadFile({
+                    base64: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    type: 'document'
+                }, postId);
+
+                // Remove placeholder
+                this.quill.deleteText(range.index, 'Uploading file...'.length);
+
+                if (result.success && result.path) {
+                    // Format file size
+                    let filesize = '';
+                    if (file.size < 1024) {
+                        filesize = file.size + ' B';
+                    } else if (file.size < 1024 * 1024) {
+                        filesize = (file.size / 1024).toFixed(1) + ' KB';
+                    } else {
+                        filesize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+                    }
+
+                    this.quill.insertEmbed(range.index, 'file-download', {
+                        url: result.path,
+                        filename: file.name,
+                        filesize: filesize
+                    });
+                    this.quill.setSelection(range.index + 1);
+                } else {
+                    alert('Failed to upload file: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                this.quill.deleteText(range.index, 'Uploading file...'.length);
+                alert('Failed to upload file: ' + error.message);
+            }
+        };
+    }
+
+    getQuillContent() {
+        if (!this.quill) return '';
+        const html = this.quill.root.innerHTML;
+        // Return empty string if only contains empty paragraph
+        if (html === '<p><br></p>' || html === '<p></p>') return '';
+        // Sanitize with DOMPurify if available
+        if (typeof DOMPurify !== 'undefined') {
+            return DOMPurify.sanitize(html, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'blockquote', 'ul', 'ol', 'li', 'a', 'img', 'iframe', 'div', 'span'],
+                ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
+                ADD_ATTR: ['target']
+            });
+        }
+        return html;
+    }
+
+    setQuillContent(html) {
+        if (!this.quill) return;
+        if (!html) {
+            this.quill.setText('');
+            return;
+        }
+        // If content looks like plain text (no HTML tags), convert it
+        if (!/<[a-z][\s\S]*>/i.test(html)) {
+            // Convert plain text to HTML paragraphs
+            const paragraphs = html.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            this.quill.root.innerHTML = paragraphs;
+        } else {
+            this.quill.root.innerHTML = html;
+        }
     }
 
     // ========================================
@@ -297,7 +576,8 @@ class AdminDashboard {
         document.getElementById('post-category').value = post.category || '';
         document.getElementById('post-author').value = post.author || 'Les Omotani';
         document.getElementById('post-summary').value = post.summary || '';
-        document.getElementById('post-content').value = post.content || '';
+        // Load content into Quill editor (handles both HTML and plain text)
+        this.setQuillContent(post.content || '');
 
         // Featured video
         const featuredVideoInput = document.getElementById('featured-video-url');
@@ -353,6 +633,9 @@ class AdminDashboard {
         document.getElementById('edit-post-id').value = '';
         document.getElementById('post-author').value = 'Les Omotani';
         document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+
+        // Reset Quill editor content
+        this.setQuillContent('');
 
         // Reset post images gallery
         this.postImages = [];
@@ -861,7 +1144,8 @@ class AdminDashboard {
         const category = document.getElementById('post-category').value;
         const author = document.getElementById('post-author').value.trim() || 'Les Omotani';
         const summary = document.getElementById('post-summary').value.trim();
-        const content = document.getElementById('post-content').value.trim();
+        // Get content from Quill editor (sanitized HTML)
+        const content = this.getQuillContent();
 
         // Generate ID
         const id = editId || this.generateId(title, date);
@@ -962,7 +1246,8 @@ class AdminDashboard {
         const date = document.getElementById('post-date').value;
         const category = document.getElementById('post-category').value;
         const summary = document.getElementById('post-summary').value.trim();
-        const content = document.getElementById('post-content').value.trim();
+        // Get content from Quill editor instead of textarea
+        const content = this.getQuillContent();
 
         if (!title || !date || !category || !summary || !content) {
             alert('Please fill in all required fields.');
@@ -1262,6 +1547,16 @@ class AdminDashboard {
 
         const formatContent = (content) => {
             if (!content) return '';
+            // Check if content is HTML (from WYSIWYG editor)
+            const htmlPattern = /<[a-z][\s\S]*>/i;
+            if (htmlPattern.test(content)) {
+                // HTML content from WYSIWYG editor - sanitize with DOMPurify if available
+                if (typeof DOMPurify !== 'undefined') {
+                    return DOMPurify.sanitize(content);
+                }
+                return content;
+            }
+            // Legacy plain text - convert to paragraphs
             return content
                 .split(/\n\n+/)
                 .map(p => p.trim())

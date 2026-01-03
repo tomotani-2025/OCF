@@ -100,7 +100,22 @@ class BlogPost {
     formatContent(content) {
         if (!content) return '';
 
-        // Split by double newlines to create paragraphs
+        // Check if content is HTML (from WYSIWYG editor) or plain text (legacy)
+        const htmlPattern = /<[a-z][\s\S]*>/i;
+
+        if (htmlPattern.test(content)) {
+            // HTML content from WYSIWYG editor - sanitize with DOMPurify if available
+            if (typeof DOMPurify !== 'undefined') {
+                return DOMPurify.sanitize(content, {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'blockquote', 'ul', 'ol', 'li', 'a', 'img', 'iframe', 'div', 'span'],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
+                    ADD_ATTR: ['target']
+                });
+            }
+            return content;
+        }
+
+        // Legacy plain text content - convert to paragraphs
         const paragraphs = content.split(/\n\n+/);
 
         return paragraphs

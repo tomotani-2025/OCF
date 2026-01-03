@@ -3654,3 +3654,235 @@
         padding: 8px;
     }
 }
+
+/* =========================================
+   Quill Rich Text Editor Styles
+   ========================================= */
+
+/* Editor container */
+.quill-editor {
+    background: #fff;
+    border: 1px solid #d1cdc4;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Toolbar styling */
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid #e8e4db;
+    background: #faf9f6;
+    padding: 12px;
+}
+
+.ql-toolbar.ql-snow .ql-picker-label,
+.ql-toolbar.ql-snow button {
+    color: #31110F;
+}
+
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow .ql-picker-label:hover {
+    color: #C8102E;
+}
+
+.ql-toolbar.ql-snow button.ql-active,
+.ql-toolbar.ql-snow .ql-picker-label.ql-active {
+    color: #C8102E;
+}
+
+.ql-toolbar.ql-snow .ql-stroke {
+    stroke: currentColor;
+}
+
+.ql-toolbar.ql-snow .ql-fill {
+    fill: currentColor;
+}
+
+/* Editor area */
+.ql-container.ql-snow {
+    border: none;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.ql-editor {
+    min-height: 300px;
+    padding: 20px;
+    color: #31110F;
+}
+
+.ql-editor.ql-blank::before {
+    color: #999;
+    font-style: normal;
+}
+
+/* Content styles in editor */
+.ql-editor p {
+    margin-bottom: 1em;
+}
+
+.ql-editor blockquote {
+    border-left: 4px solid #C8102E;
+    padding-left: 16px;
+    margin: 1em 0;
+    color: #555;
+    font-style: italic;
+}
+
+.ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1em 0;
+}
+
+.ql-editor iframe {
+    max-width: 100%;
+    margin: 1em 0;
+    border-radius: 8px;
+}
+
+/* File download embed in editor */
+.file-download-embed {
+    margin: 1em 0;
+}
+
+.file-download-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #faf9f6;
+    border: 1px solid #e8e4db;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+.file-download-card:hover {
+    border-color: #C8102E;
+}
+
+.file-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.file-icon-pdf {
+    background-color: #fee2e2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23dc2626'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-icon-word {
+    background-color: #dbeafe;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232563eb'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-icon-excel {
+    background-color: #dcfce7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2316a34a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-icon-powerpoint {
+    background-color: #fef3c7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d97706'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-icon-image {
+    background-color: #f3e8ff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239333ea'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-icon-archive {
+    background-color: #fef9c3;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ca8a04'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4'/%3E%3C/svg%3E");
+}
+
+.file-icon-generic {
+    background-color: #f3f4f6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    display: block;
+    font-weight: 500;
+    color: #31110F;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-size {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.file-download-btn {
+    padding: 8px 16px;
+    background: #C8102E;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.file-download-btn:hover {
+    background: #a00d25;
+    color: #fff;
+}
+
+/* Custom file-download button in toolbar */
+.ql-file-download {
+    width: 28px !important;
+}
+
+.ql-file-download svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Responsive Quill */
+@media (max-width: 768px) {
+    .ql-editor {
+        min-height: 200px;
+        padding: 16px;
+    }
+
+    .ql-toolbar.ql-snow {
+        padding: 8px;
+    }
+
+    .file-download-card {
+        flex-wrap: wrap;
+    }
+
+    .file-info {
+        flex: 1 1 calc(100% - 64px);
+    }
+
+    .file-download-btn {
+        flex: 1 1 100%;
+        text-align: center;
+        margin-top: 8px;
+    }
+}
