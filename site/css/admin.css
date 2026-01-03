@@ -3042,8 +3042,9 @@
 
 /* Gallery Image Editor Modal */
 .gallery-image-editor-content {
-    max-width: 500px;
+    max-width: 550px;
     padding: 32px;
+    width: 95vw;
 }
 
 .gallery-image-editor-content .image-preview-large {
@@ -3053,13 +3054,27 @@
 
 .gallery-image-modal-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid #e8e4db;
+    margin-top: 16px;
+}
+
+.gallery-image-modal-actions .btn-danger {
+    margin-right: auto;
 }
 
 .gallery-image-modal-right-actions {
-    display: flex;
-    gap: 12px;
+    display: contents;
+}
+
+/* Make buttons more compact in gallery modal */
+.gallery-image-modal-actions .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 /* Hide remove button for new images */
