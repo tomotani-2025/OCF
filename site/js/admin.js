@@ -389,6 +389,7 @@ class AdminDashboard {
         document.getElementById('post-gallery-image-cancel').addEventListener('click', () => this.closePostGalleryModal());
         document.getElementById('post-gallery-image-remove').addEventListener('click', () => this.removePostImage());
         document.getElementById('post-gallery-set-cover').addEventListener('click', () => this.setAsCover());
+        document.getElementById('post-gallery-insert-content').addEventListener('click', () => this.insertGalleryImageIntoContent());
         document.getElementById('post-gallery-image-src').addEventListener('input', () => this.updatePostGalleryImagePreview());
         document.getElementById('post-gallery-image-file').addEventListener('change', (e) => this.handlePostGalleryImageUpload(e));
 
@@ -756,42 +757,119 @@ class AdminDashboard {
     }
 
     async handlePostGalleryImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
 
         const fileNameEl = document.getElementById('post-gallery-image-file-name');
-        if (fileNameEl) fileNameEl.textContent = 'Uploading...';
+        const postId = document.getElementById('edit-post-id').value || 'post-images';
+        const indexField = document.getElementById('post-gallery-image-index');
+        const isEditMode = indexField.value !== '';
 
-        try {
-            const base64 = await this.fileToBase64(file);
-            const postId = document.getElementById('edit-post-id').value || 'post-images';
+        // If editing single image, only use first file
+        if (isEditMode) {
+            const file = files[0];
+            if (fileNameEl) fileNameEl.textContent = 'Uploading...';
 
-            const response = await fetch(`${this.apiBase}/upload-file`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    file: base64,
-                    filename: file.name,
-                    mimeType: file.type,
-                    postId: postId,
-                    fileType: 'image'
-                })
-            });
+            try {
+                const base64 = await this.fileToBase64(file);
+                const response = await fetch(`${this.apiBase}/upload-file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file: base64,
+                        filename: file.name,
+                        mimeType: file.type,
+                        postId: postId,
+                        fileType: 'image'
+                    })
+                });
 
-            const result = await response.json();
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Upload failed');
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Upload failed');
+                document.getElementById('post-gallery-image-src').value = result.path;
+                this.updatePostGalleryImagePreview();
+                if (fileNameEl) fileNameEl.textContent = file.name;
+            } catch (error) {
+                console.error('Error uploading post gallery image:', error);
+                alert('Error uploading image: ' + error.message);
+                if (fileNameEl) fileNameEl.textContent = 'Upload failed';
             }
-
-            document.getElementById('post-gallery-image-src').value = result.path;
-            this.updatePostGalleryImagePreview();
-            if (fileNameEl) fileNameEl.textContent = file.name;
-        } catch (error) {
-            console.error('Error uploading post gallery image:', error);
-            alert('Error uploading image: ' + error.message);
-            if (fileNameEl) fileNameEl.textContent = 'Upload failed';
+            return;
         }
+
+        // Multiple file upload mode (adding new images)
+        if (fileNameEl) fileNameEl.textContent = `Uploading ${files.length} image(s)...`;
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (fileNameEl) fileNameEl.textContent = `Uploading ${i + 1} of ${files.length}...`;
+
+            try {
+                // Check file size (4.5MB limit)
+                const fileSizeMB = file.size / (1024 * 1024);
+                if (fileSizeMB > 4.5) {
+                    console.warn(`Skipping ${file.name}: too large (${fileSizeMB.toFixed(1)}MB)`);
+                    errorCount++;
+                    continue;
+                }
+
+                const base64 = await this.fileToBase64(file);
+                const response = await fetch(`${this.apiBase}/upload-file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file: base64,
+                        filename: file.name,
+                        mimeType: file.type,
+                        postId: postId,
+                        fileType: 'image'
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+                // Add image to gallery
+                this.postImages.push({
+                    src: result.path,
+                    alt: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+                });
+                successCount++;
+
+                // Set first image as cover if no cover exists
+                if (this.coverImageIndex === -1 && this.postImages.length === 1) {
+                    this.coverImageIndex = 0;
+                }
+            } catch (error) {
+                console.error(`Error uploading ${file.name}:`, error);
+                errorCount++;
+            }
+        }
+
+        // Update the gallery grid
+        this.renderPostImagesGallery();
+        this.updateCoverImagePreview();
+
+        // Show completion message
+        if (fileNameEl) {
+            if (errorCount === 0) {
+                fileNameEl.textContent = `${successCount} image(s) uploaded successfully`;
+            } else {
+                fileNameEl.textContent = `${successCount} uploaded, ${errorCount} failed`;
+            }
+        }
+
+        // Close the modal after multi-upload
+        if (successCount > 0) {
+            setTimeout(() => this.closePostGalleryModal(), 1000);
+        }
+
+        // Reset file input
+        e.target.value = '';
     }
 
     fileToBase64(file) {
@@ -874,6 +952,39 @@ class AdminDashboard {
             this.closePostGalleryModal();
             this.renderPostGalleryGrid();
         }
+    }
+
+    insertGalleryImageIntoContent() {
+        const src = document.getElementById('post-gallery-image-src').value.trim();
+        const alt = document.getElementById('post-gallery-image-alt').value.trim();
+
+        if (!src) {
+            alert('No image to insert. Please upload or enter an image path first.');
+            return;
+        }
+
+        if (!this.quill) {
+            alert('Content editor not available.');
+            return;
+        }
+
+        // Get current selection or end of content
+        const range = this.quill.getSelection(true);
+        const index = range ? range.index : this.quill.getLength();
+
+        // Insert the image into Quill
+        this.quill.insertEmbed(index, 'image', src);
+        this.quill.setSelection(index + 1);
+
+        // Close the modal
+        this.closePostGalleryModal();
+
+        // Show confirmation
+        const notification = document.createElement('div');
+        notification.className = 'toast-notification';
+        notification.textContent = 'Image inserted into content';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
     }
 
     updateCoverImagePreview() {
@@ -1669,6 +1780,7 @@ class AdminDashboard {
         this.previewModal.hidden = true;
         this.deleteModal.hidden = true;
         if (this.publishingModal) this.publishingModal.hidden = true;
+        if (this.postGalleryModal) this.postGalleryModal.hidden = true;
         document.body.style.overflow = '';
     }
 }

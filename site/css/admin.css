@@ -3656,6 +3656,37 @@
 }
 
 /* =========================================
+   Toast Notification
+   ========================================= */
+
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #31110F;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 10000;
+    animation: toast-slide-up 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes toast-slide-up {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* =========================================
    Quill Rich Text Editor Styles
    ========================================= */
 
@@ -3664,15 +3695,19 @@
     background: #fff;
     border: 1px solid #d1cdc4;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
 }
 
-/* Toolbar styling */
+/* Toolbar styling - sticky at top when scrolling */
 .ql-toolbar.ql-snow {
     border: none;
     border-bottom: 1px solid #e8e4db;
     background: #faf9f6;
     padding: 12px;
+    position: sticky;
+    top: 80px; /* Below the header */
+    z-index: 100;
+    border-radius: 8px 8px 0 0;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label,

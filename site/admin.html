@@ -346,16 +346,17 @@
                                     <div class="form-group">
                                         <label for="post-gallery-image-file">Upload Image</label>
                                         <div class="file-upload-wrapper">
-                                            <input type="file" id="post-gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                            <input type="file" id="post-gallery-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input" multiple>
                                             <label for="post-gallery-image-file" class="file-upload-btn">
                                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                     <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                     <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                 </svg>
-                                                <span>Choose File</span>
+                                                <span>Choose Files</span>
                                             </label>
-                                            <span class="file-name" id="post-gallery-image-file-name">No file chosen</span>
+                                            <span class="file-name" id="post-gallery-image-file-name">No files chosen</span>
                                         </div>
+                                        <p class="form-hint">Select multiple images at once (hold Ctrl/Cmd to select multiple)</p>
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -380,6 +381,7 @@
                             <div class="form-actions gallery-image-modal-actions">
                                 <button type="button" id="post-gallery-image-remove" class="btn btn-danger">Remove Image</button>
                                 <div class="gallery-image-modal-right-actions">
+                                    <button type="button" id="post-gallery-insert-content" class="btn btn-outline" title="Insert this image into the post content">Insert into Content</button>
                                     <button type="button" id="post-gallery-set-cover" class="btn btn-outline">Set as Cover</button>
                                     <button type="button" id="post-gallery-image-cancel" class="btn btn-outline">Cancel</button>
                                     <button type="submit" class="btn btn-primary">Save Image</button>
