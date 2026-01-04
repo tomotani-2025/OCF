@@ -3760,41 +3760,47 @@
 
 .ql-toolbar.ql-snow button:hover,
 .ql-toolbar.ql-snow .ql-picker-label:hover {
-    color: #31110F;
+    color: #31110F !important;
     background: rgba(255, 255, 255, 0.9);
 }
 
 .ql-toolbar.ql-snow button:hover .ql-stroke,
-.ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
-    stroke: #31110F;
+.ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke,
+.ql-toolbar.ql-snow button:hover .ql-stroke-miter {
+    stroke: #31110F !important;
 }
 
 .ql-toolbar.ql-snow button:hover .ql-fill,
-.ql-toolbar.ql-snow .ql-picker-label:hover .ql-fill {
-    fill: #31110F;
+.ql-toolbar.ql-snow .ql-picker-label:hover .ql-fill,
+.ql-toolbar.ql-snow button:hover .ql-fill-miter {
+    fill: #31110F !important;
 }
 
 .ql-toolbar.ql-snow button.ql-active,
 .ql-toolbar.ql-snow .ql-picker-label.ql-active {
-    color: #31110F;
+    color: #31110F !important;
     background: #fff;
 }
 
 .ql-toolbar.ql-snow button.ql-active .ql-stroke,
-.ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
-    stroke: #31110F;
+.ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke,
+.ql-toolbar.ql-snow button.ql-active .ql-stroke-miter {
+    stroke: #31110F !important;
 }
 
 .ql-toolbar.ql-snow button.ql-active .ql-fill,
-.ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-fill {
-    fill: #31110F;
+.ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-fill,
+.ql-toolbar.ql-snow button.ql-active .ql-fill-miter {
+    fill: #31110F !important;
 }
 
-.ql-toolbar.ql-snow .ql-stroke {
+.ql-toolbar.ql-snow .ql-stroke,
+.ql-toolbar.ql-snow .ql-stroke-miter {
     stroke: #fff;
 }
 
-.ql-toolbar.ql-snow .ql-fill {
+.ql-toolbar.ql-snow .ql-fill,
+.ql-toolbar.ql-snow .ql-fill-miter {
     fill: #fff;
 }
 
