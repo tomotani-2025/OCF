@@ -115,7 +115,7 @@
     <script src="js/main.js?v=3"></script>
     <script src="js/footer-loader.js"></script>
     <script src="js/supabase-client.js"></script>
-    <script src="js/news.js?v=6"></script>
+    <script src="js/news.js?v=7"></script>
 
     <style>
         /* News Page Specific Styles */
@@ -522,10 +522,12 @@
         @media (max-width: 768px) {
             .news-grid {
                 grid-template-columns: 1fr;
+                justify-items: center;
             }
 
-            .news-card {
-                max-width: 100%;
+            a.news-card {
+                max-width: 400px;
+                width: 100%;
             }
 
             .filters-sort-row {
