@@ -473,6 +473,15 @@ class BlogPost {
             preview.style.cursor = 'pointer';
         });
 
+        // Image click handler - open lightbox fullscreen
+        const carouselImages = imageContainer.querySelectorAll('.carousel-images > img.post-image');
+        carouselImages.forEach(img => {
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', () => {
+                this.openLightbox();
+            });
+        });
+
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
