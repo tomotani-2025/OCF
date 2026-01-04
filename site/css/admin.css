@@ -3951,6 +3951,9 @@
     min-height: 300px;
     padding: 20px;
     color: #31110F;
+    font-size: 18px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
 }
 
 .ql-editor.ql-blank::before {

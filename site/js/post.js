@@ -112,7 +112,7 @@ class BlogPost {
             if (typeof DOMPurify !== 'undefined') {
                 return DOMPurify.sanitize(content, {
                     ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'blockquote', 'ul', 'ol', 'li', 'a', 'img', 'iframe', 'div', 'span'],
-                    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'style', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
                     ADD_ATTR: ['target']
                 });
             }
@@ -207,13 +207,9 @@ class BlogPost {
         // Handle gallery position - move to bottom if galleryAtBottom is true
         if (post.galleryAtBottom) {
             const imageContainer = document.querySelector('.post-image-container');
-            const paginationContainer = document.querySelector('.post-image-pagination');
             if (imageContainer && contentEl) {
-                // Move image container after content
+                // Move image container after content (pagination is already inside carousel)
                 contentEl.after(imageContainer);
-                if (paginationContainer) {
-                    imageContainer.after(paginationContainer);
-                }
             }
         }
 
