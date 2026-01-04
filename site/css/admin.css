@@ -4003,6 +4003,9 @@
 }
 
 .blot-formatter__toolbar {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 4px !important;
     background: #31110F !important;
     border-radius: 6px !important;
     padding: 4px !important;
