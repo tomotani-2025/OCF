@@ -403,7 +403,7 @@ class AdminDashboard {
         if (typeof DOMPurify !== 'undefined') {
             return DOMPurify.sanitize(html, {
                 ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'blockquote', 'ul', 'ol', 'li', 'a', 'img', 'iframe', 'div', 'span'],
-                ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
+                ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', 'class', 'style', 'data-url', 'data-filename', 'data-filesize', 'download', 'frameborder', 'allowfullscreen', 'width', 'height'],
                 ADD_ATTR: ['target']
             });
         }
