@@ -324,11 +324,10 @@ class BlogPost {
             const totalImages = this.images.length;
 
             // Generate pagination dots HTML - inside carousel-images for proper positioning
+            // Max 7 regular dots + 2 small overflow indicators = show up to 9 visual elements
             const paginationHTML = this.images.length > 1 ? `
-                <div class="post-image-pagination visible">
-                    ${this.images.map((_, idx) => `
-                        <span class="pagination-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>
-                    `).join('')}
+                <div class="post-image-pagination visible" data-total="${this.images.length}">
+                    ${this.generatePaginationDots(0)}
                 </div>
             ` : '';
 
@@ -555,6 +554,60 @@ class BlogPost {
         if (nextBtn) {
             nextBtn.style.display = index === this.images.length - 1 ? 'none' : 'flex';
         }
+
+        // Update pagination dots for sliding window
+        const paginationContainer = document.querySelector('.post-image-pagination');
+        if (paginationContainer && this.images.length > 7) {
+            paginationContainer.innerHTML = this.generatePaginationDots(index);
+        }
+    }
+
+    generatePaginationDots(activeIndex) {
+        const total = this.images.length;
+        const maxDots = 7; // Maximum visible dots
+
+        // If 7 or fewer images, show all dots
+        if (total <= maxDots) {
+            return this.images.map((_, idx) =>
+                `<span class="pagination-dot ${idx === activeIndex ? 'active' : ''}" data-index="${idx}"></span>`
+            ).join('');
+        }
+
+        // Sliding window pagination for more than 7 images
+        let dots = [];
+        let startIdx, endIdx;
+
+        // Calculate window position
+        if (activeIndex <= 3) {
+            // Near the start: show first 5 + small dot + last
+            startIdx = 0;
+            endIdx = 4;
+            for (let i = startIdx; i <= endIdx; i++) {
+                dots.push(`<span class="pagination-dot ${i === activeIndex ? 'active' : ''}" data-index="${i}"></span>`);
+            }
+            dots.push(`<span class="pagination-dot pagination-dot-small" data-index="${endIdx + 1}"></span>`);
+            dots.push(`<span class="pagination-dot pagination-dot-end" data-index="${total - 1}"></span>`);
+        } else if (activeIndex >= total - 4) {
+            // Near the end: show first + small dot + last 5
+            startIdx = total - 5;
+            endIdx = total - 1;
+            dots.push(`<span class="pagination-dot pagination-dot-end" data-index="0"></span>`);
+            dots.push(`<span class="pagination-dot pagination-dot-small" data-index="${startIdx - 1}"></span>`);
+            for (let i = startIdx; i <= endIdx; i++) {
+                dots.push(`<span class="pagination-dot ${i === activeIndex ? 'active' : ''}" data-index="${i}"></span>`);
+            }
+        } else {
+            // In the middle: show first + small + 3 middle + small + last
+            dots.push(`<span class="pagination-dot pagination-dot-end" data-index="0"></span>`);
+            dots.push(`<span class="pagination-dot pagination-dot-small" data-index="${activeIndex - 2}"></span>`);
+            for (let i = activeIndex - 1; i <= activeIndex + 1; i++) {
+                dots.push(`<span class="pagination-dot ${i === activeIndex ? 'active' : ''}" data-index="${i}"></span>`);
+            }
+            dots.push(`<span class="pagination-dot pagination-dot-small" data-index="${activeIndex + 2}"></span>`);
+            dots.push(`<span class="pagination-dot pagination-dot-end" data-index="${total - 1}"></span>`);
+        }
+
+        return dots.join('');
     }
 
     setupNavigation() {
