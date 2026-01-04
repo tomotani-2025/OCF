@@ -173,13 +173,14 @@ class NewsCMS {
     }
 
     formatDate(dateString) {
-        const date = new Date(dateString);
+        // Parse date string as local date (not UTC) to avoid timezone issues
+        const [year, month, day] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const day = date.getDate();
         const suffix = day === 1 || day === 21 || day === 31 ? 'st' :
                        day === 2 || day === 22 ? 'nd' :
                        day === 3 || day === 23 ? 'rd' : 'th';
-        return `${months[date.getMonth()]} ${day}${suffix}, ${date.getFullYear()}`;
+        return `${months[month - 1]} ${day}${suffix}, ${year}`;
     }
 
     createPostCard(post) {

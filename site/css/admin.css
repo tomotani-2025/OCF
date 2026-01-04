@@ -3984,6 +3984,56 @@
     border-radius: 8px;
 }
 
+/* Blot Formatter - Image/Video Resizing */
+.blot-formatter__overlay {
+    border: 2px solid #EF3A4F !important;
+    box-shadow: 0 0 0 4px rgba(239, 58, 79, 0.15) !important;
+}
+
+.blot-formatter__resize-handle {
+    width: 12px !important;
+    height: 12px !important;
+    background-color: #EF3A4F !important;
+    border: 2px solid white !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.blot-formatter__toolbar {
+    background: #31110F !important;
+    border-radius: 6px !important;
+    padding: 4px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.blot-formatter__toolbar-button {
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s !important;
+}
+
+.blot-formatter__toolbar-button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.blot-formatter__toolbar-button svg {
+    fill: white !important;
+    width: 18px !important;
+    height: 18px !important;
+}
+
+/* Ensure images in editor can be selected */
+.ql-editor img {
+    cursor: pointer;
+}
+
 /* File download embed in editor */
 .file-download-embed {
     margin: 1em 0;

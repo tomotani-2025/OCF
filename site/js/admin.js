@@ -69,6 +69,11 @@ class AdminDashboard {
         // Register custom file download blot
         this.registerFileDownloadBlot();
 
+        // Register Blot Formatter for image/video resizing
+        if (typeof QuillBlotFormatter !== 'undefined') {
+            Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
+        }
+
         // Custom toolbar handlers
         const self = this;
         const toolbarOptions = {
@@ -92,7 +97,8 @@ class AdminDashboard {
         this.quill = new Quill('#post-content-editor', {
             theme: 'snow',
             modules: {
-                toolbar: toolbarOptions
+                toolbar: toolbarOptions,
+                blotFormatter: {}  // Enable image/video resizing
             },
             placeholder: 'Write your post content here. Use the toolbar to format text, add images, videos, and files...'
         });
@@ -444,7 +450,8 @@ class AdminDashboard {
                 images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
                 videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
                 pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
-                featuredVideo: post.featured_video
+                featuredVideo: post.featured_video,
+                galleryAtBottom: post.gallery_at_bottom || false
             }));
 
             this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -1610,7 +1617,8 @@ class AdminDashboard {
                 images: JSON.stringify(imagesArray),
                 videos: JSON.stringify(postData.videos || []),
                 pdfs: JSON.stringify(postData.pdfs || []),
-                featured_video: featuredVideoUrl
+                featured_video: featuredVideoUrl,
+                gallery_at_bottom: cleanData.galleryAtBottom || false
             };
 
             if (this.editingPostId) {

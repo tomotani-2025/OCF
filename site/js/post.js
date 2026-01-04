@@ -72,7 +72,8 @@ class BlogPost {
             images: typeof post.images === 'string' ? JSON.parse(post.images) : (post.images || []),
             videos: typeof post.videos === 'string' ? JSON.parse(post.videos) : (post.videos || []),
             pdfs: typeof post.pdfs === 'string' ? JSON.parse(post.pdfs) : (post.pdfs || []),
-            featuredVideo: post.featured_video
+            featuredVideo: post.featured_video,
+            galleryAtBottom: post.gallery_at_bottom || false
         }));
 
         // Sort by date (newest first)
@@ -87,7 +88,10 @@ class BlogPost {
     }
 
     formatDate(dateString) {
-        const date = new Date(dateString);
+        // Parse date string as local date (not UTC) to avoid timezone issues
+        // Input format: "2026-01-01" should display as January 1, 2026 regardless of timezone
+        const [year, month, day] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
         const options = {
             weekday: 'long',
             year: 'numeric',
