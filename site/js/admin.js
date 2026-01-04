@@ -78,7 +78,7 @@ class AdminDashboard {
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],          // Lists
                 [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }],  // Text alignment
                 ['link'],                                              // Links
-                ['image', 'gallery-pick', 'video', 'file-download'],   // Media
+                ['gallery-pick', 'image', 'video', 'file-download'],   // Media
                 ['clean']                                              // Clear formatting
             ],
             handlers: {
@@ -140,6 +140,19 @@ class AdminDashboard {
                 videoBtn.title = 'Embed YouTube/Vimeo video';
             }
         }
+
+        // Prevent scroll to top when content changes
+        this.quill.on('text-change', (delta, oldDelta, source) => {
+            if (source === 'user' || source === 'api') {
+                // Preserve scroll position
+                const scrollY = window.scrollY;
+                requestAnimationFrame(() => {
+                    if (Math.abs(window.scrollY - scrollY) > 100) {
+                        window.scrollTo(0, scrollY);
+                    }
+                });
+            }
+        });
     }
 
     quillGalleryPickHandler() {
@@ -704,6 +717,12 @@ class AdminDashboard {
         if (post.pdfs && post.pdfs.length > 0) {
             post.pdfs.forEach(pdf => this.addPdf(pdf.url, pdf.title, pdf.description));
         }
+
+        // Gallery position toggle
+        const galleryPositionToggle = document.getElementById('gallery-position-bottom');
+        if (galleryPositionToggle) {
+            galleryPositionToggle.checked = post.galleryAtBottom || false;
+        }
     }
 
     resetForm() {
@@ -728,6 +747,12 @@ class AdminDashboard {
 
         // Reset featured video preview
         this.updateFeaturedVideoPreview();
+
+        // Reset gallery position toggle
+        const galleryPositionToggle = document.getElementById('gallery-position-bottom');
+        if (galleryPositionToggle) {
+            galleryPositionToggle.checked = false;
+        }
     }
 
     // ========================================
@@ -743,7 +768,10 @@ class AdminDashboard {
         this.postImages.forEach((img, index) => {
             const isCover = index === this.coverImageIndex;
             html += `
-                <div class="gallery-grid-item${isCover ? ' is-cover' : ''}" data-index="${index}">
+                <div class="gallery-grid-item${isCover ? ' is-cover' : ''}" data-index="${index}" draggable="true">
+                    <div class="gallery-grid-item-drag-handle" title="Drag to reorder">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm8-12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm0 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/></svg>
+                    </div>
                     <img src="${img.src}" alt="${img.alt || ''}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 75%22%3E%3Crect fill=%22%23f7f4eb%22 width=%22100%22 height=%2275%22/%3E%3Ctext x=%2250%22 y=%2237.5%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2210%22%3EImage not found%3C/text%3E%3C/svg%3E'">
                     <div class="gallery-grid-item-overlay">
                         <span>Click to edit</span>
@@ -766,7 +794,9 @@ class AdminDashboard {
 
         // Add click handlers
         this.galleryContainer.querySelectorAll('.gallery-grid-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                // Don't open modal if clicking on drag handle
+                if (e.target.closest('.gallery-grid-item-drag-handle')) return;
                 const index = parseInt(item.dataset.index);
                 this.openPostImageModal(index);
             });
@@ -774,6 +804,71 @@ class AdminDashboard {
 
         document.getElementById('post-gallery-add-btn').addEventListener('click', () => {
             this.openPostImageModal(-1); // -1 = new image
+        });
+
+        // Setup drag and drop
+        this.setupGalleryDragDrop();
+    }
+
+    setupGalleryDragDrop() {
+        const items = this.galleryContainer.querySelectorAll('.gallery-grid-item');
+        let draggedItem = null;
+        let draggedIndex = -1;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = item;
+                draggedIndex = parseInt(item.dataset.index);
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', () => {
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                }
+                draggedItem = null;
+                draggedIndex = -1;
+                // Remove all drag-over classes
+                this.galleryContainer.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            });
+
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (item !== draggedItem) {
+                    item.classList.add('drag-over');
+                }
+            });
+
+            item.addEventListener('dragleave', () => {
+                item.classList.remove('drag-over');
+            });
+
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over');
+
+                const targetIndex = parseInt(item.dataset.index);
+                if (draggedIndex !== -1 && targetIndex !== draggedIndex) {
+                    // Reorder the images array
+                    const [movedImage] = this.postImages.splice(draggedIndex, 1);
+                    this.postImages.splice(targetIndex, 0, movedImage);
+
+                    // Update cover index if needed
+                    if (this.coverImageIndex === draggedIndex) {
+                        this.coverImageIndex = targetIndex;
+                    } else if (draggedIndex < this.coverImageIndex && targetIndex >= this.coverImageIndex) {
+                        this.coverImageIndex--;
+                    } else if (draggedIndex > this.coverImageIndex && targetIndex <= this.coverImageIndex) {
+                        this.coverImageIndex++;
+                    }
+
+                    // Re-render the grid
+                    this.renderPostGalleryGrid();
+                    this.updateCoverImagePreview();
+                }
+            });
         });
     }
 
@@ -1394,6 +1489,9 @@ class AdminDashboard {
             }
         });
 
+        // Gallery position toggle
+        const galleryAtBottom = document.getElementById('gallery-position-bottom')?.checked || false;
+
         return {
             id,
             title,
@@ -1404,6 +1502,7 @@ class AdminDashboard {
             image: coverImage,
             imageAlt: coverImageAlt,
             images: images.length > 0 ? images : [],
+            galleryAtBottom,
             featuredVideo: featuredVideo,
             videos: videos.length > 0 ? videos : [],
             pdfs: pdfs.length > 0 ? pdfs : [],

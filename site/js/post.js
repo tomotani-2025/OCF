@@ -200,6 +200,19 @@ class BlogPost {
             contentEl.innerHTML = this.formatContent(post.content);
         }
 
+        // Handle gallery position - move to bottom if galleryAtBottom is true
+        if (post.galleryAtBottom) {
+            const imageContainer = document.querySelector('.post-image-container');
+            const paginationContainer = document.querySelector('.post-image-pagination');
+            if (imageContainer && contentEl) {
+                // Move image container after content
+                contentEl.after(imageContainer);
+                if (paginationContainer) {
+                    imageContainer.after(paginationContainer);
+                }
+            }
+        }
+
         // Videos
         this.renderVideos(post);
 

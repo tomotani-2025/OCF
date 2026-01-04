@@ -209,8 +209,17 @@
 
                         <!-- Image Gallery -->
                         <div class="form-section">
-                            <h2>Images</h2>
-                            <p class="form-help">Click on an image to edit, remove, or set as cover. Multiple images will display as a carousel.</p>
+                            <div class="form-section-header">
+                                <div>
+                                    <h2>Images</h2>
+                                    <p class="form-help">Click on an image to edit, remove, or set as cover. Multiple images will display as a carousel.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="gallery-position-bottom">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">Gallery at bottom</span>
+                                </label>
+                            </div>
                             <div id="post-gallery-container" class="gallery-grid-container">
                                 <!-- Gallery items will be rendered as a grid by JS -->
                             </div>
