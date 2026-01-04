@@ -69,6 +69,35 @@ class AdminDashboard {
         // Register custom file download blot
         this.registerFileDownloadBlot();
 
+        // Register custom Image blot that preserves style attribute for alignment
+        const BaseImage = Quill.import('formats/image');
+        class StyledImage extends BaseImage {
+            static formats(domNode) {
+                return {
+                    alt: domNode.getAttribute('alt'),
+                    src: domNode.getAttribute('src'),
+                    style: domNode.getAttribute('style'),
+                    width: domNode.getAttribute('width'),
+                    height: domNode.getAttribute('height')
+                };
+            }
+
+            format(name, value) {
+                if (['alt', 'src', 'style', 'width', 'height'].includes(name)) {
+                    if (value) {
+                        this.domNode.setAttribute(name, value);
+                    } else {
+                        this.domNode.removeAttribute(name);
+                    }
+                } else {
+                    super.format(name, value);
+                }
+            }
+        }
+        StyledImage.blotName = 'image';
+        StyledImage.tagName = 'IMG';
+        Quill.register(StyledImage, true);
+
         // Register Blot Formatter for image/video resizing
         if (typeof QuillBlotFormatter !== 'undefined') {
             Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
