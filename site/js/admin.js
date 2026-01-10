@@ -176,16 +176,24 @@ class AdminDashboard {
             }
         }
 
-        // Prevent scroll to top when content changes
+        // Prevent scroll to top when pasting content
+        // Capture scroll position before paste and restore after
+        let savedScrollY = null;
+
+        this.quill.root.addEventListener('paste', () => {
+            savedScrollY = window.scrollY;
+        });
+
         this.quill.on('text-change', (delta, oldDelta, source) => {
-            if (source === 'user' || source === 'api') {
-                // Preserve scroll position
-                const scrollY = window.scrollY;
-                requestAnimationFrame(() => {
-                    if (Math.abs(window.scrollY - scrollY) > 100) {
-                        window.scrollTo(0, scrollY);
-                    }
-                });
+            if (source === 'user' && savedScrollY !== null) {
+                // Restore scroll position after paste
+                const targetScroll = savedScrollY;
+                savedScrollY = null;
+
+                // Use setTimeout to ensure DOM has updated
+                setTimeout(() => {
+                    window.scrollTo(0, targetScroll);
+                }, 0);
             }
         });
     }
@@ -1626,12 +1634,14 @@ class AdminDashboard {
             // Get images array (use postData since cleanObject may have removed empty arrays)
             const imagesArray = postData.images || [];
 
-            // Get primary image from images array or cleanData.image
-            let postImage = imagesArray.length > 0 ? imagesArray[0].src : (cleanData.image || null);
+            // Get cover image - use the selected cover from collectFormData, not the first image
+            let postImage = cleanData.image || null;
+            let postImageAlt = cleanData.imageAlt || cleanData.title || null;
 
             // Auto-generate thumbnail from YouTube video if no image provided
             if (!postImage && featuredVideoUrl) {
                 postImage = this.getVideoThumbnail(featuredVideoUrl);
+                postImageAlt = cleanData.title || null;
             }
 
             // Transform camelCase to snake_case for database
@@ -1642,7 +1652,7 @@ class AdminDashboard {
                 category: cleanData.category,
                 author: cleanData.author || 'Les Omotani',
                 image: postImage,
-                image_alt: imagesArray.length > 0 ? (imagesArray[0].alt || cleanData.title) : (cleanData.title || null),
+                image_alt: postImageAlt,
                 summary: cleanData.summary,
                 content: cleanData.content,
                 images: JSON.stringify(imagesArray),
