@@ -475,8 +475,11 @@ class BlogPost {
         if (this.images.length <= 1) return;
 
         // Find the image container with the carousel (not the featured video container)
-        const imageContainer = document.querySelector('.post-image-container:has(.carousel-wrapper)')
-            || document.querySelector('.post-image-container');
+        let imageContainer = null;
+        document.querySelectorAll('.post-image-container').forEach(el => {
+            if (el.querySelector('.carousel-wrapper')) imageContainer = el;
+        });
+        if (!imageContainer) imageContainer = document.querySelector('.post-image-container');
         const paginationContainer = document.querySelector('.post-image-pagination');
 
         if (!imageContainer) return;
