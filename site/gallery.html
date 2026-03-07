@@ -317,6 +317,11 @@
                     `;
                 }).join('');
 
+                // Re-initialize scroll reveal for dynamically added tiles
+                if (window.initRevealAnimations) {
+                    window.initRevealAnimations();
+                }
+
             } catch (error) {
                 console.error('Error loading albums:', error);
                 grid.innerHTML = '<p class="error-message">Failed to load albums. Please try again later.</p>';
