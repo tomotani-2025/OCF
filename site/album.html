@@ -79,18 +79,6 @@
         </section>
     </main>
 
-    <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" aria-label="Close">&times;</button>
-        <button class="lightbox-prev" aria-label="Previous">&lsaquo;</button>
-        <button class="lightbox-next" aria-label="Next">&rsaquo;</button>
-        <div class="lightbox-content">
-            <img src="" alt="">
-            <video controls style="display:none; max-width:100%; max-height:85vh;"></video>
-        </div>
-        <div class="lightbox-caption"></div>
-    </div>
-
     <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-header">
@@ -221,84 +209,6 @@
             opacity: 1;
         }
 
-        /* Lightbox styles */
-        .lightbox {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .lightbox.active {
-            display: flex;
-        }
-
-        .lightbox-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 3rem;
-            color: var(--color-white);
-            background: none;
-            border: none;
-            cursor: pointer;
-            z-index: 2001;
-        }
-
-        .lightbox-prev,
-        .lightbox-next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 3rem;
-            color: var(--color-white);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 20px;
-            z-index: 2001;
-        }
-
-        .lightbox-prev { left: 20px; }
-        .lightbox-next { right: 20px; }
-
-        .lightbox-content {
-            max-width: 90%;
-            max-height: 85vh;
-            text-align: center;
-        }
-
-        .lightbox-content img {
-            max-width: 100%;
-            max-height: 85vh;
-            object-fit: contain;
-        }
-
-        .lightbox-content video {
-            max-width: 100%;
-            max-height: 85vh;
-        }
-
-        .lightbox-caption {
-            color: #fff;
-            font-size: 14px;
-            text-align: center;
-            padding: 12px 20px;
-            max-width: 600px;
-            opacity: 0.8;
-        }
-
-        .lightbox-caption:empty {
-            display: none;
-        }
-
         .loading-message,
         .no-images,
         .error-message {
@@ -359,98 +269,32 @@
 
                     if (isVideo) {
                         return `
-                            <div class="gallery-item" data-index="${index}" data-type="video" data-src="${src}" data-caption="${caption.replace(/"/g, '&quot;')}">
-                                <video src="${src}" muted preload="metadata"></video>
+                            <div class="gallery-item">
+                                <video src="${src}" muted preload="metadata" data-caption="${caption.replace(/"/g, '&quot;')}"></video>
                                 <div class="video-play-icon"></div>
                                 ${caption ? `<div class="item-caption">${caption}</div>` : ''}
                             </div>
                         `;
                     } else {
                         return `
-                            <div class="gallery-item" data-index="${index}" data-type="image" data-src="${src}" data-caption="${caption.replace(/"/g, '&quot;')}">
-                                <img src="${src}" alt="${alt}" loading="lazy">
+                            <div class="gallery-item">
+                                <img src="${src}" alt="${alt || caption}" loading="lazy">
                                 ${caption ? `<div class="item-caption">${caption}</div>` : ''}
                             </div>
                         `;
                     }
                 }).join('');
 
-                // Initialize lightbox
-                initLightbox(images);
+                // Use the same lightbox as posts (from main.js)
+                if (window.initGalleryLightbox) {
+                    window.initGalleryLightbox();
+                }
 
             } catch (error) {
                 console.error('Error loading album:', error);
                 grid.innerHTML = '<p class="error-message">Failed to load album. Please try again later.</p>';
             }
         });
-
-        function initLightbox(images) {
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImg = lightbox.querySelector('img');
-            const lightboxVideo = lightbox.querySelector('video');
-            const lightboxCaption = lightbox.querySelector('.lightbox-caption');
-            const closeBtn = lightbox.querySelector('.lightbox-close');
-            const prevBtn = lightbox.querySelector('.lightbox-prev');
-            const nextBtn = lightbox.querySelector('.lightbox-next');
-            const galleryItems = document.querySelectorAll('.gallery-item');
-            let currentIndex = 0;
-
-            function showItem(index) {
-                currentIndex = index;
-                const item = galleryItems[currentIndex];
-                const isVideo = item.dataset.type === 'video';
-                const src = item.dataset.src;
-                const caption = item.dataset.caption || '';
-
-                if (isVideo) {
-                    lightboxImg.style.display = 'none';
-                    lightboxVideo.style.display = 'block';
-                    lightboxVideo.src = src;
-                    lightboxVideo.play();
-                } else {
-                    lightboxVideo.style.display = 'none';
-                    lightboxVideo.pause();
-                    lightboxVideo.src = '';
-                    lightboxImg.style.display = 'block';
-                    lightboxImg.src = src;
-                    lightboxImg.alt = item.querySelector('img')?.alt || 'Gallery image';
-                }
-
-                lightboxCaption.textContent = caption;
-            }
-
-            function openLightbox(index) {
-                showItem(index);
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeLightbox() {
-                lightbox.classList.remove('active');
-                document.body.style.overflow = '';
-                lightboxVideo.pause();
-                lightboxVideo.src = '';
-            }
-
-            galleryItems.forEach((item, index) => {
-                item.addEventListener('click', () => openLightbox(index));
-            });
-
-            closeBtn.addEventListener('click', closeLightbox);
-            prevBtn.addEventListener('click', () => showItem((currentIndex - 1 + galleryItems.length) % galleryItems.length));
-            nextBtn.addEventListener('click', () => showItem((currentIndex + 1) % galleryItems.length));
-
-            lightbox.addEventListener('click', (e) => {
-                if (e.target === lightbox) closeLightbox();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (!lightbox.classList.contains('active')) return;
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowLeft') showItem((currentIndex - 1 + galleryItems.length) % galleryItems.length);
-                if (e.key === 'ArrowRight') showItem((currentIndex + 1) % galleryItems.length);
-            });
-        }
     </script>
 </body>
 </html>
