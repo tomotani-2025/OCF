@@ -3468,6 +3468,14 @@
     color: #EF3A4F;
 }
 
+.toast-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.toast-info .toast-icon {
+    color: #3b82f6;
+}
+
 /* =========================================
    Bulk Upload Modal
    ========================================= */
@@ -3796,37 +3804,6 @@
 
     .btn-logout {
         padding: 8px;
-    }
-}
-
-/* =========================================
-   Toast Notification
-   ========================================= */
-
-.toast-notification {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #31110F;
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 10000;
-    animation: toast-slide-up 0.3s ease-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes toast-slide-up {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -4270,4 +4247,160 @@
         text-align: center;
         margin-top: 8px;
     }
+}
+
+/* =========================================
+   Sticky Form Actions Bar
+   ========================================= */
+
+#post-form > .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: #FFFFFF;
+    padding: 16px 20px;
+    margin: 0 -20px;
+    border-top: 1px solid rgba(49, 17, 15, 0.1);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+/* =========================================
+   Collapsible Form Sections
+   ========================================= */
+
+.form-section.collapsible > h2 {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-section.collapsible > h2::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #31110F;
+    border-bottom: 2px solid #31110F;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.form-section.collapsible.collapsed > h2::after {
+    transform: rotate(-45deg);
+}
+
+.form-section.collapsible.collapsed > *:not(h2) {
+    display: none;
+}
+
+/* =========================================
+   Gallery Drag-and-Drop Overlay
+   ========================================= */
+
+.gallery-drop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(239, 58, 79, 0.08);
+    border: 3px dashed #EF3A4F;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.gallery-drop-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #EF3A4F;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.gallery-drop-message svg {
+    width: 48px;
+    height: 48px;
+}
+
+/* Video Drop Overlay (scoped to section) */
+.video-drop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(239, 58, 79, 0.08);
+    border: 3px dashed #EF3A4F;
+    border-radius: 8px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* =========================================
+   Inline Form Validation
+   ========================================= */
+
+.field-invalid {
+    border-color: #EF3A4F !important;
+    box-shadow: 0 0 0 2px rgba(239, 58, 79, 0.15);
+}
+
+.field-error-msg {
+    color: #EF3A4F;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* =========================================
+   Cover Image Upload
+   ========================================= */
+
+.cover-upload-wrapper {
+    margin-top: 8px;
+}
+
+.cover-upload-wrapper .file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+.file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #F7F4EB;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #31110F;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.file-upload-btn:hover {
+    background: #efe9d8;
+    border-color: rgba(49, 17, 15, 0.4);
+}
+
+.file-upload-btn svg {
+    width: 16px;
+    height: 16px;
 }

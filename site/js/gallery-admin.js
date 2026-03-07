@@ -83,6 +83,25 @@ class GalleryAdmin {
         document.getElementById('cancel-album-edit')?.addEventListener('click', () => this.hideAlbumEditor());
         document.querySelector('#album-editor-modal .modal-close')?.addEventListener('click', () => this.hideAlbumEditor());
 
+        // Auto-generate slug and directory from album name
+        document.getElementById('album-name')?.addEventListener('input', (e) => {
+            const slugField = document.getElementById('album-slug');
+            const dirField = document.getElementById('album-directory');
+            if (slugField && !slugField.dataset.manual) {
+                const slug = e.target.value.toLowerCase().trim()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-');
+                slugField.value = slug;
+                if (dirField && !dirField.dataset.manual) {
+                    dirField.value = slug;
+                }
+            }
+        });
+        // Mark fields as manually edited so auto-gen stops
+        document.getElementById('album-slug')?.addEventListener('input', function() { this.dataset.manual = '1'; });
+        document.getElementById('album-directory')?.addEventListener('input', function() { this.dataset.manual = '1'; });
+
         // Image editor modal
         document.getElementById('image-form')?.addEventListener('submit', (e) => this.saveImage(e));
         document.getElementById('cancel-image-edit')?.addEventListener('click', () => this.hideImageEditor());
@@ -110,7 +129,7 @@ class GalleryAdmin {
 
         // Search and filter
         document.getElementById('search-images')?.addEventListener('input', (e) => this.filterImages(e.target.value));
-        document.getElementById('filter-category')?.addEventListener('change', (e) => this.filterByCategory(e.target.value));
+        document.getElementById('filter-images-category')?.addEventListener('change', (e) => this.filterByCategory(e.target.value));
     }
 
     // ========================================
@@ -287,21 +306,30 @@ class GalleryAdmin {
         const modal = document.getElementById('album-editor-modal');
         const form = document.getElementById('album-form');
 
+        const slugField = document.getElementById('album-slug');
+        const dirField = document.getElementById('album-directory');
+
         if (albumId) {
             const album = this.albums.find(a => a.id === albumId);
             document.getElementById('album-editor-title').textContent = 'Edit Album';
             document.getElementById('album-name').value = album.name || '';
             document.getElementById('album-label').value = album.label || '';
             document.getElementById('album-title').value = album.title || '';
-            document.getElementById('album-slug').value = album.slug || '';
-            document.getElementById('album-directory').value = album.directory_name || '';
+            slugField.value = album.slug || '';
+            dirField.value = album.directory_name || '';
             document.getElementById('album-description').value = album.description || '';
             document.getElementById('album-sort-order').value = album.sort_order || 0;
             document.getElementById('album-is-active').checked = album.is_active;
+            // Mark as manual so auto-gen doesn't overwrite existing values
+            slugField.dataset.manual = '1';
+            dirField.dataset.manual = '1';
         } else {
             document.getElementById('album-editor-title').textContent = 'Create New Album';
             form.reset();
             document.getElementById('album-is-active').checked = true;
+            // Allow auto-generation for new albums
+            delete slugField.dataset.manual;
+            delete dirField.dataset.manual;
         }
 
         modal.hidden = false;
@@ -1035,7 +1063,7 @@ class GalleryAdmin {
                         <path d="M21 21l-4.35-4.35"></path>
                     </svg>
                     <p>No images match your search</p>
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('search-images').value=''; document.getElementById('filter-category').value='all'; galleryAdmin.renderImages();">Clear Filters</button>
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('search-images').value=''; document.getElementById('filter-images-category').value='all'; galleryAdmin.renderImages();">Clear Filters</button>
                 </div>
             `;
             return;

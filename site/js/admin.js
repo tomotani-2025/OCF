@@ -10,6 +10,47 @@
  * - Search and filter posts
  */
 
+// ============================================================
+// Toast Notification Utility
+// ============================================================
+
+function showToast(message, type = 'info') {
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+
+    const icons = {
+        success: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>',
+        error: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <span class="toast-icon">${icons[type] || icons.info}</span>
+            <span class="toast-message">${message}</span>
+        </div>
+        <button class="toast-close">&times;</button>
+    `;
+
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('toast-visible'));
+
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.classList.add('toast-hiding');
+        setTimeout(() => toast.remove(), 300);
+    });
+
+    const duration = type === 'error' ? 6000 : 3500;
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.classList.add('toast-hiding');
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, duration);
+}
+
+
 class AdminDashboard {
     constructor() {
         this.dataUrl = 'data/news-posts.json?v=' + Date.now();
@@ -44,6 +85,11 @@ class AdminDashboard {
 
         // Quill rich text editor instance
         this.quill = null;
+
+        // UX: Dirty tracking and autosave
+        this._dirty = false;
+        this._autosaveTimer = null;
+        this._autosaveKey = null;
 
         this.init();
     }
@@ -201,7 +247,7 @@ class AdminDashboard {
     quillGalleryPickHandler() {
         // Show a picker with images from the post gallery
         if (!this.postImages || this.postImages.length === 0) {
-            alert('No images in gallery yet. Add images to the gallery below first, or use the image button to upload a new one.');
+            showToast('No images in gallery yet. Add images to the gallery below first, or use the image button to upload a new one.', 'info');
             return;
         }
 
@@ -319,7 +365,7 @@ class AdminDashboard {
             // Check file size
             const fileSizeMB = file.size / (1024 * 1024);
             if (fileSizeMB > 4.5) {
-                alert(`Image too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`);
+                showToast(`Image too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`, 'error');
                 return;
             }
 
@@ -345,11 +391,11 @@ class AdminDashboard {
                     this.quill.insertEmbed(range.index, 'image', result.path);
                     this.quill.setSelection(range.index + 1);
                 } else {
-                    alert('Failed to upload image: ' + (result.error || 'Unknown error'));
+                    showToast('Failed to upload image: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 this.quill.deleteText(range.index, 'Uploading image...'.length);
-                alert('Failed to upload image: ' + error.message);
+                showToast('Failed to upload image: ' + error.message, 'error');
             }
         };
     }
@@ -360,7 +406,7 @@ class AdminDashboard {
 
         const embedUrl = this.getVideoEmbedUrl(url);
         if (!embedUrl) {
-            alert('Please enter a valid YouTube or Vimeo URL.');
+            showToast('Please enter a valid YouTube or Vimeo URL.', 'error');
             return;
         }
 
@@ -382,7 +428,7 @@ class AdminDashboard {
             // Check file size
             const fileSizeMB = file.size / (1024 * 1024);
             if (fileSizeMB > 4.5) {
-                alert(`File too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`);
+                showToast(`File too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`, 'error');
                 return;
             }
 
@@ -422,11 +468,11 @@ class AdminDashboard {
                     });
                     this.quill.setSelection(range.index + 1);
                 } else {
-                    alert('Failed to upload file: ' + (result.error || 'Unknown error'));
+                    showToast('Failed to upload file: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 this.quill.deleteText(range.index, 'Uploading file...'.length);
-                alert('Failed to upload file: ' + error.message);
+                showToast('Failed to upload file: ' + error.message, 'error');
             }
         };
     }
@@ -508,7 +554,7 @@ class AdminDashboard {
         // Dashboard actions
         document.getElementById('create-new-btn').addEventListener('click', () => this.showEditor());
         document.getElementById('search-posts').addEventListener('input', (e) => this.filterPosts(e.target.value));
-        document.getElementById('filter-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
+        document.getElementById('filter-posts-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
 
         // Editor actions
         document.getElementById('back-to-dashboard').addEventListener('click', () => this.showDashboard());
@@ -542,7 +588,7 @@ class AdminDashboard {
 
                 const fileSizeMB = file.size / (1024 * 1024);
                 if (fileSizeMB > 50) {
-                    alert(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`);
+                    showToast(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`, 'error');
                     e.target.value = '';
                     return;
                 }
@@ -592,17 +638,72 @@ class AdminDashboard {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.closeAllModals();
         });
+
+        // Cover image direct upload
+        const coverFileInput = document.getElementById('cover-image-file');
+        if (coverFileInput) {
+            coverFileInput.addEventListener('change', (e) => this.handleCoverImageUpload(e));
+        }
+
+        // Dirty tracking: mark form dirty on any input change
+        this.form.addEventListener('input', () => this.markDirty());
+        this.form.addEventListener('change', () => this.markDirty());
+
+        // Unsaved changes: warn before leaving page
+        window.addEventListener('beforeunload', (e) => {
+            if (this._dirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Inline validation: blur handlers for required fields
+        ['post-title', 'post-date', 'post-category', 'post-summary'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('blur', () => this.validateField(el));
+                el.addEventListener('input', () => {
+                    if (el.classList.contains('field-invalid')) this.validateField(el);
+                });
+            }
+        });
+
+        // Drag-and-drop images onto gallery
+        this.setupGalleryDropZone();
+
+        // Drag-and-drop videos onto video sections
+        this.setupVideoDropZones();
+
+        // Collapsible sections
+        this.form.querySelectorAll('.form-section.collapsible > h2').forEach(h2 => {
+            h2.addEventListener('click', () => {
+                h2.parentElement.classList.toggle('collapsed');
+            });
+        });
+
+        // Keyboard shortcut: Ctrl+S to save
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && !this.editor.hidden) {
+                e.preventDefault();
+                this.form.requestSubmit();
+            }
+        });
     }
 
     // ========================================
     // Dashboard View
     // ========================================
 
-    showDashboard() {
+    showDashboard(force = false) {
+        if (!force && this._dirty) {
+            if (!confirm('You have unsaved changes. Discard them?')) return;
+        }
         this.editor.hidden = true;
         this.dashboard.hidden = false;
         this.editingPostId = null;
         this.pendingUploads = [];
+        this.stopAutosave();
+        this.resetDirty();
         this.resetForm();
     }
 
@@ -682,7 +783,7 @@ class AdminDashboard {
 
     filterPosts(searchTerm) {
         const term = searchTerm.toLowerCase().trim();
-        const categoryFilter = document.getElementById('filter-category').value;
+        const categoryFilter = document.getElementById('filter-posts-category').value;
 
         this.filteredPosts = this.posts.filter(post => {
             const matchesSearch = !term ||
@@ -738,10 +839,37 @@ class AdminDashboard {
             subtitle.textContent = 'Fill out the form below. Click Publish when ready.';
             saveBtn.textContent = 'Publish Post';
             this.resetForm();
+            // Check for autosaved draft
+            this.checkForDraft();
         }
 
         // Render post gallery grid
         this.renderPostGalleryGrid();
+
+        // Collapse empty optional sections on edit
+        if (postId) {
+            const post = this.posts.find(p => p.id === postId);
+            if (post) {
+                this.form.querySelectorAll('.form-section.collapsible').forEach(section => {
+                    const h2 = section.querySelector('h2');
+                    if (!h2) return;
+                    const text = h2.textContent;
+                    const isEmpty =
+                        (text.includes('Featured Video') && !post.featuredVideo) ||
+                        (text.includes('Additional Videos') && (!post.videos || post.videos.length === 0)) ||
+                        (text.includes('PDF') && (!post.pdfs || post.pdfs.length === 0));
+                    if (isEmpty) section.classList.add('collapsed');
+                    else section.classList.remove('collapsed');
+                });
+            }
+        } else {
+            // Collapse all optional sections for new posts
+            this.form.querySelectorAll('.form-section.collapsible').forEach(s => s.classList.add('collapsed'));
+        }
+
+        // Reset dirty state and start autosave
+        this.resetDirty();
+        this.startAutosave(postId);
     }
 
     editPost(postId) {
@@ -1070,7 +1198,7 @@ class AdminDashboard {
                 if (fileNameEl) fileNameEl.textContent = file.name;
             } catch (error) {
                 console.error('Error uploading post gallery image:', error);
-                alert('Error uploading image: ' + error.message);
+                showToast('Error uploading image: ' + error.message, 'error');
                 if (fileNameEl) fileNameEl.textContent = 'Upload failed';
             }
             return;
@@ -1167,7 +1295,7 @@ class AdminDashboard {
         const alt = document.getElementById('post-gallery-image-alt').value.trim();
 
         if (!src) {
-            alert('Please provide an image path or upload an image.');
+            showToast('Please provide an image path or upload an image.', 'error');
             return;
         }
 
@@ -1237,12 +1365,12 @@ class AdminDashboard {
         const alt = document.getElementById('post-gallery-image-alt').value.trim();
 
         if (!src) {
-            alert('No image to insert. Please upload or enter an image path first.');
+            showToast('No image to insert. Please upload or enter an image path first.', 'error');
             return;
         }
 
         if (!this.quill) {
-            alert('Content editor not available.');
+            showToast('Content editor not available.', 'error');
             return;
         }
 
@@ -1258,11 +1386,7 @@ class AdminDashboard {
         this.closePostGalleryModal();
 
         // Show confirmation
-        const notification = document.createElement('div');
-        notification.className = 'toast-notification';
-        notification.textContent = 'Image inserted into content';
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
+        showToast('Image inserted into content', 'success');
     }
 
     updateCoverImagePreview() {
@@ -1356,7 +1480,7 @@ class AdminDashboard {
 
             const fileSizeMB = file.size / (1024 * 1024);
             if (fileSizeMB > 50) {
-                alert(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`);
+                showToast(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`, 'error');
                 e.target.value = '';
                 return;
             }
@@ -1782,7 +1906,7 @@ class AdminDashboard {
         const content = this.getQuillContent();
 
         if (!title || !date || !category || !summary || !content) {
-            alert('Please fill in all required fields.');
+            showToast('Please fill in all required fields.', 'error');
             return;
         }
 
@@ -1909,6 +2033,10 @@ class AdminDashboard {
                 }
             }
             this.filteredPosts = [...this.posts];
+
+            // Clear autosave draft and dirty state on success
+            this.clearAutodraft();
+            this.resetDirty();
 
             // Return to dashboard after delay
             setTimeout(() => {
@@ -2300,6 +2428,434 @@ class AdminDashboard {
     }
 
     // ========================================
+    // Cover Image Direct Upload
+    // ========================================
+
+    async handleCoverImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileSizeMB = file.size / (1024 * 1024);
+        if (fileSizeMB > 4.5) {
+            showToast(`Image too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 4.5MB.`, 'error');
+            e.target.value = '';
+            return;
+        }
+
+        showToast('Uploading cover image...', 'info');
+
+        try {
+            const base64 = await this.fileToBase64(file);
+            const postId = document.getElementById('edit-post-id').value || 'post-images';
+
+            const response = await fetch(`${this.apiBase}/upload-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file: base64,
+                    filename: file.name,
+                    mimeType: file.type,
+                    postId: postId,
+                    fileType: 'image'
+                })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+            // Add to gallery and set as cover
+            this.postImages.push({
+                src: result.path,
+                alt: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+            });
+            this.coverImageIndex = this.postImages.length - 1;
+            this.updateCoverImagePreview();
+            this.renderPostGalleryGrid();
+            this.markDirty();
+            showToast('Cover image uploaded!', 'success');
+        } catch (error) {
+            console.error('Error uploading cover image:', error);
+            showToast('Error uploading cover image: ' + error.message, 'error');
+        }
+
+        e.target.value = '';
+    }
+
+    // ========================================
+    // Dirty Tracking & Unsaved Changes
+    // ========================================
+
+    markDirty() {
+        this._dirty = true;
+    }
+
+    resetDirty() {
+        this._dirty = false;
+        // Clear validation errors
+        this.form.querySelectorAll('.field-invalid').forEach(el => {
+            el.classList.remove('field-invalid');
+            const msg = el.parentElement.querySelector('.field-error-msg');
+            if (msg) msg.remove();
+        });
+    }
+
+    // ========================================
+    // Inline Form Validation
+    // ========================================
+
+    validateField(el) {
+        const value = el.value.trim();
+        const label = el.closest('.form-group')?.querySelector('label')?.textContent?.replace(' *', '') || 'This field';
+
+        // Remove existing error
+        el.classList.remove('field-invalid');
+        const existingMsg = el.parentElement.querySelector('.field-error-msg');
+        if (existingMsg) existingMsg.remove();
+
+        if (!value) {
+            el.classList.add('field-invalid');
+            const msg = document.createElement('span');
+            msg.className = 'field-error-msg';
+            msg.textContent = `${label} is required`;
+            el.after(msg);
+            return false;
+        }
+        return true;
+    }
+
+    validateForm() {
+        const fields = ['post-title', 'post-date', 'post-category', 'post-summary'];
+        let firstInvalid = null;
+
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !this.validateField(el) && !firstInvalid) {
+                firstInvalid = el;
+            }
+        });
+
+        // Check Quill content
+        const content = this.getQuillContent();
+        if (!content) {
+            const editorEl = document.getElementById('post-content-editor');
+            if (editorEl && !firstInvalid) {
+                firstInvalid = editorEl;
+            }
+        }
+
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus?.();
+            showToast('Please fill in all required fields.', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    // ========================================
+    // Autosave to localStorage
+    // ========================================
+
+    startAutosave(postId) {
+        this.stopAutosave();
+        this._autosaveKey = postId ? `autosave-${postId}` : 'autosave-new-draft';
+        this._autosaveTimer = setInterval(() => {
+            if (this._dirty) this.saveAutodraft();
+        }, 30000);
+    }
+
+    stopAutosave() {
+        if (this._autosaveTimer) {
+            clearInterval(this._autosaveTimer);
+            this._autosaveTimer = null;
+        }
+    }
+
+    saveAutodraft() {
+        if (!this._autosaveKey) return;
+        try {
+            const draft = {
+                title: document.getElementById('post-title').value,
+                date: document.getElementById('post-date').value,
+                category: document.getElementById('post-category').value,
+                author: document.getElementById('post-author').value,
+                summary: document.getElementById('post-summary').value,
+                content: this.getQuillContent(),
+                images: this.postImages,
+                coverImageIndex: this.coverImageIndex,
+                savedAt: Date.now()
+            };
+            localStorage.setItem(this._autosaveKey, JSON.stringify(draft));
+        } catch (e) {
+            console.warn('Autosave failed:', e);
+        }
+    }
+
+    checkForDraft() {
+        const key = 'autosave-new-draft';
+        try {
+            const saved = localStorage.getItem(key);
+            if (!saved) return;
+            const draft = JSON.parse(saved);
+            // Only restore if less than 24 hours old
+            if (Date.now() - draft.savedAt > 86400000) {
+                localStorage.removeItem(key);
+                return;
+            }
+            const ago = Math.round((Date.now() - draft.savedAt) / 60000);
+            const timeLabel = ago < 60 ? `${ago} min ago` : `${Math.round(ago / 60)}h ago`;
+            if (confirm(`Restore unsaved draft "${draft.title || 'Untitled'}" (saved ${timeLabel})?`)) {
+                document.getElementById('post-title').value = draft.title || '';
+                document.getElementById('post-date').value = draft.date || '';
+                document.getElementById('post-category').value = draft.category || '';
+                document.getElementById('post-author').value = draft.author || 'Les Omotani';
+                document.getElementById('post-summary').value = draft.summary || '';
+                this.setQuillContent(draft.content || '');
+                if (draft.images) this.postImages = draft.images;
+                if (draft.coverImageIndex != null) this.coverImageIndex = draft.coverImageIndex;
+                this.updateCoverImagePreview();
+                this.renderPostGalleryGrid();
+            } else {
+                localStorage.removeItem(key);
+            }
+        } catch (e) {
+            console.warn('Failed to restore draft:', e);
+        }
+    }
+
+    clearAutodraft() {
+        if (this._autosaveKey) {
+            localStorage.removeItem(this._autosaveKey);
+        }
+        localStorage.removeItem('autosave-new-draft');
+    }
+
+    // ========================================
+    // Drag-and-Drop Image Upload
+    // ========================================
+
+    setupGalleryDropZone() {
+        const imagesSection = this.galleryContainer?.closest('.form-section');
+        const overlay = document.getElementById('gallery-drop-overlay');
+        if (!imagesSection || !overlay) return;
+
+        let dragCounter = 0;
+
+        imagesSection.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            if (e.dataTransfer.types.includes('Files')) {
+                overlay.hidden = false;
+            }
+        });
+
+        imagesSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                overlay.hidden = true;
+            }
+        });
+
+        imagesSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        imagesSection.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            overlay.hidden = true;
+
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            if (files.length === 0) return;
+
+            showToast(`Uploading ${files.length} image(s)...`, 'info');
+            const postId = document.getElementById('edit-post-id').value || 'post-images';
+            let successCount = 0;
+
+            for (const file of files) {
+                if (file.size / (1024 * 1024) > 4.5) continue;
+                try {
+                    const base64 = await this.fileToBase64(file);
+                    const response = await fetch(`${this.apiBase}/upload-file`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            file: base64,
+                            filename: file.name,
+                            mimeType: file.type,
+                            postId: postId,
+                            fileType: 'image'
+                        })
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.path) {
+                        this.postImages.push({
+                            src: result.path,
+                            alt: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+                        });
+                        if (this.coverImageIndex === -1 && this.postImages.length === 1) {
+                            this.coverImageIndex = 0;
+                        }
+                        successCount++;
+                    }
+                } catch (err) {
+                    console.error('Drop upload error:', err);
+                }
+            }
+
+            if (successCount > 0) {
+                this.renderPostGalleryGrid();
+                this.updateCoverImagePreview();
+                this.markDirty();
+                showToast(`${successCount} image(s) uploaded!`, 'success');
+            }
+        });
+    }
+
+    setupVideoDropZones() {
+        const sections = [
+            { id: 'featured-video-section', type: 'featured' },
+            { id: 'additional-videos-section', type: 'additional' }
+        ];
+
+        sections.forEach(({ id, type }) => {
+            const section = document.getElementById(id);
+            if (!section) return;
+
+            // Create overlay dynamically
+            const overlay = document.createElement('div');
+            overlay.className = 'video-drop-overlay';
+            overlay.hidden = true;
+            overlay.innerHTML = `<div class="gallery-drop-message"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg><span>Drop video here</span></div>`;
+            section.style.position = 'relative';
+            section.appendChild(overlay);
+
+            let dragCounter = 0;
+
+            section.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                if (e.dataTransfer.types.includes('Files')) {
+                    dragCounter++;
+                    overlay.hidden = false;
+                }
+            });
+
+            section.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dragCounter = 0;
+                    overlay.hidden = true;
+                }
+            });
+
+            section.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            });
+
+            section.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                dragCounter = 0;
+                overlay.hidden = true;
+
+                const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
+                if (files.length === 0) {
+                    showToast('No video files detected. Please drop MP4 video files.', 'error');
+                    return;
+                }
+
+                if (type === 'featured') {
+                    // Featured video: only take the first file
+                    const file = files[0];
+                    const fileSizeMB = file.size / (1024 * 1024);
+                    if (fileSizeMB > 50) {
+                        showToast(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`, 'error');
+                        return;
+                    }
+
+                    // Expand section if collapsed
+                    section.classList.remove('collapsed');
+
+                    // Update UI same as file input handler
+                    document.getElementById('file-name-featured-video').textContent = file.name;
+                    const preview = document.getElementById('featured-video-preview');
+                    const objectUrl = URL.createObjectURL(file);
+                    preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
+                    document.getElementById('featured-video-url').value = '';
+
+                    // Generate thumbnail
+                    const thumbnail = await this.generateVideoThumbnail(file);
+                    if (thumbnail) {
+                        this._videoThumbnailBase64 = thumbnail.base64;
+                        this._videoThumbnailFilename = file.name.replace(/\.[^.]+$/, '') + '-thumb.jpg';
+                    }
+
+                    // Add to pending uploads
+                    this.pendingUploads = this.pendingUploads.filter(u => u.type !== 'featured-video');
+                    this.pendingUploads.push({
+                        type: 'featured-video',
+                        index: 0,
+                        file: file,
+                        filename: file.name,
+                        mimeType: file.type,
+                        directUpload: true
+                    });
+
+                    this.markDirty();
+                    showToast('Featured video added!', 'success');
+
+                } else {
+                    // Additional videos: add a slot for each dropped file
+                    let addedCount = 0;
+                    section.classList.remove('collapsed');
+
+                    for (const file of files) {
+                        const fileSizeMB = file.size / (1024 * 1024);
+                        if (fileSizeMB > 50) {
+                            showToast(`${file.name} too large (${fileSizeMB.toFixed(1)}MB). Skipped.`, 'error');
+                            continue;
+                        }
+
+                        // Create a video slot
+                        this.addVideo('', '', '');
+                        const index = this.videoCount;
+                        const videoItem = this.videosContainer.querySelector(`.media-item[data-index="${index}"]`);
+
+                        // Update the slot UI
+                        const fileNameSpan = videoItem.querySelector(`#file-name-video-${index}`);
+                        if (fileNameSpan) fileNameSpan.textContent = file.name;
+
+                        const preview = videoItem.querySelector(`#video-preview-${index}`);
+                        const objectUrl = URL.createObjectURL(file);
+                        if (preview) preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
+
+                        // Add to pending uploads
+                        this.pendingUploads.push({
+                            type: 'video',
+                            index: index,
+                            file: file,
+                            filename: file.name,
+                            mimeType: file.type,
+                            directUpload: true
+                        });
+
+                        addedCount++;
+                    }
+
+                    if (addedCount > 0) {
+                        this.markDirty();
+                        showToast(`${addedCount} video(s) added!`, 'success');
+                    }
+                }
+            });
+        });
+    }
+
+    // ========================================
     // Modal Management
     // ========================================
 
@@ -2640,7 +3196,7 @@ class GalleryManager {
         const alt = document.getElementById('gallery-image-alt').value.trim();
 
         if (!caption || !category) {
-            alert('Please fill in all required fields.');
+            showToast('Please fill in all required fields.', 'error');
             return;
         }
 
@@ -3581,12 +4137,12 @@ class ProgressManager {
         const donations = this.collectDonations();
 
         if (!title) {
-            alert('Please enter a goal title.');
+            showToast('Please enter a goal title.', 'error');
             return;
         }
 
         if (!donations.value) {
-            alert('Please enter a donations value.');
+            showToast('Please enter a donations value.', 'error');
             return;
         }
 
@@ -3803,6 +4359,13 @@ function setupTabs() {
     tabs.forEach(tab => {
         tab.addEventListener('click', (e) => {
             e.preventDefault();
+            // Warn if leaving Posts tab with unsaved changes
+            if (window.adminDashboard && window.adminDashboard._dirty) {
+                if (!confirm('You have unsaved changes. Leave without saving?')) {
+                    return;
+                }
+                window.adminDashboard.resetDirty();
+            }
             showTab(tab.dataset.tab);
         });
     });
@@ -4039,10 +4602,10 @@ class AboutManager {
             };
             await aboutAPI.upsert(item);
             this.trustees = item;
-            alert('Trustees text saved successfully!');
+            showToast('Trustees text saved successfully!', 'success');
         } catch (error) {
             console.error('Error saving trustees:', error);
-            alert('Error saving trustees: ' + error.message);
+            showToast('Error saving trustees: ' + error.message, 'error');
         }
     }
 
@@ -4249,7 +4812,7 @@ class AboutManager {
         } catch (error) {
             console.error('Error uploading photo:', error);
             document.getElementById('advisor-photo-file-name').textContent = 'Upload failed';
-            alert('Error uploading photo: ' + error.message);
+            showToast('Error uploading photo: ' + error.message, 'error');
         }
     }
 
@@ -4302,7 +4865,7 @@ class AboutManager {
         } catch (error) {
             console.error('Error uploading logo:', error);
             document.getElementById(`advisor-partner-logo-file-name-${index}`).textContent = 'Upload failed';
-            alert('Error uploading logo: ' + error.message);
+            showToast('Error uploading logo: ' + error.message, 'error');
         }
     }
 
@@ -4352,7 +4915,7 @@ class AboutManager {
             this.closeEditor();
         } catch (error) {
             console.error('Error saving advisor:', error);
-            alert('Error saving advisor: ' + error.message);
+            showToast('Error saving advisor: ' + error.message, 'error');
         }
     }
 
@@ -4379,7 +4942,7 @@ class AboutManager {
             this.closeDeleteModal();
         } catch (error) {
             console.error('Error deleting advisor:', error);
-            alert('Error deleting advisor: ' + error.message);
+            showToast('Error deleting advisor: ' + error.message, 'error');
         }
     }
 }
@@ -4594,7 +5157,7 @@ class MissionManager {
             this.updateBreakerPreview();
         } catch (error) {
             console.error('Error uploading breaker image:', error);
-            alert('Error uploading image: ' + error.message);
+            showToast('Error uploading image: ' + error.message, 'error');
         }
     }
 
@@ -4611,10 +5174,10 @@ class MissionManager {
         try {
             const breakerImage = document.getElementById('mission-breaker-image').value;
             await missionAPI.updateSettings({ breaker_image: breakerImage });
-            alert('Mission breaker image saved successfully!');
+            showToast('Mission breaker image saved successfully!', 'success');
         } catch (error) {
             console.error('Error saving breaker image:', error);
-            alert('Error saving breaker image: ' + error.message);
+            showToast('Error saving breaker image: ' + error.message, 'error');
         }
     }
 
@@ -4750,7 +5313,7 @@ class MissionManager {
             this.closeStatementEditor();
         } catch (error) {
             console.error('Error saving statement:', error);
-            alert('Error saving statement: ' + error.message);
+            showToast('Error saving statement: ' + error.message, 'error');
         }
     }
 
@@ -4774,7 +5337,7 @@ class MissionManager {
             this.closeDeleteStatementModal();
         } catch (error) {
             console.error('Error deleting statement:', error);
-            alert('Error deleting statement: ' + error.message);
+            showToast('Error deleting statement: ' + error.message, 'error');
         }
     }
 
@@ -4981,7 +5544,7 @@ class MissionManager {
         const description = document.getElementById('goal-card-description').value.trim();
         const wordCount = description ? description.split(/\s+/).length : 0;
         if (wordCount > 60) {
-            alert(`Description exceeds 60 word limit (currently ${wordCount} words). Please shorten it.`);
+            showToast(`Description exceeds 60 word limit (currently ${wordCount} words). Please shorten it.`, 'error');
             return;
         }
 
@@ -5008,7 +5571,7 @@ class MissionManager {
             this.closeGoalCardEditor();
         } catch (error) {
             console.error('Error saving goal card:', error);
-            alert('Error saving goal card: ' + error.message);
+            showToast('Error saving goal card: ' + error.message, 'error');
         }
     }
 }
@@ -5311,7 +5874,7 @@ class GoalPagesManager {
             if (fileNameEl) fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading hero image:', error);
-            alert('Error uploading image: ' + error.message);
+            showToast('Error uploading image: ' + error.message, 'error');
             if (fileNameEl) fileNameEl.textContent = 'Upload failed';
         }
     }
@@ -5373,7 +5936,7 @@ class GoalPagesManager {
             if (fileNameEl) fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading gallery image:', error);
-            alert('Error uploading image: ' + error.message);
+            showToast('Error uploading image: ' + error.message, 'error');
             if (fileNameEl) fileNameEl.textContent = 'Upload failed';
         }
     }
@@ -5705,7 +6268,7 @@ class GoalPagesManager {
             if (fileNameEl) fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading gallery image:', error);
-            alert('Error uploading image: ' + error.message);
+            showToast('Error uploading image: ' + error.message, 'error');
             if (fileNameEl) fileNameEl.textContent = 'Upload failed';
         }
     }
@@ -5718,7 +6281,7 @@ class GoalPagesManager {
         const alt = document.getElementById('goal-gallery-image-alt').value.trim();
 
         if (!src) {
-            alert('Please provide an image path or upload an image.');
+            showToast('Please provide an image path or upload an image.', 'error');
             return;
         }
 
@@ -5787,7 +6350,7 @@ class GoalPagesManager {
             this.closeEditor();
         } catch (error) {
             console.error('Error saving goal page:', error);
-            alert('Error saving goal page: ' + error.message);
+            showToast('Error saving goal page: ' + error.message, 'error');
         }
     }
 
@@ -5813,7 +6376,7 @@ class GoalPagesManager {
             this.closeDeleteModal();
         } catch (error) {
             console.error('Error deleting page:', error);
-            alert('Error deleting page: ' + error.message);
+            showToast('Error deleting page: ' + error.message, 'error');
         }
     }
 }
@@ -5937,7 +6500,7 @@ class FooterManager {
             fileNameEl.textContent = file.name;
         } catch (error) {
             console.error('Error uploading image:', error);
-            alert('Error uploading image: ' + error.message);
+            showToast('Error uploading image: ' + error.message, 'error');
             fileNameEl.textContent = 'Upload failed';
         }
     }
@@ -5987,7 +6550,7 @@ class FooterManager {
             }, 2000);
         } catch (error) {
             console.error('Error saving footer settings:', error);
-            alert('Error saving footer settings: ' + error.message);
+            showToast('Error saving footer settings: ' + error.message, 'error');
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
         }
@@ -5998,7 +6561,7 @@ class FooterManager {
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
-    new AdminDashboard();
+    window.adminDashboard = new AdminDashboard();
     new GalleryManager();
     new ProgressManager();
     new AboutManager();

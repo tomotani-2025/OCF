@@ -89,7 +89,7 @@
                                 <input type="text" id="search-posts" placeholder="Search posts...">
                             </div>
                             <div class="dashboard-filter">
-                                <select id="filter-category">
+                                <select id="filter-posts-category">
                                     <option value="all">All Categories</option>
                                     <option value="Batwa">Batwa</option>
                                     <option value="Bwindi">Bwindi</option>
@@ -198,13 +198,23 @@
                         <!-- Cover Image -->
                         <div class="form-section">
                             <h2>Cover Image</h2>
-                            <p class="form-help">Select an image from your gallery to use as the post cover on the news listing page.</p>
+                            <p class="form-help">Upload a cover image directly, or select one from the gallery below.</p>
                             <div class="cover-image-selector">
                                 <div id="post-cover-preview" class="cover-image-preview">
                                     <span class="image-preview-placeholder">No cover selected</span>
                                 </div>
                                 <div class="cover-image-info">
                                     <p id="cover-image-text" class="cover-source-text">Add images below, then click one to set as cover</p>
+                                    <div class="cover-upload-wrapper">
+                                        <input type="file" id="cover-image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                        <label for="cover-image-file" class="file-upload-btn">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span>Upload Cover Image</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -225,10 +235,16 @@
                             <div id="post-gallery-container" class="gallery-grid-container">
                                 <!-- Gallery items will be rendered as a grid by JS -->
                             </div>
+                            <div id="gallery-drop-overlay" class="gallery-drop-overlay" hidden>
+                                <div class="gallery-drop-message">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                    <span>Drop images here</span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Featured Video -->
-                        <div class="form-section">
+                        <div id="featured-video-section" class="form-section collapsible">
                             <h2>Featured Video (Optional)</h2>
                             <p class="form-help">Add a featured video that replaces the image carousel at the top of the post. Use a YouTube/Vimeo URL or upload an MP4 file.</p>
 
@@ -261,7 +277,7 @@
                         </div>
 
                         <!-- Additional Videos -->
-                        <div class="form-section">
+                        <div id="additional-videos-section" class="form-section collapsible">
                             <h2>Additional Videos</h2>
                             <p class="form-help">Add YouTube/Vimeo videos or upload MP4 files that appear in the post content.</p>
 
@@ -278,7 +294,7 @@
                         </div>
 
                         <!-- PDFs -->
-                        <div class="form-section">
+                        <div class="form-section collapsible">
                             <h2>PDF Documents</h2>
                             <p class="form-help">Upload PDFs or enter URLs. They will appear as downloadable links.</p>
 
@@ -481,7 +497,7 @@
                                     <input type="text" id="search-images" placeholder="Search images...">
                                 </div>
                                 <div class="dashboard-filter">
-                                    <select id="filter-category">
+                                    <select id="filter-images-category">
                                         <option value="all">All Categories</option>
                                         <option value="Batwa">Batwa</option>
                                         <option value="Nepal">Nepal</option>
