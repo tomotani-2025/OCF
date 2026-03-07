@@ -2639,6 +2639,7 @@ class AdminDashboard {
         const overlay = document.getElementById('gallery-drop-overlay');
         if (!imagesSection || !overlay) return;
 
+        imagesSection.style.position = 'relative';
         let dragCounter = 0;
 
         imagesSection.addEventListener('dragenter', (e) => {

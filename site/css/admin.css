@@ -4302,14 +4302,15 @@
    ========================================= */
 
 .gallery-drop-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(239, 58, 79, 0.08);
     border: 3px dashed #EF3A4F;
-    z-index: 9999;
+    border-radius: 8px;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
