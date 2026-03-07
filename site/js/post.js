@@ -204,15 +204,6 @@ class BlogPost {
             contentEl.innerHTML = this.formatContent(post.content);
         }
 
-        // Handle gallery position - move to bottom if galleryAtBottom is true
-        if (post.galleryAtBottom) {
-            const imageContainer = document.querySelector('.post-image-container');
-            if (imageContainer && contentEl) {
-                // Move image container after content (pagination is already inside carousel)
-                contentEl.after(imageContainer);
-            }
-        }
-
         // Videos
         this.renderVideos(post);
 
@@ -305,44 +296,49 @@ class BlogPost {
         const paginationContainer = document.querySelector('.post-image-pagination');
         const post = this.currentPost;
 
-        // Check for featured video (replaces image carousel)
+        // Check for featured video
         if (post.featuredVideo) {
             const featuredUrl = post.featuredVideo.url || post.featuredVideo;
             const isMp4 = typeof featuredUrl === 'string' && featuredUrl.endsWith('.mp4');
+            let videoHtml = '';
 
-            if (isMp4 && imageContainer) {
-                imageContainer.style.display = 'flex';
-                imageContainer.innerHTML = `
+            if (isMp4) {
+                videoHtml = `
                     <div class="featured-video-wrapper featured-video-wrapper--mp4">
-                        <video
-                            src="${featuredUrl}"
-                            controls
-                            preload="metadata"
-                            playsinline
-                        ></video>
+                        <video src="${featuredUrl}" controls preload="metadata" playsinline></video>
                     </div>
                     ${post.featuredVideo.caption ? `<div class="post-image-caption"><span class="caption-text">${post.featuredVideo.caption}</span></div>` : ''}
                 `;
-                if (paginationContainer) paginationContainer.classList.remove('visible');
-                return;
+            } else {
+                const embedUrl = this.getVideoEmbedUrl(featuredUrl);
+                if (embedUrl) {
+                    videoHtml = `
+                        <div class="featured-video-wrapper">
+                            <iframe src="${embedUrl}" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        </div>
+                        ${post.featuredVideo.caption ? `<div class="post-image-caption"><span class="caption-text">${post.featuredVideo.caption}</span></div>` : ''}
+                    `;
+                }
             }
 
-            const embedUrl = this.getVideoEmbedUrl(featuredUrl);
-            if (embedUrl && imageContainer) {
-                imageContainer.style.display = 'flex';
-                imageContainer.innerHTML = `
-                    <div class="featured-video-wrapper">
-                        <iframe
-                            src="${embedUrl}"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                        ></iframe>
-                    </div>
-                    ${post.featuredVideo.caption ? `<div class="post-image-caption"><span class="caption-text">${post.featuredVideo.caption}</span></div>` : ''}
-                `;
-                if (paginationContainer) paginationContainer.classList.remove('visible');
-                return;
+            if (videoHtml) {
+                if (this.images.length > 0) {
+                    // Has images too: put video in the image container spot, let gallery render below content
+                    const videoContainer = document.createElement('div');
+                    videoContainer.className = 'post-image-container';
+                    videoContainer.style.display = 'flex';
+                    videoContainer.innerHTML = videoHtml;
+                    imageContainer.before(videoContainer);
+                    // The real imageContainer will render the gallery and get moved below content
+                } else {
+                    // No images: put video in the image container as before
+                    imageContainer.style.display = 'flex';
+                    imageContainer.innerHTML = videoHtml;
+                    if (paginationContainer) paginationContainer.classList.remove('visible');
+                    return;
+                }
             }
         }
 
@@ -465,12 +461,22 @@ class BlogPost {
                 paginationContainer.classList.remove('visible');
             }
         }
+
+        // Move gallery below content if galleryAtBottom is set,
+        // or automatically when a featured video is present with images
+        const post = this.currentPost;
+        const contentEl = document.querySelector('.post-content');
+        if (contentEl && (post.galleryAtBottom || post.featuredVideo)) {
+            contentEl.after(imageContainer);
+        }
     }
 
     setupCarousel() {
         if (this.images.length <= 1) return;
 
-        const imageContainer = document.querySelector('.post-image-container');
+        // Find the image container with the carousel (not the featured video container)
+        const imageContainer = document.querySelector('.post-image-container:has(.carousel-wrapper)')
+            || document.querySelector('.post-image-container');
         const paginationContainer = document.querySelector('.post-image-pagination');
 
         if (!imageContainer) return;
