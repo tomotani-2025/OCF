@@ -37,6 +37,9 @@ CREATE TABLE IF NOT EXISTS album_images (
     location VARCHAR(500),                         -- location where photo was taken
     tags TEXT,                                     -- comma-separated tags for search
 
+    -- Media type
+    media_type VARCHAR(10) DEFAULT 'image',        -- 'image' or 'video' (mp4/mov)
+
     -- Technical metadata
     sort_order INTEGER DEFAULT 0,                  -- order images appear in gallery (from WordPress export)
     width INTEGER,                                 -- image width in pixels (optional, for optimization)

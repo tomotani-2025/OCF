@@ -16,7 +16,7 @@ const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_DOC_TYPES = ['application/pdf'];
-const ALLOWED_VIDEO_TYPES = ['video/mp4'];
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime'];
 
 function getFileExtension(mimeType) {
     const extensions = {
@@ -25,7 +25,8 @@ function getFileExtension(mimeType) {
         'image/gif': '.gif',
         'image/webp': '.webp',
         'application/pdf': '.pdf',
-        'video/mp4': '.mp4'
+        'video/mp4': '.mp4',
+        'video/quicktime': '.mov'
     };
     return extensions[mimeType] || '';
 }
@@ -132,7 +133,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, PDF, MP4' })
+                body: JSON.stringify({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, PDF, MP4, MOV' })
             };
         }
 

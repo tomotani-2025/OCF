@@ -32,9 +32,94 @@ class GalleryAdmin {
     }
 
     async init() {
+        this.apiBase = '/.netlify/functions';
         await this.loadAlbums();
         this.renderAlbums();
         this.setupEventListeners();
+    }
+
+    // ========================================
+    // File Upload Helpers
+    // ========================================
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    isVideoFile(file) {
+        return file.type === 'video/mp4' || file.type === 'video/quicktime';
+    }
+
+    async uploadFileToStorage(file, albumDir) {
+        if (this.isVideoFile(file) || file.size > 4.5 * 1024 * 1024) {
+            return this.uploadLargeFile(file, albumDir);
+        }
+
+        const base64 = await this.fileToBase64(file);
+        const response = await fetch(`${this.apiBase}/upload-file`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                file: base64,
+                filename: file.name,
+                mimeType: file.type,
+                postId: `gallery/${albumDir}`
+            })
+        });
+
+        const text = await response.text();
+        if (!text) throw new Error('Empty response from server');
+
+        let result;
+        try { result = JSON.parse(text); } catch (e) {
+            throw new Error('Server error during upload');
+        }
+        if (!result.success) throw new Error(result.error || 'Upload failed');
+        return result.path;
+    }
+
+    async uploadLargeFile(file, albumDir) {
+        const bucket = this.isVideoFile(file) ? 'videos' : 'images';
+        const urlResponse = await fetch(`${this.apiBase}/get-upload-url`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                filename: file.name,
+                mimeType: file.type,
+                postId: `gallery/${albumDir}`,
+                bucket: bucket
+            })
+        });
+
+        const urlText = await urlResponse.text();
+        if (!urlText) throw new Error('Empty response when requesting upload URL');
+
+        let urlData;
+        try { urlData = JSON.parse(urlText); } catch (e) {
+            throw new Error('Failed to parse upload URL response');
+        }
+        if (!urlData.success) throw new Error(urlData.error || 'Failed to get upload URL');
+
+        const uploadResponse = await fetch(urlData.signedUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': file.type,
+                'x-upsert': 'true'
+            },
+            body: file
+        });
+
+        if (!uploadResponse.ok) {
+            const errorText = await uploadResponse.text();
+            throw new Error(`Upload failed: ${errorText}`);
+        }
+
+        return urlData.publicUrl;
     }
 
     // ========================================
@@ -130,6 +215,82 @@ class GalleryAdmin {
         // Search and filter
         document.getElementById('search-images')?.addEventListener('input', (e) => this.filterImages(e.target.value));
         document.getElementById('filter-images-category')?.addEventListener('change', (e) => this.filterByCategory(e.target.value));
+
+        // Drag and drop upload zone
+        this.setupMediaDropZone();
+    }
+
+    setupMediaDropZone() {
+        const dropzone = document.getElementById('gallery-media-dropzone');
+        if (!dropzone) return;
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+
+            if (!this.currentAlbum) {
+                this.showError('Please select an album first');
+                return;
+            }
+
+            const files = Array.from(e.dataTransfer.files).filter(f =>
+                f.type.startsWith('image/') || f.type === 'video/mp4' || f.type === 'video/quicktime'
+            );
+            if (files.length === 0) {
+                this.showError('No supported files detected. Drop images or videos (MP4/MOV).');
+                return;
+            }
+
+            this.showSuccess(`Uploading ${files.length} file(s)...`);
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const uploadedUrl = await this.uploadFileToStorage(file, this.currentAlbum.directory_name);
+                    const isVideo = this.isVideoFile(file);
+
+                    const imageData = {
+                        album_id: this.currentAlbum.id,
+                        filename: file.name,
+                        file_path: uploadedUrl,
+                        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+                        alt_text: isVideo ? 'Gallery video' : 'Gallery image',
+                        media_type: isVideo ? 'video' : 'image',
+                        sort_order: this.currentImages.length + successCount
+                    };
+
+                    await galleryAPI.createImage(imageData);
+                    successCount++;
+                } catch (err) {
+                    console.error(`Error uploading ${file.name}:`, err);
+                    errorCount++;
+                }
+            }
+
+            if (successCount > 0) {
+                const msg = errorCount > 0
+                    ? `Uploaded ${successCount} of ${files.length} file(s). ${errorCount} failed.`
+                    : `${successCount} file(s) uploaded!`;
+                this.showSuccess(msg);
+                await this.loadAlbumImages(this.currentAlbum.id);
+                this.renderImages();
+                this.updateImagesHeader();
+            } else {
+                this.showError('All uploads failed. Please check file sizes and try again.');
+            }
+        });
     }
 
     // ========================================
@@ -259,11 +420,23 @@ class GalleryAdmin {
             return;
         }
 
-        this.imagesList.innerHTML = this.currentImages.map(image => `
+        this.imagesList.innerHTML = this.currentImages.map(image => this.renderImageCard(image)).join('');
+    }
+
+    renderImageCard(image) {
+        const isVideo = image.media_type === 'video' || /\.(mp4|mov)$/i.test(image.file_path || '');
+        const isCover = this.currentAlbum && this.currentAlbum.cover_image === image.file_path;
+        const thumbContent = isVideo
+            ? `<video src="${escapeHTML(image.file_path || '')}" muted preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>
+               <span class="video-badge">VIDEO</span>`
+            : '';
+        const bgStyle = isVideo ? '' : `style="background-image: url('${escapeHTML(image.file_path || '')}');"`;
+
+        return `
             <div class="image-card-admin" data-image-id="${image.id}">
-                <div class="image-card-image" style="background-image: url('${escapeHTML(image.file_path || '')}');">
-                    ${this.currentAlbum && this.currentAlbum.cover_image === image.file_path ?
-                        '<span class="cover-badge">Cover</span>' : ''}
+                <div class="image-card-image" ${bgStyle}>
+                    ${isVideo ? thumbContent : ''}
+                    ${isCover ? '<span class="cover-badge">Cover</span>' : ''}
                 </div>
                 <div class="image-card-content">
                     <div class="image-card-header">
@@ -293,8 +466,7 @@ class GalleryAdmin {
                         ${image.location ? `<span class="meta-tag">${escapeHTML(image.location)}</span>` : ''}
                     </div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
     }
 
     // ========================================
@@ -434,9 +606,9 @@ class GalleryAdmin {
         const modal = document.getElementById('image-editor-modal');
         const form = document.getElementById('image-form');
 
-        document.getElementById('image-editor-title').textContent = 'Add Image';
+        document.getElementById('image-editor-title').textContent = 'Add Image or Video';
         form.reset();
-        document.getElementById('image-preview').innerHTML = '<span class="image-preview-placeholder">Image preview</span>';
+        document.getElementById('image-preview').innerHTML = '<span class="image-preview-placeholder">File preview</span>';
 
         modal.hidden = false;
     }
@@ -452,31 +624,31 @@ class GalleryAdmin {
                 <div class="modal-backdrop"></div>
                 <div class="modal-content bulk-upload-content">
                     <button type="button" class="modal-close" aria-label="Close">&times;</button>
-                    <h2 class="title">Bulk Upload Images</h2>
+                    <h2 class="title">Bulk Upload Media</h2>
                     <form id="bulk-upload-form">
                         <div class="form-section">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Select Images</label>
+                                    <label>Select Images or Videos</label>
                                     <div class="bulk-upload-dropzone" id="bulk-dropzone">
                                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                             <polyline points="17 8 12 3 7 8"></polyline>
                                             <line x1="12" y1="3" x2="12" y2="15"></line>
                                         </svg>
-                                        <p>Drag & drop images here, or click to select</p>
-                                        <input type="file" id="bulk-files-input" multiple accept="image/jpeg,image/png,image/gif,image/webp" class="bulk-file-input">
+                                        <p>Drag & drop images/videos here, or click to select</p>
+                                        <input type="file" id="bulk-files-input" multiple accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime" class="bulk-file-input">
                                     </div>
                                 </div>
                             </div>
                             <div id="bulk-preview-container" class="bulk-preview-container" hidden>
-                                <h3>Selected Images (<span id="bulk-count">0</span>)</h3>
+                                <h3>Selected Files (<span id="bulk-count">0</span>)</h3>
                                 <div id="bulk-preview-grid" class="bulk-preview-grid"></div>
                             </div>
                         </div>
                         <div class="form-section">
                             <h3>Default Metadata (Optional)</h3>
-                            <p class="form-help">These values will be applied to all uploaded images. You can edit individual images after upload.</p>
+                            <p class="form-help">These values will be applied to all uploaded files. You can edit individual items after upload.</p>
                             <div class="form-row two-col">
                                 <div class="form-group">
                                     <label for="bulk-category">Category</label>
@@ -500,7 +672,7 @@ class GalleryAdmin {
                         </div>
                         <div class="form-actions">
                             <button type="button" id="cancel-bulk-upload" class="btn btn-outline">Cancel</button>
-                            <button type="submit" id="submit-bulk-upload" class="btn btn-primary" disabled>Upload Images</button>
+                            <button type="submit" id="submit-bulk-upload" class="btn btn-primary" disabled>Upload Files</button>
                         </div>
                     </form>
                 </div>
@@ -562,7 +734,7 @@ class GalleryAdmin {
     }
 
     handleBulkFileSelect(files) {
-        this.bulkFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        this.bulkFiles = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'video/mp4' || f.type === 'video/quicktime');
 
         const previewContainer = document.getElementById('bulk-preview-container');
         const previewGrid = document.getElementById('bulk-preview-grid');
@@ -581,24 +753,47 @@ class GalleryAdmin {
 
         previewGrid.innerHTML = '';
         this.bulkFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const item = document.createElement('div');
-                item.className = 'bulk-preview-item';
+            const isVideo = this.isVideoFile(file);
+            const item = document.createElement('div');
+            item.className = 'bulk-preview-item';
+
+            if (isVideo) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.muted = true;
+                video.preload = 'metadata';
+                video.addEventListener('loadeddata', () => video.currentTime = 1);
                 item.innerHTML = `
-                    <img src="${e.target.result}" alt="${file.name}">
+                    <span class="bulk-preview-video-badge">VIDEO</span>
                     <span class="bulk-preview-name">${file.name}</span>
                     <button type="button" class="bulk-preview-remove" data-index="${index}" title="Remove">&times;</button>
                 `;
+                item.prepend(video);
                 previewGrid.appendChild(item);
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    item.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <span class="bulk-preview-name">${file.name}</span>
+                        <button type="button" class="bulk-preview-remove" data-index="${index}" title="Remove">&times;</button>
+                    `;
+                    previewGrid.appendChild(item);
+                    item.querySelector('.bulk-preview-remove').addEventListener('click', () => {
+                        this.bulkFiles.splice(index, 1);
+                        this.handleBulkFileSelect(this.bulkFiles);
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
 
-                // Add remove handler
+            // Add remove handler for video items (already in DOM)
+            if (isVideo) {
                 item.querySelector('.bulk-preview-remove').addEventListener('click', () => {
                     this.bulkFiles.splice(index, 1);
                     this.handleBulkFileSelect(this.bulkFiles);
                 });
-            };
-            reader.readAsDataURL(file);
+            }
         });
     }
 
@@ -606,13 +801,12 @@ class GalleryAdmin {
         e.preventDefault();
 
         if (!this.bulkFiles || this.bulkFiles.length === 0) {
-            this.showError('Please select at least one image');
+            this.showError('Please select at least one file');
             return;
         }
 
         const submitBtn = document.getElementById('submit-bulk-upload');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Uploading...';
 
         const defaultMetadata = {
             category: document.getElementById('bulk-category').value,
@@ -621,40 +815,58 @@ class GalleryAdmin {
             photo_date: document.getElementById('bulk-date').value || null
         };
 
+        const totalFiles = this.bulkFiles.length;
+        let successCount = 0;
+        let errorCount = 0;
+
         try {
-            let successCount = 0;
+            for (let i = 0; i < this.bulkFiles.length; i++) {
+                const file = this.bulkFiles[i];
+                submitBtn.textContent = `Uploading ${i + 1} of ${totalFiles}...`;
 
-            for (const file of this.bulkFiles) {
-                // Create file path (in production, upload to storage first)
-                const filePath = `images/gallery/${this.currentAlbum.directory_name}/${file.name}`;
+                try {
+                    const uploadedUrl = await this.uploadFileToStorage(file, this.currentAlbum.directory_name);
+                    const isVideo = this.isVideoFile(file);
 
-                const imageData = {
-                    album_id: this.currentAlbum.id,
-                    filename: file.name,
-                    file_path: filePath,
-                    title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-                    alt_text: 'Gallery image',
-                    ...defaultMetadata,
-                    sort_order: this.currentImages.length + successCount
-                };
+                    const imageData = {
+                        album_id: this.currentAlbum.id,
+                        filename: file.name,
+                        file_path: uploadedUrl,
+                        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+                        alt_text: isVideo ? 'Gallery video' : 'Gallery image',
+                        media_type: isVideo ? 'video' : 'image',
+                        ...defaultMetadata,
+                        sort_order: this.currentImages.length + successCount
+                    };
 
-                await galleryAPI.createImage(imageData);
-                successCount++;
+                    await galleryAPI.createImage(imageData);
+                    successCount++;
+                } catch (err) {
+                    console.error(`Error uploading ${file.name}:`, err);
+                    errorCount++;
+                }
             }
 
-            this.showSuccess(`Successfully added ${successCount} image(s)`);
-            document.getElementById('bulk-upload-modal').hidden = true;
-            this.bulkFiles = [];
-            await this.loadAlbumImages(this.currentAlbum.id);
-            this.renderImages();
-            this.updateImagesHeader();
+            if (successCount > 0) {
+                const msg = errorCount > 0
+                    ? `Uploaded ${successCount} of ${totalFiles} file(s). ${errorCount} failed.`
+                    : `Successfully uploaded ${successCount} file(s)`;
+                this.showSuccess(msg);
+                document.getElementById('bulk-upload-modal').hidden = true;
+                this.bulkFiles = [];
+                await this.loadAlbumImages(this.currentAlbum.id);
+                this.renderImages();
+                this.updateImagesHeader();
+            } else {
+                this.showError('All uploads failed. Please check file sizes and try again.');
+            }
 
         } catch (error) {
-            console.error('Error uploading images:', error);
-            this.showError('Failed to upload images: ' + error.message);
+            console.error('Error in bulk upload:', error);
+            this.showError('Failed to upload files: ' + error.message);
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Upload Images';
+            submitBtn.textContent = 'Upload Files';
         }
     }
 
@@ -678,7 +890,11 @@ class GalleryAdmin {
 
         // Show preview
         const preview = document.getElementById('image-preview');
-        preview.innerHTML = `<img src="${image.file_path}" alt="Preview">`;
+        if (image.media_type === 'video' || /\.(mp4|mov)$/i.test(image.file_path)) {
+            preview.innerHTML = `<video src="${image.file_path}" controls style="max-width:100%;max-height:200px;"></video>`;
+        } else {
+            preview.innerHTML = `<img src="${image.file_path}" alt="Preview">`;
+        }
 
         modal.hidden = false;
     }
@@ -696,12 +912,17 @@ class GalleryAdmin {
         document.getElementById('image-file-name').textContent = file.name;
 
         // Show preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('image-preview').innerHTML =
-                `<img src="${e.target.result}" alt="Preview">`;
-        };
-        reader.readAsDataURL(file);
+        const preview = document.getElementById('image-preview');
+        if (this.isVideoFile(file)) {
+            const url = URL.createObjectURL(file);
+            preview.innerHTML = `<video src="${url}" controls style="max-width:100%;max-height:200px;"></video>`;
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     async saveImage(e) {
@@ -709,46 +930,47 @@ class GalleryAdmin {
 
         const file = document.getElementById('image-file').files[0];
         let filePath = '';
-        let filename = '';
 
-        if (file) {
-            // Generate file path - in production, upload to storage first
-            // For now, we assume manual file placement in the images/gallery folder
-            filename = file.name;
-            filePath = `images/gallery/${this.currentAlbum.directory_name}/${filename}`;
-
-            // Note: For full storage integration, you would upload to Supabase Storage here:
-            // const { data, error } = await supabase.storage.from('gallery').upload(filePath, file);
-            // if (error) throw error;
-            // filePath = data.path;
-        } else if (this.editingImage) {
-            const existing = this.currentImages.find(img => img.id === this.editingImage);
-            filePath = existing.file_path;
-            filename = existing.filename;
+        const saveBtn = document.querySelector('#image-form button[type="submit"]');
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = file ? 'Uploading...' : 'Saving...';
         }
 
-        const imageData = {
-            album_id: this.currentAlbum.id,
-            filename: file ? file.name : this.editingImage ? this.currentImages.find(img => img.id === this.editingImage).filename : '',
-            file_path: filePath,
-            title: document.getElementById('image-title').value,
-            alt_text: document.getElementById('image-alt').value || 'Gallery image',
-            caption: document.getElementById('image-caption').value,
-            category: document.getElementById('image-category').value,
-            photographer: document.getElementById('image-photographer').value,
-            photo_date: document.getElementById('image-date').value || null,
-            location: document.getElementById('image-location').value,
-            tags: document.getElementById('image-tags').value,
-            sort_order: this.currentImages.length
-        };
-
         try {
+            if (file) {
+                filePath = await this.uploadFileToStorage(file, this.currentAlbum.directory_name);
+            } else if (this.editingImage) {
+                const existing = this.currentImages.find(img => img.id === this.editingImage);
+                filePath = existing.file_path;
+            }
+
+            const isVideo = file && this.isVideoFile(file);
+            const imageData = {
+                album_id: this.currentAlbum.id,
+                filename: file ? file.name : this.editingImage ? this.currentImages.find(img => img.id === this.editingImage).filename : '',
+                file_path: filePath,
+                title: document.getElementById('image-title').value,
+                alt_text: document.getElementById('image-alt').value || (isVideo ? 'Gallery video' : 'Gallery image'),
+                caption: document.getElementById('image-caption').value,
+                category: document.getElementById('image-category').value,
+                photographer: document.getElementById('image-photographer').value,
+                photo_date: document.getElementById('image-date').value || null,
+                location: document.getElementById('image-location').value,
+                tags: document.getElementById('image-tags').value,
+                sort_order: this.currentImages.length
+            };
+
+            if (file) {
+                imageData.media_type = isVideo ? 'video' : 'image';
+            }
+
             if (this.editingImage) {
                 await galleryAPI.updateImage(this.editingImage, imageData);
                 this.showSuccess('Image updated successfully');
             } else {
                 await galleryAPI.createImage(imageData);
-                this.showSuccess('Image added successfully');
+                this.showSuccess('File uploaded successfully');
             }
 
             this.hideImageEditor();
@@ -756,7 +978,12 @@ class GalleryAdmin {
             this.renderImages();
         } catch (error) {
             console.error('Error saving image:', error);
-            this.showError('Failed to save image: ' + error.message);
+            this.showError('Failed to save: ' + error.message);
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            }
         }
     }
 
@@ -1069,42 +1296,7 @@ class GalleryAdmin {
             return;
         }
 
-        this.imagesList.innerHTML = images.map(image => `
-            <div class="image-card-admin" data-image-id="${image.id}">
-                <div class="image-card-image" style="background-image: url('${escapeHTML(image.file_path || '')}');">
-                    ${this.currentAlbum && this.currentAlbum.cover_image === image.file_path ?
-                        '<span class="cover-badge">Cover</span>' : ''}
-                </div>
-                <div class="image-card-content">
-                    <div class="image-card-header">
-                        <div>
-                            <h4 class="image-title">${escapeHTML(image.title || image.filename || '')}</h4>
-                            ${image.caption ? `<p class="image-caption">${escapeHTML(image.caption)}</p>` : ''}
-                        </div>
-                        <div class="image-actions">
-                            <button type="button" class="btn-icon" onclick="galleryAdmin.editImage(${image.id})" title="Edit">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                            </button>
-                            <button type="button" class="btn-icon" onclick="galleryAdmin.showImageActions(${image.id})" title="More">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="1"></circle>
-                                    <circle cx="12" cy="5" r="1"></circle>
-                                    <circle cx="12" cy="19" r="1"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="image-card-meta">
-                        ${image.category ? `<span class="meta-tag">${escapeHTML(image.category)}</span>` : ''}
-                        ${image.photographer ? `<span class="meta-tag">${escapeHTML(image.photographer)}</span>` : ''}
-                        ${image.location ? `<span class="meta-tag">${escapeHTML(image.location)}</span>` : ''}
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        this.imagesList.innerHTML = images.map(image => this.renderImageCard(image)).join('');
     }
 }
 

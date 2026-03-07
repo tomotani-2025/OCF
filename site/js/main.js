@@ -315,7 +315,8 @@ window.initGalleryLightbox = function() {
                 </svg>
             </button>
             <div class="lightbox-content">
-                <img src="" alt="">
+                <img src="" alt="" class="lightbox-img">
+                <video controls class="lightbox-video" style="display:none;max-width:90vw;max-height:80vh;"></video>
             </div>
             <button class="lightbox-nav lightbox-next" aria-label="Next image">
                 <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -337,6 +338,8 @@ window.initGalleryLightbox = function() {
         closeBtn.addEventListener('click', function() {
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
+            var vid = lightbox.querySelector('.lightbox-video');
+            if (vid) vid.pause();
         });
 
         prevBtn.addEventListener('click', function() {
@@ -353,6 +356,8 @@ window.initGalleryLightbox = function() {
             if (e.target === lightbox) {
                 lightbox.classList.remove('active');
                 document.body.style.overflow = '';
+                var vid = lightbox.querySelector('.lightbox-video');
+                if (vid) vid.pause();
             }
         });
 
@@ -363,6 +368,8 @@ window.initGalleryLightbox = function() {
             if (e.key === 'Escape') {
                 lightbox.classList.remove('active');
                 document.body.style.overflow = '';
+                var vid = lightbox.querySelector('.lightbox-video');
+                if (vid) vid.pause();
             }
             if (e.key === 'ArrowLeft') {
                 lightbox.dispatchEvent(new CustomEvent('lightbox-prev'));
@@ -373,7 +380,8 @@ window.initGalleryLightbox = function() {
         });
     }
 
-    const lightboxImg = lightbox.querySelector('.lightbox-content img');
+    const lightboxImg = lightbox.querySelector('.lightbox-img');
+    const lightboxVideo = lightbox.querySelector('.lightbox-video');
     const lightboxCount = lightbox.querySelector('.lightbox-count');
     const lightboxText = lightbox.querySelector('.lightbox-text');
     const prevBtn = lightbox.querySelector('.lightbox-prev');
@@ -386,11 +394,31 @@ window.initGalleryLightbox = function() {
 
     function updateLightbox() {
         const items = document.querySelectorAll('.gallery-item');
-        const img = items[currentIndex].querySelector('img');
-        lightboxImg.src = img.src;
-        lightboxImg.alt = img.alt || '';
-        lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(items.length)}`;
-        lightboxText.textContent = img.alt || '';
+        const item = items[currentIndex];
+        const video = item.querySelector('video');
+        const img = item.querySelector('img');
+
+        // Pause any playing video
+        if (lightboxVideo) lightboxVideo.pause();
+
+        if (video) {
+            // Show video, hide image
+            var src = video.querySelector('source') ? video.querySelector('source').src : video.src;
+            lightboxVideo.src = src;
+            lightboxVideo.style.display = 'block';
+            lightboxImg.style.display = 'none';
+            lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(items.length)}`;
+            lightboxText.textContent = (video.dataset.alt || video.dataset.caption || 'Video') ;
+        } else if (img) {
+            // Show image, hide video
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt || '';
+            lightboxImg.style.display = 'block';
+            lightboxVideo.style.display = 'none';
+            lightboxCount.textContent = `${formatNumber(currentIndex + 1)}/${formatNumber(items.length)}`;
+            lightboxText.textContent = img.alt || '';
+        }
+
         prevBtn.style.display = currentIndex === 0 ? 'none' : 'flex';
         nextBtn.style.display = currentIndex === items.length - 1 ? 'none' : 'flex';
     }

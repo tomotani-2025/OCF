@@ -100,16 +100,19 @@ exports.handler = async (event) => {
             };
         }
 
-        const allowedBuckets = ['videos'];
+        const allowedBuckets = ['videos', 'images'];
         if (!allowedBuckets.includes(bucket)) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'Invalid bucket. Only "videos" is allowed for direct upload.' })
+                body: JSON.stringify({ error: 'Invalid bucket. Allowed: "videos", "images".' })
             };
         }
 
-        const sanitizedFilename = sanitizeFilename(filename.replace(/\.[^.]+$/, '')) + '.mp4';
+        // Preserve original extension
+        const extMatch = filename.match(/\.[^.]+$/);
+        const ext = extMatch ? extMatch[0].toLowerCase() : '';
+        const sanitizedFilename = sanitizeFilename(filename.replace(/\.[^.]+$/, '')) + ext;
         const filePath = `${postId}/${sanitizedFilename}`;
 
         const result = await createSignedUploadUrl(bucket, filePath);

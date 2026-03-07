@@ -253,20 +253,20 @@
                                            placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
                                     <small style="color: #666; font-size: 12px; margin-top: 4px;">YouTube or Vimeo URL</small>
 
-                                    <label for="featured-video-file" style="margin-top: 12px; display: block;">Or Upload MP4</label>
+                                    <label for="featured-video-file" style="margin-top: 12px; display: block;">Or Upload Video (MP4/MOV)</label>
                                     <div class="file-upload-wrapper">
                                         <input type="file" id="featured-video-file" name="featured-video-file"
-                                               accept="video/mp4" class="file-input">
+                                               accept="video/mp4,video/quicktime" class="file-input">
                                         <label for="featured-video-file" class="file-upload-btn">
                                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                 <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
-                                            <span>Choose MP4</span>
+                                            <span>Choose Video</span>
                                         </label>
                                         <span class="file-name" id="file-name-featured-video">No file chosen</span>
                                     </div>
-                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">Max 50MB. Upload will override URL above.</small>
+                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">Max 50MB. MP4 or MOV. Upload will override URL above.</small>
                                 </div>
                                 <div class="video-preview" id="featured-video-preview">
                                     <div class="video-preview-placeholder"><span>Video preview</span></div>
@@ -274,7 +274,7 @@
                             </div>
                             <div id="featured-video-dropzone" class="media-dropzone">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                                <span>Drag &amp; drop MP4 video here</span>
+                                <span>Drag &amp; drop video here (MP4/MOV)</span>
                             </div>
                         </div>
 
@@ -295,7 +295,7 @@
                             </button>
                             <div id="additional-videos-dropzone" class="media-dropzone">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                                <span>Drag &amp; drop MP4 videos here</span>
+                                <span>Drag &amp; drop videos here (MP4/MOV)</span>
                             </div>
                         </div>
 
@@ -483,7 +483,7 @@
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                             <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                         </svg>
-                                        Add Images
+                                        Add Image/Video
                                     </button>
                                     <button type="button" id="bulk-add-images-btn" class="btn btn-outline btn-upload">
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -521,6 +521,10 @@
                         <div id="images-list" class="images-grid-admin">
                             <!-- Image cards rendered by JS -->
                             <div class="loading-message">Loading images...</div>
+                        </div>
+                        <div id="gallery-media-dropzone" class="media-dropzone">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                            <span>Drag &amp; drop images or videos here</span>
                         </div>
                     </div>
 
@@ -597,9 +601,9 @@
                                 <div class="form-section">
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label for="image-file">Upload Image</label>
+                                            <label for="image-file">Upload Image or Video</label>
                                             <div class="file-upload-wrapper">
-                                                <input type="file" id="image-file" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input">
+                                                <input type="file" id="image-file" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime" class="file-input">
                                                 <label for="image-file" class="file-upload-btn">
                                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                         <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
