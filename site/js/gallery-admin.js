@@ -421,6 +421,87 @@ class GalleryAdmin {
         }
 
         this.imagesList.innerHTML = this.currentImages.map(image => this.renderImageCard(image)).join('');
+        this.setupImageDragReorder();
+    }
+
+    // ========================================
+    // Drag-and-Drop Reordering
+    // ========================================
+
+    setupImageDragReorder() {
+        const cards = this.imagesList.querySelectorAll('.image-card-admin[draggable]');
+        let draggedEl = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                draggedEl = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', card.dataset.imageId);
+            });
+
+            card.addEventListener('dragend', () => {
+                if (draggedEl) draggedEl.classList.remove('dragging');
+                draggedEl = null;
+                this.imagesList.querySelectorAll('.image-card-admin').forEach(c => c.classList.remove('drag-over'));
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (card !== draggedEl) {
+                    card.classList.add('drag-over');
+                }
+            });
+
+            card.addEventListener('dragleave', () => {
+                card.classList.remove('drag-over');
+            });
+
+            card.addEventListener('drop', (e) => {
+                e.preventDefault();
+                card.classList.remove('drag-over');
+                if (!draggedEl || card === draggedEl) return;
+
+                // Determine position: insert before or after based on DOM order
+                const allCards = [...this.imagesList.querySelectorAll('.image-card-admin')];
+                const draggedIdx = allCards.indexOf(draggedEl);
+                const targetIdx = allCards.indexOf(card);
+
+                if (draggedIdx < targetIdx) {
+                    card.after(draggedEl);
+                } else {
+                    card.before(draggedEl);
+                }
+
+                this.saveImageOrder();
+            });
+        });
+    }
+
+    async saveImageOrder() {
+        const cards = this.imagesList.querySelectorAll('.image-card-admin');
+        const imageOrders = [];
+
+        cards.forEach((card, index) => {
+            const imageId = parseInt(card.dataset.imageId);
+            imageOrders.push({ id: imageId, sort_order: index });
+
+            // Update local data too
+            const img = this.currentImages.find(i => i.id === imageId);
+            if (img) img.sort_order = index;
+        });
+
+        // Sort local array to match new order
+        this.currentImages.sort((a, b) => a.sort_order - b.sort_order);
+
+        try {
+            await galleryAPI.reorderImages(this.currentAlbum.id, imageOrders);
+            this.showSuccess('Image order saved');
+        } catch (error) {
+            console.error('Error saving image order:', error);
+            this.showError('Failed to save image order');
+        }
     }
 
     renderImageCard(image) {
@@ -433,7 +514,7 @@ class GalleryAdmin {
         const bgStyle = isVideo ? '' : `style="background-image: url('${escapeHTML(image.file_path || '')}');"`;
 
         return `
-            <div class="image-card-admin" data-image-id="${image.id}">
+            <div class="image-card-admin" data-image-id="${image.id}" draggable="true">
                 <div class="image-card-image" ${bgStyle}>
                     ${isVideo ? thumbContent : ''}
                     ${isCover ? '<span class="cover-badge">Cover</span>' : ''}

@@ -2773,6 +2773,20 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
+.image-card-admin[draggable] {
+    cursor: grab;
+}
+
+.image-card-admin.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+}
+
+.image-card-admin.drag-over {
+    outline: 2px dashed #EF3A4F;
+    outline-offset: -2px;
+}
+
 .image-card-image {
     width: 100%;
     height: 180px;
