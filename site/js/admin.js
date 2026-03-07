@@ -2236,7 +2236,8 @@ class AdminDashboard {
     async confirmDelete() {
         if (!this.deletePostId) return;
 
-        const postTitle = this.posts.find(p => p.id === this.deletePostId)?.title || 'Post';
+        const postId = this.deletePostId;
+        const postTitle = this.posts.find(p => p.id === postId)?.title || 'Post';
 
         // Close delete modal and show publishing modal
         this.closeDeleteModal();
@@ -2244,13 +2245,13 @@ class AdminDashboard {
 
         try {
             // Delete directly from Supabase (instant!)
-            await postsAPI.delete(this.deletePostId);
+            await postsAPI.delete(postId);
 
             // Success!
             this.updatePublishingStatus('Post deleted successfully!', true);
 
             // Update local data
-            const index = this.posts.findIndex(p => p.id === this.deletePostId);
+            const index = this.posts.findIndex(p => p.id === postId);
             if (index !== -1) {
                 this.posts.splice(index, 1);
                 this.filteredPosts = [...this.posts];
