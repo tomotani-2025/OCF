@@ -464,7 +464,6 @@ class BlogPost {
 
         // Move gallery below content if galleryAtBottom is set,
         // or automatically when a featured video is present with images
-        const post = this.currentPost;
         const contentEl = document.querySelector('.post-content');
         if (contentEl && (post.galleryAtBottom || post.featuredVideo)) {
             contentEl.after(imageContainer);
