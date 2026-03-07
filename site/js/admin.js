@@ -2635,39 +2635,22 @@ class AdminDashboard {
     // ========================================
 
     setupGalleryDropZone() {
-        const imagesSection = this.galleryContainer?.closest('.form-section');
-        const overlay = document.getElementById('gallery-drop-overlay');
-        if (!imagesSection || !overlay) return;
+        const dropzone = document.getElementById('image-dropzone');
+        if (!dropzone) return;
 
-        imagesSection.style.position = 'relative';
-        let dragCounter = 0;
-
-        imagesSection.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            dragCounter++;
-            if (e.dataTransfer.types.includes('Files')) {
-                overlay.hidden = false;
-            }
-        });
-
-        imagesSection.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dragCounter--;
-            if (dragCounter <= 0) {
-                dragCounter = 0;
-                overlay.hidden = true;
-            }
-        });
-
-        imagesSection.addEventListener('dragover', (e) => {
+        dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy';
+            dropzone.classList.add('dragover');
         });
 
-        imagesSection.addEventListener('drop', async (e) => {
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', async (e) => {
             e.preventDefault();
-            dragCounter = 0;
-            overlay.hidden = true;
+            dropzone.classList.remove('dragover');
 
             const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
             if (files.length === 0) return;
@@ -2717,142 +2700,109 @@ class AdminDashboard {
     }
 
     setupVideoDropZones() {
-        const sections = [
-            { id: 'featured-video-section', type: 'featured' },
-            { id: 'additional-videos-section', type: 'additional' }
-        ];
+        this._setupDropZone('featured-video-dropzone', async (files) => {
+            const file = files[0];
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 50) {
+                showToast(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`, 'error');
+                return;
+            }
 
-        sections.forEach(({ id, type }) => {
-            const section = document.getElementById(id);
-            if (!section) return;
+            const section = document.getElementById('featured-video-section');
+            if (section) section.classList.remove('collapsed');
 
-            // Create overlay dynamically
-            const overlay = document.createElement('div');
-            overlay.className = 'video-drop-overlay';
-            overlay.hidden = true;
-            overlay.innerHTML = `<div class="gallery-drop-message"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg><span>Drop video here</span></div>`;
-            section.style.position = 'relative';
-            section.appendChild(overlay);
+            document.getElementById('file-name-featured-video').textContent = file.name;
+            const preview = document.getElementById('featured-video-preview');
+            const objectUrl = URL.createObjectURL(file);
+            preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
+            document.getElementById('featured-video-url').value = '';
 
-            let dragCounter = 0;
+            const thumbnail = await this.generateVideoThumbnail(file);
+            if (thumbnail) {
+                this._videoThumbnailBase64 = thumbnail.base64;
+                this._videoThumbnailFilename = file.name.replace(/\.[^.]+$/, '') + '-thumb.jpg';
+            }
 
-            section.addEventListener('dragenter', (e) => {
-                e.preventDefault();
-                if (e.dataTransfer.types.includes('Files')) {
-                    dragCounter++;
-                    overlay.hidden = false;
-                }
+            this.pendingUploads = this.pendingUploads.filter(u => u.type !== 'featured-video');
+            this.pendingUploads.push({
+                type: 'featured-video',
+                index: 0,
+                file: file,
+                filename: file.name,
+                mimeType: file.type,
+                directUpload: true
             });
 
-            section.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                dragCounter--;
-                if (dragCounter <= 0) {
-                    dragCounter = 0;
-                    overlay.hidden = true;
-                }
-            });
+            this.markDirty();
+            showToast('Featured video added!', 'success');
+        });
 
-            section.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'copy';
-            });
+        this._setupDropZone('additional-videos-dropzone', async (files) => {
+            const section = document.getElementById('additional-videos-section');
+            if (section) section.classList.remove('collapsed');
+            let addedCount = 0;
 
-            section.addEventListener('drop', async (e) => {
-                e.preventDefault();
-                dragCounter = 0;
-                overlay.hidden = true;
-
-                const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
-                if (files.length === 0) {
-                    showToast('No video files detected. Please drop MP4 video files.', 'error');
-                    return;
+            for (const file of files) {
+                const fileSizeMB = file.size / (1024 * 1024);
+                if (fileSizeMB > 50) {
+                    showToast(`${file.name} too large (${fileSizeMB.toFixed(1)}MB). Skipped.`, 'error');
+                    continue;
                 }
 
-                if (type === 'featured') {
-                    // Featured video: only take the first file
-                    const file = files[0];
-                    const fileSizeMB = file.size / (1024 * 1024);
-                    if (fileSizeMB > 50) {
-                        showToast(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`, 'error');
-                        return;
-                    }
+                this.addVideo('', '', '');
+                const index = this.videoCount;
+                const videoItem = this.videosContainer.querySelector(`.media-item[data-index="${index}"]`);
 
-                    // Expand section if collapsed
-                    section.classList.remove('collapsed');
+                const fileNameSpan = videoItem.querySelector(`#file-name-video-${index}`);
+                if (fileNameSpan) fileNameSpan.textContent = file.name;
 
-                    // Update UI same as file input handler
-                    document.getElementById('file-name-featured-video').textContent = file.name;
-                    const preview = document.getElementById('featured-video-preview');
-                    const objectUrl = URL.createObjectURL(file);
-                    preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
-                    document.getElementById('featured-video-url').value = '';
+                const previewEl = videoItem.querySelector(`#video-preview-${index}`);
+                const objectUrl = URL.createObjectURL(file);
+                if (previewEl) previewEl.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
 
-                    // Generate thumbnail
-                    const thumbnail = await this.generateVideoThumbnail(file);
-                    if (thumbnail) {
-                        this._videoThumbnailBase64 = thumbnail.base64;
-                        this._videoThumbnailFilename = file.name.replace(/\.[^.]+$/, '') + '-thumb.jpg';
-                    }
+                this.pendingUploads.push({
+                    type: 'video',
+                    index: index,
+                    file: file,
+                    filename: file.name,
+                    mimeType: file.type,
+                    directUpload: true
+                });
 
-                    // Add to pending uploads
-                    this.pendingUploads = this.pendingUploads.filter(u => u.type !== 'featured-video');
-                    this.pendingUploads.push({
-                        type: 'featured-video',
-                        index: 0,
-                        file: file,
-                        filename: file.name,
-                        mimeType: file.type,
-                        directUpload: true
-                    });
+                addedCount++;
+            }
 
-                    this.markDirty();
-                    showToast('Featured video added!', 'success');
+            if (addedCount > 0) {
+                this.markDirty();
+                showToast(`${addedCount} video(s) added!`, 'success');
+            }
+        });
+    }
 
-                } else {
-                    // Additional videos: add a slot for each dropped file
-                    let addedCount = 0;
-                    section.classList.remove('collapsed');
+    _setupDropZone(elementId, onDrop) {
+        const dropzone = document.getElementById(elementId);
+        if (!dropzone) return;
 
-                    for (const file of files) {
-                        const fileSizeMB = file.size / (1024 * 1024);
-                        if (fileSizeMB > 50) {
-                            showToast(`${file.name} too large (${fileSizeMB.toFixed(1)}MB). Skipped.`, 'error');
-                            continue;
-                        }
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            dropzone.classList.add('dragover');
+        });
 
-                        // Create a video slot
-                        this.addVideo('', '', '');
-                        const index = this.videoCount;
-                        const videoItem = this.videosContainer.querySelector(`.media-item[data-index="${index}"]`);
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
 
-                        // Update the slot UI
-                        const fileNameSpan = videoItem.querySelector(`#file-name-video-${index}`);
-                        if (fileNameSpan) fileNameSpan.textContent = file.name;
+        dropzone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
 
-                        const preview = videoItem.querySelector(`#video-preview-${index}`);
-                        const objectUrl = URL.createObjectURL(file);
-                        if (preview) preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
-
-                        // Add to pending uploads
-                        this.pendingUploads.push({
-                            type: 'video',
-                            index: index,
-                            file: file,
-                            filename: file.name,
-                            mimeType: file.type,
-                            directUpload: true
-                        });
-
-                        addedCount++;
-                    }
-
-                    if (addedCount > 0) {
-                        this.markDirty();
-                        showToast(`${addedCount} video(s) added!`, 'success');
-                    }
-                }
-            });
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
+            if (files.length === 0) {
+                showToast('No video files detected. Please drop MP4 video files.', 'error');
+                return;
+            }
+            await onDrop(files);
         });
     }
 
