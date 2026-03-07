@@ -1313,13 +1313,13 @@ class AdminDashboard {
                     <div class="file-upload-wrapper">
                         <input type="file" id="video-file-${index}" name="video-file-${index}"
                                accept="video/mp4" class="file-input">
-                        <div class="file-upload-btn">
+                        <label for="video-file-${index}" class="file-upload-btn">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             <span>Choose MP4</span>
-                        </div>
+                        </label>
                         <span class="file-name" id="file-name-video-${index}">${isUploadedMp4 ? url.split('/').pop() : 'No file chosen'}</span>
                     </div>
                     <small style="color: #666; font-size: 12px; margin-top: 4px;">Max 50MB. Upload will override URL above.</small>
