@@ -54,51 +54,9 @@
 
         <section class="gallery-section">
             <div class="gallery-content">
-                <!-- Albums Grid -->
+                <!-- Albums Grid - dynamically loaded from Supabase -->
                 <div class="albums-grid">
-                    <!-- Global Images Album -->
-                    <a href="global-images.html" class="album-tile reveal-on-scroll">
-                        <div class="album-tile-image" style="background-image: url('images/orangutan-borneo-1024x683.jpg');"></div>
-                        <div class="album-tile-overlay"></div>
-                        <svg class="album-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M50.7906,13.2094A8.009,8.009,0,0,0,43,7H15a8.0092,8.0092,0,0,0-8,8V43a8.009,8.009,0,0,0,6.2094,7.7906A8.009,8.009,0,0,0,21,57H49a8.0092,8.0092,0,0,0,8-8V21A8.009,8.009,0,0,0,50.7906,13.2094ZM53,21V43.1826L34.9922,30.7158a9.9543,9.9543,0,0,0-11.87.3589L17,35.8848V21a4.0046,4.0046,0,0,1,4-4H49A4.0046,4.0046,0,0,1,53,21ZM11,43V15a4.0046,4.0046,0,0,1,4-4H43a3.9868,3.9868,0,0,1,3.4435,2H21a8.0092,8.0092,0,0,0-8,8V46.4435A3.9868,3.9868,0,0,1,11,43ZM49,53H21a4.0046,4.0046,0,0,1-4-4V40.9724L25.5938,34.22a5.9722,5.9722,0,0,1,7.1221-.2153L53,48.0482V49A4.0046,4.0046,0,0,1,49,53Z"/><path d="M40,25a6,6,0,1,0,6-6A6.0066,6.0066,0,0,0,40,25Zm8,0a2,2,0,1,1-2-2A2.002,2.002,0,0,1,48,25Z"/></svg>
-                        <div class="album-tile-content">
-                            <!-- <h3 class="album-label">Global</h3> -->
-                            <h2 class="album-title">Global Images</h2>
-                        </div>
-                    </a>
-
-                    <!-- Gallery 2017-2024 -->
-                    <a href="gallery-2017-2024.html" class="album-tile reveal-on-scroll">
-                        <div class="album-tile-image" style="background-image: url('images/gallery/2017-2024/img_0049.webp');"></div>
-                        <div class="album-tile-overlay"></div>
-                        <svg class="album-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M50.7906,13.2094A8.009,8.009,0,0,0,43,7H15a8.0092,8.0092,0,0,0-8,8V43a8.009,8.009,0,0,0,6.2094,7.7906A8.009,8.009,0,0,0,21,57H49a8.0092,8.0092,0,0,0,8-8V21A8.009,8.009,0,0,0,50.7906,13.2094ZM53,21V43.1826L34.9922,30.7158a9.9543,9.9543,0,0,0-11.87.3589L17,35.8848V21a4.0046,4.0046,0,0,1,4-4H49A4.0046,4.0046,0,0,1,53,21ZM11,43V15a4.0046,4.0046,0,0,1,4-4H43a3.9868,3.9868,0,0,1,3.4435,2H21a8.0092,8.0092,0,0,0-8,8V46.4435A3.9868,3.9868,0,0,1,11,43ZM49,53H21a4.0046,4.0046,0,0,1-4-4V40.9724L25.5938,34.22a5.9722,5.9722,0,0,1,7.1221-.2153L53,48.0482V49A4.0046,4.0046,0,0,1,49,53Z"/><path d="M40,25a6,6,0,1,0,6-6A6.0066,6.0066,0,0,0,40,25Zm8,0a2,2,0,1,1-2-2A2.002,2.002,0,0,1,48,25Z"/></svg>
-                        <div class="album-tile-content">
-                            <!-- <h3 class="album-label">Archive</h3> -->
-                            <h2 class="album-title">Gallery 2017-2024</h2>
-                        </div>
-                    </a>
-
-                    <!-- Gallery 2 -->
-                    <a href="gallery-2.html" class="album-tile reveal-on-scroll">
-                        <div class="album-tile-image" style="background-image: url('images/gallery/gallery-2/unknown.webp');"></div>
-                        <div class="album-tile-overlay"></div>
-                        <svg class="album-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M50.7906,13.2094A8.009,8.009,0,0,0,43,7H15a8.0092,8.0092,0,0,0-8,8V43a8.009,8.009,0,0,0,6.2094,7.7906A8.009,8.009,0,0,0,21,57H49a8.0092,8.0092,0,0,0,8-8V21A8.009,8.009,0,0,0,50.7906,13.2094ZM53,21V43.1826L34.9922,30.7158a9.9543,9.9543,0,0,0-11.87.3589L17,35.8848V21a4.0046,4.0046,0,0,1,4-4H49A4.0046,4.0046,0,0,1,53,21ZM11,43V15a4.0046,4.0046,0,0,1,4-4H43a3.9868,3.9868,0,0,1,3.4435,2H21a8.0092,8.0092,0,0,0-8,8V46.4435A3.9868,3.9868,0,0,1,11,43ZM49,53H21a4.0046,4.0046,0,0,1-4-4V40.9724L25.5938,34.22a5.9722,5.9722,0,0,1,7.1221-.2153L53,48.0482V49A4.0046,4.0046,0,0,1,49,53Z"/><path d="M40,25a6,6,0,1,0,6-6A6.0066,6.0066,0,0,0,40,25Zm8,0a2,2,0,1,1-2-2A2.002,2.002,0,0,1,48,25Z"/></svg>
-                        <div class="album-tile-content">
-                            <!-- <h3 class="album-label">Archive</h3> -->
-                            <h2 class="album-title">Gallery 2</h2>
-                        </div>
-                    </a>
-
-                    <!-- Gallery 3 -->
-                    <a href="gallery-3.html" class="album-tile reveal-on-scroll">
-                        <div class="album-tile-image" style="background-image: url('images/gallery/gallery-3/food-distribution-may-2024-1024x519.webp');"></div>
-                        <div class="album-tile-overlay"></div>
-                        <svg class="album-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M50.7906,13.2094A8.009,8.009,0,0,0,43,7H15a8.0092,8.0092,0,0,0-8,8V43a8.009,8.009,0,0,0,6.2094,7.7906A8.009,8.009,0,0,0,21,57H49a8.0092,8.0092,0,0,0,8-8V21A8.009,8.009,0,0,0,50.7906,13.2094ZM53,21V43.1826L34.9922,30.7158a9.9543,9.9543,0,0,0-11.87.3589L17,35.8848V21a4.0046,4.0046,0,0,1,4-4H49A4.0046,4.0046,0,0,1,53,21ZM11,43V15a4.0046,4.0046,0,0,1,4-4H43a3.9868,3.9868,0,0,1,3.4435,2H21a8.0092,8.0092,0,0,0-8,8V46.4435A3.9868,3.9868,0,0,1,11,43ZM49,53H21a4.0046,4.0046,0,0,1-4-4V40.9724L25.5938,34.22a5.9722,5.9722,0,0,1,7.1221-.2153L53,48.0482V49A4.0046,4.0046,0,0,1,49,53Z"/><path d="M40,25a6,6,0,1,0,6-6A6.0066,6.0066,0,0,0,40,25Zm8,0a2,2,0,1,1-2-2A2.002,2.002,0,0,1,48,25Z"/></svg>
-                        <div class="album-tile-content">
-                            <!-- <h3 class="album-label">Archive</h3> -->
-                            <h2 class="album-title">Gallery 3</h2>
-                        </div>
-                    </a>
+                    <p class="loading-message">Loading albums...</p>
                 </div>
             </div>
         </section>
@@ -312,9 +270,58 @@
                 font-size: 20px;
             }
         }
+
+        .loading-message,
+        .no-albums,
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #31110F;
+            grid-column: 1 / -1;
+            font-size: 18px;
+        }
+
+        .error-message {
+            color: #EF3A4F;
+        }
     </style>
 
     <script src="js/main.js?v=3"></script>
     <script src="js/footer-loader.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const grid = document.querySelector('.albums-grid');
+            const albumIconSVG = '<svg class="album-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M50.7906,13.2094A8.009,8.009,0,0,0,43,7H15a8.0092,8.0092,0,0,0-8,8V43a8.009,8.009,0,0,0,6.2094,7.7906A8.009,8.009,0,0,0,21,57H49a8.0092,8.0092,0,0,0,8-8V21A8.009,8.009,0,0,0,50.7906,13.2094ZM53,21V43.1826L34.9922,30.7158a9.9543,9.9543,0,0,0-11.87.3589L17,35.8848V21a4.0046,4.0046,0,0,1,4-4H49A4.0046,4.0046,0,0,1,53,21ZM11,43V15a4.0046,4.0046,0,0,1,4-4H43a3.9868,3.9868,0,0,1,3.4435,2H21a8.0092,8.0092,0,0,0-8,8V46.4435A3.9868,3.9868,0,0,1,11,43ZM49,53H21a4.0046,4.0046,0,0,1-4-4V40.9724L25.5938,34.22a5.9722,5.9722,0,0,1,7.1221-.2153L53,48.0482V49A4.0046,4.0046,0,0,1,49,53Z"/><path d="M40,25a6,6,0,1,0,6-6A6.0066,6.0066,0,0,0,40,25Zm8,0a2,2,0,1,1-2-2A2.002,2.002,0,0,1,48,25Z"/></svg>';
+
+            try {
+                const albums = await galleryAPI.getActiveAlbums();
+
+                if (!albums || albums.length === 0) {
+                    grid.innerHTML = '<p class="no-albums">No albums available yet.</p>';
+                    return;
+                }
+
+                grid.innerHTML = albums.map(album => {
+                    const coverUrl = album.cover_image || 'images/orangutan-borneo-1024x683.jpg';
+                    const title = album.title || album.name;
+                    return `
+                        <a href="album.html?id=${album.id}" class="album-tile reveal-on-scroll">
+                            <div class="album-tile-image" style="background-image: url('${coverUrl}');"></div>
+                            <div class="album-tile-overlay"></div>
+                            ${albumIconSVG}
+                            <div class="album-tile-content">
+                                <h2 class="album-title">${title}</h2>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading albums:', error);
+                grid.innerHTML = '<p class="error-message">Failed to load albums. Please try again later.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
