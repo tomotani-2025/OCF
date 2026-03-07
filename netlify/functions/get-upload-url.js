@@ -115,13 +115,17 @@ exports.handler = async (event) => {
         const result = await createSignedUploadUrl(bucket, filePath);
         const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filePath}`;
 
+        // Supabase returns { url: "/object/upload/sign/bucket/path?token=..." }
+        const signedUrl = result.url.startsWith('http')
+            ? result.url
+            : `${SUPABASE_URL}/storage/v1${result.url}`;
+
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                signedUrl: `${SUPABASE_URL}/storage/v1/object/upload/sign/${bucket}/${filePath}?token=${result.token}`,
-                token: result.token,
+                signedUrl: signedUrl,
                 publicUrl: publicUrl,
                 filePath: filePath,
                 filename: sanitizedFilename
