@@ -250,6 +250,22 @@ class BlogPost {
         }
 
         const videosHtml = post.videos.map(video => {
+            if (video.type === 'mp4' && video.url) {
+                return `
+                    <div class="post-video-item">
+                        <div class="post-video-embed post-video-embed--mp4">
+                            <video
+                                src="${video.url}"
+                                controls
+                                preload="metadata"
+                                playsinline
+                            ></video>
+                        </div>
+                        ${video.caption ? `<p class="post-video-caption">${video.caption}</p>` : ''}
+                    </div>
+                `;
+            }
+
             const embedUrl = video.embedUrl || this.getVideoEmbedUrl(video.url);
             if (!embedUrl) return '';
 
@@ -291,7 +307,27 @@ class BlogPost {
 
         // Check for featured video (replaces image carousel)
         if (post.featuredVideo) {
-            const embedUrl = this.getVideoEmbedUrl(post.featuredVideo.url || post.featuredVideo);
+            const featuredUrl = post.featuredVideo.url || post.featuredVideo;
+            const isMp4 = typeof featuredUrl === 'string' && featuredUrl.endsWith('.mp4');
+
+            if (isMp4 && imageContainer) {
+                imageContainer.style.display = 'flex';
+                imageContainer.innerHTML = `
+                    <div class="featured-video-wrapper featured-video-wrapper--mp4">
+                        <video
+                            src="${featuredUrl}"
+                            controls
+                            preload="metadata"
+                            playsinline
+                        ></video>
+                    </div>
+                    ${post.featuredVideo.caption ? `<div class="post-image-caption"><span class="caption-text">${post.featuredVideo.caption}</span></div>` : ''}
+                `;
+                if (paginationContainer) paginationContainer.classList.remove('visible');
+                return;
+            }
+
+            const embedUrl = this.getVideoEmbedUrl(featuredUrl);
             if (embedUrl && imageContainer) {
                 imageContainer.style.display = 'flex';
                 imageContainer.innerHTML = `

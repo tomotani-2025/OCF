@@ -230,14 +230,29 @@
                         <!-- Featured Video -->
                         <div class="form-section">
                             <h2>Featured Video (Optional)</h2>
-                            <p class="form-help">Add a featured YouTube or Vimeo video that replaces the image carousel at the top of the post.</p>
+                            <p class="form-help">Add a featured video that replaces the image carousel at the top of the post. Use a YouTube/Vimeo URL or upload an MP4 file.</p>
 
                             <div class="form-row two-col">
                                 <div class="form-group">
                                     <label for="featured-video-url">Featured Video URL</label>
                                     <input type="url" id="featured-video-url" name="featured-video-url"
                                            placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
-                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">This video will appear at the top of the post instead of images</small>
+                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">YouTube or Vimeo URL</small>
+
+                                    <label for="featured-video-file" style="margin-top: 12px; display: block;">Or Upload MP4</label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" id="featured-video-file" name="featured-video-file"
+                                               accept="video/mp4" class="file-input">
+                                        <div class="file-upload-btn">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span>Choose MP4</span>
+                                        </div>
+                                        <span class="file-name" id="file-name-featured-video">No file chosen</span>
+                                    </div>
+                                    <small style="color: #666; font-size: 12px; margin-top: 4px;">Max 50MB. Upload will override URL above.</small>
                                 </div>
                                 <div class="video-preview" id="featured-video-preview">
                                     <div class="video-preview-placeholder"><span>Video preview</span></div>
@@ -248,7 +263,7 @@
                         <!-- Additional Videos -->
                         <div class="form-section">
                             <h2>Additional Videos</h2>
-                            <p class="form-help">Add YouTube or Vimeo videos that appear in the post content.</p>
+                            <p class="form-help">Add YouTube/Vimeo videos or upload MP4 files that appear in the post content.</p>
 
                             <div id="videos-container" class="media-container">
                                 <!-- Video items will be added here -->

@@ -533,6 +533,51 @@ class AdminDashboard {
             featuredVideoInput.addEventListener('input', () => this.updateFeaturedVideoPreview());
         }
 
+        // Featured video MP4 upload
+        const featuredVideoFileInput = document.getElementById('featured-video-file');
+        if (featuredVideoFileInput) {
+            featuredVideoFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const fileSizeMB = file.size / (1024 * 1024);
+                if (fileSizeMB > 50) {
+                    alert(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`);
+                    e.target.value = '';
+                    return;
+                }
+
+                // Show file name
+                document.getElementById('file-name-featured-video').textContent = file.name;
+
+                // Show video preview
+                const preview = document.getElementById('featured-video-preview');
+                const objectUrl = URL.createObjectURL(file);
+                preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
+
+                // Clear URL input since we're uploading
+                document.getElementById('featured-video-url').value = '';
+
+                // Generate thumbnail from video
+                const thumbnail = await this.generateVideoThumbnail(file);
+                if (thumbnail) {
+                    this._videoThumbnailBase64 = thumbnail.base64;
+                    this._videoThumbnailFilename = file.name.replace(/\.[^.]+$/, '') + '-thumb.jpg';
+                }
+
+                // Remove any existing featured video upload from pending
+                this.pendingUploads = this.pendingUploads.filter(u => u.type !== 'featured-video');
+                this.pendingUploads.push({
+                    type: 'featured-video',
+                    index: 0,
+                    file: file,
+                    filename: file.name,
+                    mimeType: file.type,
+                    directUpload: true
+                });
+            });
+        }
+
         // Delete modal actions
         document.getElementById('cancel-delete-btn').addEventListener('click', () => this.closeDeleteModal());
         document.getElementById('confirm-delete-btn').addEventListener('click', () => this.confirmDelete());
@@ -719,15 +764,23 @@ class AdminDashboard {
         // Featured video
         const featuredVideoInput = document.getElementById('featured-video-url');
         if (featuredVideoInput) {
-            if (post.featuredVideo) {
-                featuredVideoInput.value = typeof post.featuredVideo === 'string'
-                    ? post.featuredVideo
-                    : post.featuredVideo.url || '';
-            } else {
+            const featuredUrl = typeof post.featuredVideo === 'string'
+                ? post.featuredVideo
+                : post.featuredVideo?.url || '';
+            const isFeaturedMp4 = featuredUrl && featuredUrl.endsWith('.mp4');
+
+            if (isFeaturedMp4) {
                 featuredVideoInput.value = '';
+                this._featuredVideoMp4Url = featuredUrl;
+                const fileNameSpan = document.getElementById('file-name-featured-video');
+                if (fileNameSpan) fileNameSpan.textContent = featuredUrl.split('/').pop();
+                const preview = document.getElementById('featured-video-preview');
+                if (preview) preview.innerHTML = `<video src="${featuredUrl}" controls style="width:100%;max-height:200px;"></video>`;
+            } else {
+                featuredVideoInput.value = featuredUrl;
+                this._featuredVideoMp4Url = null;
+                this.updateFeaturedVideoPreview();
             }
-            // Update the preview
-            this.updateFeaturedVideoPreview();
         }
 
         // Load images into postImages array
@@ -754,7 +807,7 @@ class AdminDashboard {
         this.videosContainer.innerHTML = '';
         this.videoCount = 0;
         if (post.videos && post.videos.length > 0) {
-            post.videos.forEach(video => this.addVideo(video.url, video.caption));
+            post.videos.forEach(video => this.addVideo(video.url, video.caption, video.type));
         }
 
         // Load PDFs
@@ -790,6 +843,13 @@ class AdminDashboard {
         this.videoCount = 0;
         this.pdfCount = 0;
         this.pendingUploads = [];
+        this._featuredVideoMp4Url = null;
+        this._videoThumbnailBase64 = null;
+        this._videoThumbnailFilename = null;
+
+        // Reset featured video file input display
+        const featuredVideoFileName = document.getElementById('file-name-featured-video');
+        if (featuredVideoFileName) featuredVideoFileName.textContent = 'No file chosen';
 
         // Reset featured video preview
         this.updateFeaturedVideoPreview();
@@ -1227,10 +1287,11 @@ class AdminDashboard {
     // Media Management - Videos
     // ========================================
 
-    addVideo(url = '', caption = '') {
+    addVideo(url = '', caption = '', videoType = '') {
         this.videoCount++;
         const index = this.videoCount;
-        const embedUrl = this.getVideoEmbedUrl(url);
+        const isUploadedMp4 = videoType === 'mp4' || (url && url.endsWith('.mp4'));
+        const embedUrl = isUploadedMp4 ? null : this.getVideoEmbedUrl(url);
 
         const videoItem = document.createElement('div');
         videoItem.className = 'media-item';
@@ -1242,14 +1303,32 @@ class AdminDashboard {
             </div>
             <div class="form-row two-col">
                 <div class="form-group">
-                    <label for="video-url-${index}">Video URL *</label>
+                    <label for="video-url-${index}">Video URL (YouTube/Vimeo)</label>
                     <input type="url" id="video-url-${index}" name="video-url-${index}"
-                           placeholder="https://www.youtube.com/watch?v=..." value="${url}"
+                           placeholder="https://www.youtube.com/watch?v=..." value="${isUploadedMp4 ? '' : url}"
                            data-preview-target="video-preview-${index}">
                     <small style="color: #666; font-size: 12px; margin-top: 4px;">YouTube or Vimeo</small>
+
+                    <label for="video-file-${index}" style="margin-top: 12px; display: block;">Or Upload MP4</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="video-file-${index}" name="video-file-${index}"
+                               accept="video/mp4" class="file-input">
+                        <div class="file-upload-btn">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 11V3M8 3L5 6M8 3L11 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 11V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Choose MP4</span>
+                        </div>
+                        <span class="file-name" id="file-name-video-${index}">${isUploadedMp4 ? url.split('/').pop() : 'No file chosen'}</span>
+                    </div>
+                    <small style="color: #666; font-size: 12px; margin-top: 4px;">Max 50MB. Upload will override URL above.</small>
+                    <input type="hidden" id="video-mp4-url-${index}" value="${isUploadedMp4 ? url : ''}">
                 </div>
                 <div class="video-preview" id="video-preview-${index}">
-                    ${embedUrl ? `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>` : '<div class="video-preview-placeholder"><span>Video preview</span></div>'}
+                    ${embedUrl ? `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>` :
+                      isUploadedMp4 ? `<video src="${url}" controls style="width:100%;max-height:200px;"></video>` :
+                      '<div class="video-preview-placeholder"><span>Video preview</span></div>'}
                 </div>
             </div>
             <div class="form-row">
@@ -1268,6 +1347,42 @@ class AdminDashboard {
 
         const urlInput = videoItem.querySelector(`#video-url-${index}`);
         urlInput.addEventListener('input', (e) => this.updateVideoPreview(e.target));
+
+        // MP4 file upload handler
+        const fileInput = videoItem.querySelector(`#video-file-${index}`);
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 50) {
+                alert(`Video too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 50MB.`);
+                e.target.value = '';
+                return;
+            }
+
+            // Show file name
+            const fileNameSpan = videoItem.querySelector(`#file-name-video-${index}`);
+            fileNameSpan.textContent = file.name;
+
+            // Show video preview
+            const preview = videoItem.querySelector(`#video-preview-${index}`);
+            const objectUrl = URL.createObjectURL(file);
+            preview.innerHTML = `<video src="${objectUrl}" controls style="width:100%;max-height:200px;"></video>`;
+
+            // Clear the URL input since we're uploading
+            urlInput.value = '';
+
+            // Store raw file for direct upload (bypasses base64 size limit)
+            this.pendingUploads.push({
+                type: 'video',
+                index: index,
+                file: file,
+                filename: file.name,
+                mimeType: file.type,
+                directUpload: true
+            });
+        });
     }
 
     // ========================================
@@ -1414,6 +1529,16 @@ class AdminDashboard {
 
         if (embedUrl) {
             preview.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+            // If user enters a URL, clear any pending MP4 upload for this video
+            const indexMatch = input.id.match(/video-url-(\d+)/);
+            if (indexMatch) {
+                const idx = parseInt(indexMatch[1]);
+                this.pendingUploads = this.pendingUploads.filter(u => !(u.type === 'video' && u.index === idx));
+                const mp4UrlInput = document.getElementById(`video-mp4-url-${idx}`);
+                if (mp4UrlInput) mp4UrlInput.value = '';
+                const fileNameSpan = document.getElementById(`file-name-video-${idx}`);
+                if (fileNameSpan) fileNameSpan.textContent = 'No file chosen';
+            }
         } else {
             preview.innerHTML = '<div class="video-preview-placeholder"><span>Video preview</span></div>';
         }
@@ -1429,6 +1554,13 @@ class AdminDashboard {
 
         if (embedUrl) {
             preview.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+            // Clear any pending MP4 featured video upload and thumbnail
+            this._featuredVideoMp4Url = null;
+            this._videoThumbnailBase64 = null;
+            this._videoThumbnailFilename = null;
+            this.pendingUploads = this.pendingUploads.filter(u => u.type !== 'featured-video');
+            const fileNameSpan = document.getElementById('file-name-featured-video');
+            if (fileNameSpan) fileNameSpan.textContent = 'No file chosen';
         } else {
             preview.innerHTML = '<div class="video-preview-placeholder"><span>Video preview</span></div>';
         }
@@ -1460,6 +1592,62 @@ class AdminDashboard {
         if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
         if (url.includes('vimeo.com')) return 'vimeo';
         return null;
+    }
+
+    /**
+     * Generate a JPEG thumbnail from an MP4 video file.
+     * Seeks to 1 second (or 0 if shorter) and captures a frame via canvas.
+     * Returns { blob, base64 } or null on failure.
+     */
+    generateVideoThumbnail(file) {
+        return new Promise((resolve) => {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.muted = true;
+            video.playsInline = true;
+
+            const objectUrl = URL.createObjectURL(file);
+            video.src = objectUrl;
+
+            video.addEventListener('loadedmetadata', () => {
+                // Seek to 1 second in, or halfway if shorter than 2 seconds
+                video.currentTime = video.duration > 2 ? 1 : video.duration / 2;
+            });
+
+            video.addEventListener('seeked', () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob((blob) => {
+                        URL.revokeObjectURL(objectUrl);
+                        if (!blob) {
+                            resolve(null);
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const base64 = reader.result.split(',')[1];
+                            resolve({ blob, base64 });
+                        };
+                        reader.onerror = () => resolve(null);
+                        reader.readAsDataURL(blob);
+                    }, 'image/jpeg', 0.85);
+                } catch (e) {
+                    URL.revokeObjectURL(objectUrl);
+                    console.error('Thumbnail generation failed:', e);
+                    resolve(null);
+                }
+            });
+
+            video.addEventListener('error', () => {
+                URL.revokeObjectURL(objectUrl);
+                resolve(null);
+            });
+        });
     }
 
     // ========================================
@@ -1508,13 +1696,24 @@ class AdminDashboard {
         const videos = [];
         this.videosContainer.querySelectorAll('.media-item').forEach(item => {
             const urlInput = item.querySelector('input[id^="video-url-"]');
+            const mp4UrlInput = item.querySelector('input[id^="video-mp4-url-"]');
             const captionInput = item.querySelector('input[id^="video-caption-"]');
-            if (urlInput && urlInput.value.trim()) {
-                const url = urlInput.value.trim();
+            const mp4Url = mp4UrlInput ? mp4UrlInput.value.trim() : '';
+            const externalUrl = urlInput ? urlInput.value.trim() : '';
+
+            if (mp4Url) {
+                // Uploaded MP4 video
                 videos.push({
-                    type: this.getVideoType(url),
-                    url: url,
-                    embedUrl: this.getVideoEmbedUrl(url),
+                    type: 'mp4',
+                    url: mp4Url,
+                    caption: captionInput ? captionInput.value.trim() : ''
+                });
+            } else if (externalUrl) {
+                // YouTube/Vimeo URL
+                videos.push({
+                    type: this.getVideoType(externalUrl),
+                    url: externalUrl,
+                    embedUrl: this.getVideoEmbedUrl(externalUrl),
                     caption: captionInput ? captionInput.value.trim() : ''
                 });
             }
@@ -1602,7 +1801,13 @@ class AdminDashboard {
                     const upload = this.pendingUploads[i];
                     this.updatePublishingStatus(`Uploading file ${i + 1} of ${this.pendingUploads.length}...`);
 
-                    const result = await this.uploadFile(upload, postId);
+                    let result;
+                    if (upload.directUpload) {
+                        // Direct upload for large files (videos)
+                        result = await this.uploadVideoFile(upload, postId);
+                    } else {
+                        result = await this.uploadFile(upload, postId);
+                    }
 
                     if (result.success) {
                         // Update the form field with the uploaded path
@@ -1612,6 +1817,11 @@ class AdminDashboard {
                         } else if (upload.type === 'pdf') {
                             const urlInput = document.getElementById(`pdf-url-${upload.index}`);
                             if (urlInput) urlInput.value = result.path;
+                        } else if (upload.type === 'video') {
+                            const mp4UrlInput = document.getElementById(`video-mp4-url-${upload.index}`);
+                            if (mp4UrlInput) mp4UrlInput.value = result.path;
+                        } else if (upload.type === 'featured-video') {
+                            this._featuredVideoMp4Url = result.path;
                         }
                     } else {
                         throw new Error(`Failed to upload ${upload.filename}: ${result.error}`);
@@ -1628,8 +1838,8 @@ class AdminDashboard {
             // Save post directly to Supabase (instant update!)
             this.updatePublishingStatus('Publishing post...');
 
-            // Get featured video URL
-            const featuredVideoUrl = cleanData.featuredVideo?.url || cleanData.featuredVideo || null;
+            // Get featured video URL (uploaded MP4 takes priority)
+            const featuredVideoUrl = this._featuredVideoMp4Url || cleanData.featuredVideo?.url || cleanData.featuredVideo || null;
 
             // Get images array (use postData since cleanObject may have removed empty arrays)
             const imagesArray = postData.images || [];
@@ -1638,10 +1848,26 @@ class AdminDashboard {
             let postImage = cleanData.image || null;
             let postImageAlt = cleanData.imageAlt || cleanData.title || null;
 
-            // Auto-generate thumbnail from YouTube video if no image provided
+            // Auto-generate thumbnail from video if no image provided
             if (!postImage && featuredVideoUrl) {
+                // For YouTube, use their thumbnail URL
                 postImage = this.getVideoThumbnail(featuredVideoUrl);
                 postImageAlt = cleanData.title || null;
+
+                // For MP4, upload the generated thumbnail frame
+                if (!postImage && this._videoThumbnailBase64) {
+                    this.updatePublishingStatus('Uploading video thumbnail...');
+                    const thumbResult = await this.uploadFile({
+                        type: 'image',
+                        base64: this._videoThumbnailBase64,
+                        filename: this._videoThumbnailFilename || 'video-thumb.jpg',
+                        mimeType: 'image/jpeg'
+                    }, postId);
+                    if (thumbResult.success) {
+                        postImage = thumbResult.path;
+                        postImageAlt = cleanData.title || null;
+                    }
+                }
             }
 
             // Transform camelCase to snake_case for database
@@ -1734,6 +1960,62 @@ class AdminDashboard {
                 console.error('Non-JSON response:', text.substring(0, 500));
                 return { success: false, error: 'Server error. The file may be too large or there was a network issue.' };
             }
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    async uploadVideoFile(upload, postId) {
+        try {
+            // Step 1: Get a signed upload URL from the server
+            const urlResponse = await fetch(`${this.apiBase}/get-upload-url`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: upload.filename,
+                    mimeType: upload.mimeType,
+                    postId: postId,
+                    bucket: 'videos'
+                })
+            });
+
+            const urlText = await urlResponse.text();
+            if (!urlText) {
+                return { success: false, error: 'Empty response when requesting upload URL.' };
+            }
+
+            let urlData;
+            try {
+                urlData = JSON.parse(urlText);
+            } catch (e) {
+                return { success: false, error: 'Failed to parse upload URL response.' };
+            }
+
+            if (!urlData.success) {
+                return { success: false, error: urlData.error || 'Failed to get upload URL.' };
+            }
+
+            // Step 2: Upload the file directly to Supabase Storage using the signed URL
+            const uploadResponse = await fetch(urlData.signedUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': upload.mimeType,
+                    'x-upsert': 'true'
+                },
+                body: upload.file
+            });
+
+            if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text();
+                return { success: false, error: `Upload failed: ${errorText}` };
+            }
+
+            return {
+                success: true,
+                path: urlData.publicUrl,
+                filename: urlData.filename
+            };
+
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -1903,10 +2185,20 @@ class AdminDashboard {
 
         // Check for featured video first
         let featuredMediaHtml = '';
-        const featuredVideoUrl = data.featuredVideo?.url || data.featuredVideo;
+        const featuredVideoUrl = this._featuredVideoMp4Url || data.featuredVideo?.url || data.featuredVideo;
         if (featuredVideoUrl) {
-            const embedUrl = this.getVideoEmbedUrl(featuredVideoUrl);
-            if (embedUrl) {
+            const isMp4 = featuredVideoUrl.endsWith('.mp4');
+            const embedUrl = isMp4 ? null : this.getVideoEmbedUrl(featuredVideoUrl);
+            if (isMp4) {
+                featuredMediaHtml = `
+                    <div class="preview-featured-video">
+                        <div class="preview-video-embed preview-video-embed--mp4">
+                            <video src="${featuredVideoUrl}" controls></video>
+                        </div>
+                        ${data.featuredVideo?.caption ? `<p class="preview-video-caption">${data.featuredVideo.caption}</p>` : ''}
+                    </div>
+                `;
+            } else if (embedUrl) {
                 featuredMediaHtml = `
                     <div class="preview-featured-video">
                         <div class="preview-video-embed">
@@ -1942,6 +2234,16 @@ class AdminDashboard {
             videosHtml = `
                 <div class="preview-videos">
                     ${data.videos.map(video => {
+                        if (video.type === 'mp4') {
+                            return `
+                                <div class="preview-video-item">
+                                    <div class="preview-video-embed preview-video-embed--mp4">
+                                        <video src="${video.url}" controls></video>
+                                    </div>
+                                    ${video.caption ? `<p class="preview-video-caption">${video.caption}</p>` : ''}
+                                </div>
+                            `;
+                        }
                         const embedUrl = video.embedUrl || this.getVideoEmbedUrl(video.url);
                         return `
                             <div class="preview-video-item">

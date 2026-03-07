@@ -12,9 +12,11 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_PDF_SIZE = 25 * 1024 * 1024;   // 25MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_DOC_TYPES = ['application/pdf'];
+const ALLOWED_VIDEO_TYPES = ['video/mp4'];
 
 function getFileExtension(mimeType) {
     const extensions = {
@@ -22,7 +24,8 @@ function getFileExtension(mimeType) {
         'image/png': '.png',
         'image/gif': '.gif',
         'image/webp': '.webp',
-        'application/pdf': '.pdf'
+        'application/pdf': '.pdf',
+        'video/mp4': '.mp4'
     };
     return extensions[mimeType] || '';
 }
@@ -123,29 +126,31 @@ exports.handler = async (event) => {
 
         const isImage = ALLOWED_IMAGE_TYPES.includes(mimeType);
         const isPdf = ALLOWED_DOC_TYPES.includes(mimeType);
+        const isVideo = ALLOWED_VIDEO_TYPES.includes(mimeType);
 
-        if (!isImage && !isPdf) {
+        if (!isImage && !isPdf && !isVideo) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, PDF' })
+                body: JSON.stringify({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, PDF, MP4' })
             };
         }
 
         const fileBuffer = Buffer.from(file, 'base64');
         const fileSize = fileBuffer.length;
-        const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_PDF_SIZE;
+        const maxSize = isVideo ? MAX_VIDEO_SIZE : (isImage ? MAX_IMAGE_SIZE : MAX_PDF_SIZE);
 
         if (fileSize > maxSize) {
+            const maxLabel = isVideo ? '50MB' : (isImage ? '10MB' : '25MB');
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: `File too large. Max size: ${isImage ? '10MB' : '25MB'}` })
+                body: JSON.stringify({ error: `File too large. Max size: ${maxLabel}` })
             };
         }
 
         const sanitizedFilename = sanitizeFilename(filename.replace(/\.[^.]+$/, '')) + getFileExtension(mimeType);
-        const bucket = isImage ? 'images' : 'documents';
+        const bucket = isVideo ? 'videos' : (isImage ? 'images' : 'documents');
         const filePath = `${postId}/${sanitizedFilename}`;
 
         const result = await uploadToSupabase(bucket, filePath, fileBuffer, mimeType);
