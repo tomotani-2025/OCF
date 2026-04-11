@@ -238,7 +238,7 @@ a {
     justify-content: center;
     gap: 6px;
     padding: 6px 14px;
-    background-color: var(--color-accent-red);
+    background-color: #000000;
     color: var(--color-paragraph-2) !important;
     border-radius: 500px;
     font-size: 13px;
@@ -253,8 +253,8 @@ a {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: #000000;
-    fill: #000000;
+    color: var(--color-accent-red);
+    fill: var(--color-accent-red);
 }
 
 .btn.btn-donate .donate-icon-filled {
@@ -262,12 +262,12 @@ a {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: #000000;
-    fill: #000000;
+    color: var(--color-accent-red);
+    fill: var(--color-accent-red);
 }
 
 .btn.btn-donate:hover {
-    background-color: #d42e40;
+    background-color: #1a1a1a;
     color: var(--color-paragraph-2) !important;
 }
 
