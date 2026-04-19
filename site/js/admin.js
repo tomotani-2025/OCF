@@ -510,6 +510,124 @@ class AdminDashboard {
     }
 
     // ========================================
+    // Word Doc Import
+    // ========================================
+
+    async importWordDoc(file) {
+        if (typeof mammoth === 'undefined') {
+            showToast('Word import library failed to load. Please refresh and try again.', 'error');
+            return;
+        }
+
+        const statusEl = document.getElementById('import-word-status');
+        const setStatus = (msg) => {
+            if (!statusEl) return;
+            statusEl.hidden = false;
+            statusEl.textContent = msg;
+        };
+        const clearStatus = () => {
+            if (statusEl) statusEl.hidden = true;
+        };
+
+        setStatus('Reading document...');
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const draftPostId = 'draft-' + Date.now();
+            const uploadedImages = []; // {src, alt}
+            let imgCounter = 0;
+            let imgFailures = 0;
+
+            setStatus('Converting document...');
+
+            // mammoth converts each embedded image via this handler.
+            // We upload to Supabase Storage and return the public URL as the src.
+            const convertImage = mammoth.images.imgElement(async (image) => {
+                imgCounter++;
+                setStatus(`Uploading image ${imgCounter}...`);
+                try {
+                    const base64 = await image.read('base64');
+                    const mimeType = image.contentType || 'image/png';
+                    const ext = mimeType.split('/')[1] || 'png';
+                    const filename = `word-img-${imgCounter}.${ext}`;
+
+                    const result = await this.uploadFile({
+                        base64,
+                        filename,
+                        mimeType,
+                        type: 'image'
+                    }, draftPostId);
+
+                    if (!result || !result.success || !result.path) {
+                        imgFailures++;
+                        console.warn('Word import: image upload failed', result && result.error);
+                        return { src: '' };
+                    }
+
+                    const altText = image.altText || filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+                    uploadedImages.push({ src: result.path, alt: altText });
+                    return { src: result.path, alt: altText };
+                } catch (err) {
+                    imgFailures++;
+                    console.error('Word import: image handler error', err);
+                    return { src: '' };
+                }
+            });
+
+            const conversion = await mammoth.convertToHtml(
+                { arrayBuffer },
+                { convertImage }
+            );
+
+            let html = conversion.value || '';
+
+            // Extract a title candidate from the first heading, otherwise use filename
+            let titleCandidate = '';
+            const headingMatch = html.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
+            if (headingMatch) {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = headingMatch[1];
+                titleCandidate = (tmp.textContent || '').trim();
+                // Remove that heading from the body content so it doesn't duplicate the title
+                html = html.replace(headingMatch[0], '');
+            }
+            if (!titleCandidate) {
+                titleCandidate = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').trim();
+            }
+
+            // Open editor in "new post" mode, then populate
+            this.showEditor();
+
+            document.getElementById('post-title').value = titleCandidate;
+            this.setQuillContent(html);
+
+            // Add uploaded images to the post gallery and pick a cover
+            if (uploadedImages.length > 0) {
+                this.postImages = uploadedImages.slice();
+                this.coverImageIndex = 0;
+                this.renderPostGalleryGrid();
+                this.updateCoverImagePreview();
+            }
+
+            this.markDirty();
+
+            clearStatus();
+
+            const warnings = (conversion.messages || []).filter(m => m.type === 'warning').length;
+            let doneMsg = `Imported "${file.name}"`;
+            if (uploadedImages.length > 0) doneMsg += ` with ${uploadedImages.length} image(s)`;
+            if (imgFailures > 0) doneMsg += ` (${imgFailures} image(s) failed to upload)`;
+            if (warnings > 0) doneMsg += ` — ${warnings} formatting warning(s), see console`;
+            if (warnings > 0) console.warn('Word import messages:', conversion.messages);
+            showToast(doneMsg, imgFailures > 0 ? 'warning' : 'success');
+        } catch (error) {
+            console.error('Word import failed:', error);
+            clearStatus();
+            showToast('Failed to import Word doc: ' + (error.message || 'unknown error'), 'error');
+        }
+    }
+
+    // ========================================
     // Data Loading
     // ========================================
 
@@ -553,6 +671,18 @@ class AdminDashboard {
     setupEventListeners() {
         // Dashboard actions
         document.getElementById('create-new-btn').addEventListener('click', () => this.showEditor());
+
+        // Import Word doc
+        const importWordBtn = document.getElementById('import-word-btn');
+        const importWordFile = document.getElementById('import-word-file');
+        if (importWordBtn && importWordFile) {
+            importWordBtn.addEventListener('click', () => importWordFile.click());
+            importWordFile.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (file) this.importWordDoc(file);
+                e.target.value = '';
+            });
+        }
         document.getElementById('search-posts').addEventListener('input', (e) => this.filterPosts(e.target.value));
         document.getElementById('filter-posts-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
 

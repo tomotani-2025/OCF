@@ -882,6 +882,16 @@
     min-width: 180px;
 }
 
+.import-status {
+    padding: 6px 12px;
+    background: #fff8e1;
+    border: 1px solid #f0c36d;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #7a5a10;
+    white-space: nowrap;
+}
+
 /* Bulk Selection */
 .bulk-select-label {
     display: flex;
