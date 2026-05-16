@@ -96,9 +96,60 @@ class AdminDashboard {
 
     async init() {
         await this.loadPosts();
+        this.populateCategoryDropdowns();
         this.renderPostsTable();
         this.setupEventListeners();
         this.initQuillEditor();
+    }
+
+    // Built-in defaults always shown even if no post uses them yet
+    static DEFAULT_CATEGORIES = ['Batwa', 'Bwindi', 'Nepal', 'Base Camp For Veterans'];
+    static ADD_NEW_SENTINEL = '__add_new_category__';
+
+    getKnownCategories() {
+        const set = new Set(AdminDashboard.DEFAULT_CATEGORIES);
+        (this.customCategories || []).forEach(c => set.add(c));
+        (this.posts || []).forEach(p => { if (p.category) set.add(p.category); });
+        return [...set].sort((a, b) => a.localeCompare(b));
+    }
+
+    populateCategoryDropdowns() {
+        const categories = this.getKnownCategories();
+
+        const editSelect = document.getElementById('post-category');
+        if (editSelect) {
+            const current = editSelect.value;
+            editSelect.innerHTML =
+                '<option value="">Select a category</option>' +
+                categories.map(c => `<option value="${c}">${c}</option>`).join('') +
+                `<option value="${AdminDashboard.ADD_NEW_SENTINEL}">+ Add new category…</option>`;
+            if (current && current !== AdminDashboard.ADD_NEW_SENTINEL) editSelect.value = current;
+        }
+
+        const filterSelect = document.getElementById('filter-posts-category');
+        if (filterSelect) {
+            const current = filterSelect.value || 'all';
+            filterSelect.innerHTML =
+                '<option value="all">All Categories</option>' +
+                categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            filterSelect.value = current;
+        }
+    }
+
+    handleCategoryChange() {
+        const select = document.getElementById('post-category');
+        if (!select || select.value !== AdminDashboard.ADD_NEW_SENTINEL) return;
+
+        const name = (window.prompt('New category name:') || '').trim();
+        if (!name) {
+            select.value = '';
+            return;
+        }
+        this.customCategories = this.customCategories || [];
+        const existing = this.getKnownCategories().find(c => c.toLowerCase() === name.toLowerCase());
+        if (!existing) this.customCategories.push(name);
+        this.populateCategoryDropdowns();
+        select.value = existing || name;
     }
 
     // ========================================
@@ -685,6 +736,7 @@ class AdminDashboard {
         }
         document.getElementById('search-posts').addEventListener('input', (e) => this.filterPosts(e.target.value));
         document.getElementById('filter-posts-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
+        document.getElementById('post-category').addEventListener('change', () => this.handleCategoryChange());
 
         // Editor actions
         document.getElementById('back-to-dashboard').addEventListener('click', () => this.showDashboard());
@@ -2172,6 +2224,7 @@ class AdminDashboard {
             setTimeout(() => {
                 this.closeAllModals();
                 this.showDashboard();
+                this.populateCategoryDropdowns();
                 this.renderPostsTable();
             }, 2000);
 
@@ -2390,6 +2443,7 @@ class AdminDashboard {
             // Return to dashboard after delay
             setTimeout(() => {
                 this.closeAllModals();
+                this.populateCategoryDropdowns();
                 this.renderPostsTable();
             }, 2000);
 
