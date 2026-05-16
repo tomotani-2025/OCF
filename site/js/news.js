@@ -72,7 +72,7 @@ class NewsCMS {
         this.currentSort = 'newest';
         this.currentPage = 1;
         this.postsPerPage = 6;
-        this.categories = ['Batwa', 'Bwindi', 'Nepal', 'Base Camp For Veterans'];
+        this.categories = [];
     }
 
     // Generate YouTube thumbnail URL from video URL
@@ -89,6 +89,7 @@ class NewsCMS {
     async init() {
         try {
             await this.loadPosts();
+            await this.loadCategories();
             this.render();
             this.setupFilters();
             this.setupSort();
@@ -96,6 +97,23 @@ class NewsCMS {
             console.error('Failed to initialize News CMS:', error);
             this.showError();
         }
+    }
+
+    async loadCategories() {
+        let managed = [];
+        try {
+            if (typeof categoriesAPI !== 'undefined') {
+                const rows = await categoriesAPI.getAll();
+                managed = rows.map(r => r.name);
+            }
+        } catch (err) {
+            console.error('Error loading categories:', err);
+        }
+        // Union with any category actually used by a post, in case a post
+        // references a category that isn't (yet) in the managed table.
+        const set = new Set(managed);
+        this.posts.forEach(p => { if (p.category) set.add(p.category); });
+        this.categories = [...set].sort((a, b) => a.localeCompare(b));
     }
 
     async loadPosts() {
