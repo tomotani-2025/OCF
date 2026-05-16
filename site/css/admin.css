@@ -210,6 +210,17 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.form-group select,
+.dashboard-filter select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2331110F' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -1248,6 +1259,127 @@
     color: #F7F4EB;
     white-space: pre-wrap;
     word-break: break-all;
+}
+
+/* Edit Categories Modal */
+.categories-modal-content {
+    max-width: 560px;
+    padding: 32px 40px 40px;
+}
+
+.categories-modal-content h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #31110F;
+    margin: 0 0 8px 0;
+}
+
+.categories-modal-content .form-help {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+}
+
+.categories-list {
+    list-style: none;
+    margin: 0 0 20px 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid rgba(49, 17, 15, 0.12);
+    border-radius: 6px;
+}
+
+.categories-list:empty::after {
+    content: 'No categories yet.';
+    display: block;
+    padding: 16px;
+    color: #888;
+    font-size: 14px;
+    text-align: center;
+}
+
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(49, 17, 15, 0.08);
+}
+
+.category-row:last-child {
+    border-bottom: none;
+}
+
+.category-row .category-name {
+    flex: 1;
+    font-size: 15px;
+    color: #31110F;
+}
+
+.category-row .category-count {
+    font-size: 12px;
+    color: #888;
+    margin-right: 6px;
+}
+
+.category-row input[type="text"] {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid rgba(49, 17, 15, 0.25);
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.category-row .icon-btn {
+    background: transparent;
+    border: 1px solid rgba(49, 17, 15, 0.18);
+    color: #31110F;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.category-row .icon-btn:hover {
+    background: #F7F4EB;
+}
+
+.category-row .icon-btn.danger:hover {
+    background: #FDECEE;
+    border-color: #EF3A4F;
+    color: #EF3A4F;
+}
+
+.category-row .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.add-category-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-category-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(49, 17, 15, 0.2);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.categories-modal-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Delete Modal */

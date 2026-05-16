@@ -383,6 +383,27 @@
                     </div>
                 </div>
 
+                <!-- Edit Categories Modal -->
+                <div id="categories-modal" class="modal" hidden>
+                    <div class="modal-backdrop"></div>
+                    <div class="modal-content categories-modal-content">
+                        <button type="button" class="modal-close" id="categories-modal-close" aria-label="Close">&times;</button>
+                        <h2>Edit Categories</h2>
+                        <p class="form-help">Rename or remove existing categories, or add a new one. Renaming will update every post that uses the category.</p>
+
+                        <ul id="categories-list" class="categories-list"></ul>
+
+                        <form id="add-category-form" class="add-category-row">
+                            <input type="text" id="new-category-input" placeholder="New category name" autocomplete="off">
+                            <button type="submit" class="btn btn-primary">Add Category</button>
+                        </form>
+
+                        <div class="categories-modal-actions">
+                            <button type="button" id="categories-modal-done" class="btn btn-outline">Done</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Post Gallery Image Editor Modal -->
                 <div id="post-gallery-image-modal" class="modal" hidden>
                     <div class="modal-backdrop"></div>
@@ -1689,6 +1710,6 @@ Paul Kirui Photography|http://www.paulkirui-photography.com/"></textarea>
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js?v=3"></script>
     <script src="js/gallery-admin.js?v=2"></script>
-    <script src="js/admin.js?v=16"></script>
+    <script src="js/admin.js?v=17"></script>
 </body>
 </html>

@@ -102,15 +102,35 @@ class AdminDashboard {
         this.initQuillEditor();
     }
 
-    // Built-in defaults always shown even if no post uses them yet
+    // Seed values used the first time the managed list is created in this browser
     static DEFAULT_CATEGORIES = ['Batwa', 'Bwindi', 'Nepal', 'Base Camp For Veterans'];
-    static ADD_NEW_SENTINEL = '__add_new_category__';
+    static EDIT_SENTINEL = '__edit_categories__';
+    static MANAGED_KEY = 'ocf-admin-managed-categories';
+
+    getManagedCategories() {
+        try {
+            const stored = JSON.parse(localStorage.getItem(AdminDashboard.MANAGED_KEY) || 'null');
+            if (Array.isArray(stored)) return stored;
+        } catch (_) {}
+        // First-run seed
+        const seed = [...AdminDashboard.DEFAULT_CATEGORIES];
+        localStorage.setItem(AdminDashboard.MANAGED_KEY, JSON.stringify(seed));
+        return seed;
+    }
+
+    setManagedCategories(list) {
+        const cleaned = [...new Set(list.map(s => s.trim()).filter(Boolean))];
+        localStorage.setItem(AdminDashboard.MANAGED_KEY, JSON.stringify(cleaned));
+    }
 
     getKnownCategories() {
-        const set = new Set(AdminDashboard.DEFAULT_CATEGORIES);
-        (this.customCategories || []).forEach(c => set.add(c));
+        const set = new Set(this.getManagedCategories());
         (this.posts || []).forEach(p => { if (p.category) set.add(p.category); });
         return [...set].sort((a, b) => a.localeCompare(b));
+    }
+
+    getCategoryPostCount(name) {
+        return (this.posts || []).filter(p => p.category === name).length;
     }
 
     populateCategoryDropdowns() {
@@ -122,8 +142,8 @@ class AdminDashboard {
             editSelect.innerHTML =
                 '<option value="">Select a category</option>' +
                 categories.map(c => `<option value="${c}">${c}</option>`).join('') +
-                `<option value="${AdminDashboard.ADD_NEW_SENTINEL}">+ Add new category…</option>`;
-            if (current && current !== AdminDashboard.ADD_NEW_SENTINEL) editSelect.value = current;
+                `<option value="${AdminDashboard.EDIT_SENTINEL}">Edit Categories…</option>`;
+            if (current && current !== AdminDashboard.EDIT_SENTINEL) editSelect.value = current;
         }
 
         const filterSelect = document.getElementById('filter-posts-category');
@@ -138,18 +158,150 @@ class AdminDashboard {
 
     handleCategoryChange() {
         const select = document.getElementById('post-category');
-        if (!select || select.value !== AdminDashboard.ADD_NEW_SENTINEL) return;
+        if (!select || select.value !== AdminDashboard.EDIT_SENTINEL) return;
+        // Restore previous selection so the sentinel isn't left selected after the modal closes
+        select.value = this._lastPostCategoryValue || '';
+        this.openCategoriesModal();
+    }
 
-        const name = (window.prompt('New category name:') || '').trim();
-        if (!name) {
-            select.value = '';
+    // ========================================
+    // Edit Categories Modal
+    // ========================================
+
+    openCategoriesModal() {
+        const modal = document.getElementById('categories-modal');
+        if (!modal) return;
+        this.renderCategoriesList();
+        modal.hidden = false;
+
+        if (!this._categoriesModalWired) {
+            this._categoriesModalWired = true;
+            document.getElementById('categories-modal-close').addEventListener('click', () => this.closeCategoriesModal());
+            document.getElementById('categories-modal-done').addEventListener('click', () => this.closeCategoriesModal());
+            modal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeCategoriesModal());
+            document.getElementById('add-category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.addCategoryFromModal();
+            });
+        }
+    }
+
+    closeCategoriesModal() {
+        const modal = document.getElementById('categories-modal');
+        if (modal) modal.hidden = true;
+    }
+
+    renderCategoriesList() {
+        const list = document.getElementById('categories-list');
+        if (!list) return;
+        const categories = this.getKnownCategories();
+
+        list.innerHTML = categories.map(name => {
+            const count = this.getCategoryPostCount(name);
+            const safe = name.replace(/"/g, '&quot;');
+            return `
+                <li class="category-row" data-name="${safe}">
+                    <span class="category-name">${name}</span>
+                    <span class="category-count">${count} post${count === 1 ? '' : 's'}</span>
+                    <button type="button" class="icon-btn" data-action="rename" title="Rename">&#9998;</button>
+                    <button type="button" class="icon-btn danger" data-action="delete" title="Delete"${count > 0 ? ' disabled' : ''}>&#128465;</button>
+                </li>`;
+        }).join('');
+
+        list.querySelectorAll('button[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const row = btn.closest('.category-row');
+                const name = row.dataset.name;
+                if (btn.dataset.action === 'rename') this.beginRenameCategory(row, name);
+                else if (btn.dataset.action === 'delete') this.deleteCategoryFromModal(name);
+            });
+        });
+    }
+
+    beginRenameCategory(row, oldName) {
+        row.innerHTML = `
+            <input type="text" value="${oldName.replace(/"/g, '&quot;')}">
+            <button type="button" class="icon-btn" data-action="save" title="Save">&#10003;</button>
+            <button type="button" class="icon-btn" data-action="cancel" title="Cancel">&times;</button>`;
+        const input = row.querySelector('input');
+        input.focus();
+        input.select();
+
+        const save = () => {
+            const newName = input.value.trim();
+            this.renameCategoryFromModal(oldName, newName);
+        };
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); save(); }
+            else if (e.key === 'Escape') this.renderCategoriesList();
+        });
+        row.querySelector('[data-action="save"]').addEventListener('click', save);
+        row.querySelector('[data-action="cancel"]').addEventListener('click', () => this.renderCategoriesList());
+    }
+
+    addCategoryFromModal() {
+        const input = document.getElementById('new-category-input');
+        const name = (input.value || '').trim();
+        if (!name) return;
+        const existing = this.getKnownCategories().find(c => c.toLowerCase() === name.toLowerCase());
+        if (existing) {
+            showToast(`Category "${existing}" already exists.`, 'error');
             return;
         }
-        this.customCategories = this.customCategories || [];
-        const existing = this.getKnownCategories().find(c => c.toLowerCase() === name.toLowerCase());
-        if (!existing) this.customCategories.push(name);
+        const managed = this.getManagedCategories();
+        managed.push(name);
+        this.setManagedCategories(managed);
+        input.value = '';
+        this.renderCategoriesList();
         this.populateCategoryDropdowns();
-        select.value = existing || name;
+        showToast(`Added "${name}".`, 'success');
+    }
+
+    async renameCategoryFromModal(oldName, newName) {
+        if (!newName) {
+            showToast('Category name cannot be empty.', 'error');
+            return;
+        }
+        if (newName === oldName) {
+            this.renderCategoriesList();
+            return;
+        }
+        const clash = this.getKnownCategories().find(c => c.toLowerCase() === newName.toLowerCase() && c !== oldName);
+        if (clash) {
+            showToast(`Category "${clash}" already exists.`, 'error');
+            return;
+        }
+
+        const affected = (this.posts || []).filter(p => p.category === oldName);
+        try {
+            for (const post of affected) {
+                await postsAPI.update(post.id, { category: newName });
+                post.category = newName;
+            }
+            const managed = this.getManagedCategories().map(c => c === oldName ? newName : c);
+            this.setManagedCategories(managed);
+            this.renderCategoriesList();
+            this.populateCategoryDropdowns();
+            this.renderPostsTable();
+            showToast(`Renamed to "${newName}" (${affected.length} post${affected.length === 1 ? '' : 's'} updated).`, 'success');
+        } catch (err) {
+            console.error('Rename category error:', err);
+            showToast(`Error renaming category: ${err.message}`, 'error');
+        }
+    }
+
+    deleteCategoryFromModal(name) {
+        const count = this.getCategoryPostCount(name);
+        if (count > 0) {
+            showToast(`Cannot delete "${name}" — ${count} post${count === 1 ? ' uses' : 's use'} it. Reassign first.`, 'error');
+            return;
+        }
+        if (!window.confirm(`Delete category "${name}"?`)) return;
+        const managed = this.getManagedCategories().filter(c => c !== name);
+        this.setManagedCategories(managed);
+        this.renderCategoriesList();
+        this.populateCategoryDropdowns();
+        showToast(`Deleted "${name}".`, 'success');
     }
 
     // ========================================
@@ -736,7 +888,10 @@ class AdminDashboard {
         }
         document.getElementById('search-posts').addEventListener('input', (e) => this.filterPosts(e.target.value));
         document.getElementById('filter-posts-category').addEventListener('change', (e) => this.filterByCategory(e.target.value));
-        document.getElementById('post-category').addEventListener('change', () => this.handleCategoryChange());
+        const postCategorySelect = document.getElementById('post-category');
+        postCategorySelect.addEventListener('focus', () => { this._lastPostCategoryValue = postCategorySelect.value; });
+        postCategorySelect.addEventListener('mousedown', () => { this._lastPostCategoryValue = postCategorySelect.value; });
+        postCategorySelect.addEventListener('change', () => this.handleCategoryChange());
 
         // Editor actions
         document.getElementById('back-to-dashboard').addEventListener('click', () => this.showDashboard());
