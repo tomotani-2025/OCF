@@ -95,38 +95,32 @@ class AdminDashboard {
     }
 
     async init() {
-        await this.loadPosts();
+        await Promise.all([this.loadPosts(), this.loadCategories()]);
         this.populateCategoryDropdowns();
         this.renderPostsTable();
         this.setupEventListeners();
         this.initQuillEditor();
     }
 
-    // Seed values used the first time the managed list is created in this browser
-    static DEFAULT_CATEGORIES = ['Batwa', 'Bwindi', 'Nepal', 'Base Camp For Veterans'];
     static EDIT_SENTINEL = '__edit_categories__';
-    static MANAGED_KEY = 'ocf-admin-managed-categories';
 
-    getManagedCategories() {
+    async loadCategories() {
         try {
-            const stored = JSON.parse(localStorage.getItem(AdminDashboard.MANAGED_KEY) || 'null');
-            if (Array.isArray(stored)) return stored;
-        } catch (_) {}
-        // First-run seed
-        const seed = [...AdminDashboard.DEFAULT_CATEGORIES];
-        localStorage.setItem(AdminDashboard.MANAGED_KEY, JSON.stringify(seed));
-        return seed;
-    }
-
-    setManagedCategories(list) {
-        const cleaned = [...new Set(list.map(s => s.trim()).filter(Boolean))];
-        localStorage.setItem(AdminDashboard.MANAGED_KEY, JSON.stringify(cleaned));
+            this.managedCategories = await categoriesAPI.getAll();
+        } catch (err) {
+            console.error('Error loading categories:', err);
+            this.managedCategories = [];
+        }
     }
 
     getKnownCategories() {
-        const set = new Set(this.getManagedCategories());
+        const set = new Set((this.managedCategories || []).map(c => c.name));
         (this.posts || []).forEach(p => { if (p.category) set.add(p.category); });
         return [...set].sort((a, b) => a.localeCompare(b));
+    }
+
+    findManagedCategory(name) {
+        return (this.managedCategories || []).find(c => c.name === name);
     }
 
     getCategoryPostCount(name) {
@@ -239,7 +233,7 @@ class AdminDashboard {
         row.querySelector('[data-action="cancel"]').addEventListener('click', () => this.renderCategoriesList());
     }
 
-    addCategoryFromModal() {
+    async addCategoryFromModal() {
         const input = document.getElementById('new-category-input');
         const name = (input.value || '').trim();
         if (!name) return;
@@ -248,13 +242,18 @@ class AdminDashboard {
             showToast(`Category "${existing}" already exists.`, 'error');
             return;
         }
-        const managed = this.getManagedCategories();
-        managed.push(name);
-        this.setManagedCategories(managed);
-        input.value = '';
-        this.renderCategoriesList();
-        this.populateCategoryDropdowns();
-        showToast(`Added "${name}".`, 'success');
+        try {
+            const created = await categoriesAPI.create(name);
+            this.managedCategories = this.managedCategories || [];
+            if (created) this.managedCategories.push(created);
+            input.value = '';
+            this.renderCategoriesList();
+            this.populateCategoryDropdowns();
+            showToast(`Added "${name}".`, 'success');
+        } catch (err) {
+            console.error('Add category error:', err);
+            showToast(`Error adding category: ${err.message}`, 'error');
+        }
     }
 
     async renameCategoryFromModal(oldName, newName) {
@@ -278,8 +277,15 @@ class AdminDashboard {
                 await postsAPI.update(post.id, { category: newName });
                 post.category = newName;
             }
-            const managed = this.getManagedCategories().map(c => c === oldName ? newName : c);
-            this.setManagedCategories(managed);
+            const managed = this.findManagedCategory(oldName);
+            if (managed) {
+                await categoriesAPI.rename(managed.id, newName);
+                managed.name = newName;
+            } else {
+                // Was only referenced by posts; create a managed row under the new name
+                const created = await categoriesAPI.create(newName);
+                if (created) (this.managedCategories = this.managedCategories || []).push(created);
+            }
             this.renderCategoriesList();
             this.populateCategoryDropdowns();
             this.renderPostsTable();
@@ -290,18 +296,28 @@ class AdminDashboard {
         }
     }
 
-    deleteCategoryFromModal(name) {
+    async deleteCategoryFromModal(name) {
         const count = this.getCategoryPostCount(name);
         if (count > 0) {
             showToast(`Cannot delete "${name}" — ${count} post${count === 1 ? ' uses' : 's use'} it. Reassign first.`, 'error');
             return;
         }
         if (!window.confirm(`Delete category "${name}"?`)) return;
-        const managed = this.getManagedCategories().filter(c => c !== name);
-        this.setManagedCategories(managed);
-        this.renderCategoriesList();
-        this.populateCategoryDropdowns();
-        showToast(`Deleted "${name}".`, 'success');
+        const managed = this.findManagedCategory(name);
+        if (!managed) {
+            this.renderCategoriesList();
+            return;
+        }
+        try {
+            await categoriesAPI.delete(managed.id);
+            this.managedCategories = this.managedCategories.filter(c => c.id !== managed.id);
+            this.renderCategoriesList();
+            this.populateCategoryDropdowns();
+            showToast(`Deleted "${name}".`, 'success');
+        } catch (err) {
+            console.error('Delete category error:', err);
+            showToast(`Error deleting category: ${err.message}`, 'error');
+        }
     }
 
     // ========================================

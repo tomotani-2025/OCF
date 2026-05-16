@@ -563,6 +563,36 @@ const footerAPI = {
     }
 };
 
+// Post Categories API
+const categoriesAPI = {
+    slugify(name) {
+        return name.toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    },
+
+    async getAll() {
+        return supabase.query('post_categories', {
+            select: '*',
+            order: 'sort_order.asc,name.asc'
+        });
+    },
+
+    async create(name) {
+        const id = this.slugify(name);
+        const result = await supabase.insert('post_categories', { id, name, sort_order: 100 });
+        return Array.isArray(result) ? result[0] : result;
+    },
+
+    async rename(id, newName) {
+        return supabase.update('post_categories', { name: newName }, { id });
+    },
+
+    async delete(id) {
+        return supabase.delete('post_categories', { id });
+    }
+};
+
 // Export for use
 window.supabase = supabase;
 window.postsAPI = postsAPI;
@@ -572,3 +602,4 @@ window.aboutAPI = aboutAPI;
 window.missionAPI = missionAPI;
 window.goalPagesAPI = goalPagesAPI;
 window.footerAPI = footerAPI;
+window.categoriesAPI = categoriesAPI;
