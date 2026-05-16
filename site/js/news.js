@@ -89,7 +89,7 @@ class NewsCMS {
     async init() {
         try {
             await this.loadPosts();
-            await this.loadCategories();
+            this.deriveCategoriesFromPosts();
             this.render();
             this.setupFilters();
             this.setupSort();
@@ -99,19 +99,8 @@ class NewsCMS {
         }
     }
 
-    async loadCategories() {
-        let managed = [];
-        try {
-            if (typeof categoriesAPI !== 'undefined') {
-                const rows = await categoriesAPI.getAll();
-                managed = rows.map(r => r.name);
-            }
-        } catch (err) {
-            console.error('Error loading categories:', err);
-        }
-        // Union with any category actually used by a post, in case a post
-        // references a category that isn't (yet) in the managed table.
-        const set = new Set(managed);
+    deriveCategoriesFromPosts() {
+        const set = new Set();
         this.posts.forEach(p => { if (p.category) set.add(p.category); });
         this.categories = [...set].sort((a, b) => a.localeCompare(b));
     }
