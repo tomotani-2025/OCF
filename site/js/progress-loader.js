@@ -176,7 +176,7 @@ function createProgressCard(goal) {
                     ${goalBarsHTML}
                     ${donationsValue > 0 ? `
                     <div class="bar-raised" style="--bar-height: ${donationsPercent}%; --bar-color: ${donationsColor}; ${donations.gradientColor1 && donations.gradientColor2 ? `--bar-gradient: linear-gradient(to bottom, ${donations.gradientColor1}, ${donations.gradientColor2});` : ''}">
-                        <span class="bar-text">Donations To Date<br>${formatCurrency(donationsValue)}</span>
+                        <span class="bar-text">Donations To Date<br><strong>${formatCurrency(donationsValue)}</strong></span>
                     </div>
                     ` : ''}
                     ${markersHTML}
