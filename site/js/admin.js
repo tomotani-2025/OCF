@@ -729,8 +729,34 @@ class AdminDashboard {
     }
 
     // ========================================
-    // Word Doc Import
+    // Document Import (Word .docx / PDF)
     // ========================================
+
+    // Shared status pill under the dashboard actions, used by both importers.
+    importStatus() {
+        const statusEl = document.getElementById('import-doc-status');
+        return {
+            setStatus: (msg) => {
+                if (!statusEl) return;
+                statusEl.hidden = false;
+                statusEl.textContent = msg;
+            },
+            clearStatus: () => {
+                if (statusEl) statusEl.hidden = true;
+            }
+        };
+    }
+
+    importDocument(file) {
+        const name = (file.name || '').toLowerCase();
+        if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+            return this.importPdfDoc(file);
+        }
+        if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
+            return this.importWordDoc(file);
+        }
+        showToast('Unsupported file type. Please choose a .docx or .pdf file.', 'error');
+    }
 
     async importWordDoc(file) {
         if (typeof mammoth === 'undefined') {
@@ -738,15 +764,7 @@ class AdminDashboard {
             return;
         }
 
-        const statusEl = document.getElementById('import-word-status');
-        const setStatus = (msg) => {
-            if (!statusEl) return;
-            statusEl.hidden = false;
-            statusEl.textContent = msg;
-        };
-        const clearStatus = () => {
-            if (statusEl) statusEl.hidden = true;
-        };
+        const { setStatus, clearStatus } = this.importStatus();
 
         setStatus('Reading document...');
 
@@ -846,6 +864,505 @@ class AdminDashboard {
         }
     }
 
+    // ----------------------------------------
+    // PDF Import
+    // ----------------------------------------
+
+    async importPdfDoc(file) {
+        if (typeof pdfjsLib === 'undefined') {
+            showToast('PDF import library failed to load. Please refresh and try again.', 'error');
+            return;
+        }
+
+        const { setStatus, clearStatus } = this.importStatus();
+        setStatus('Reading PDF...');
+
+        try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            const draftPostId = 'draft-' + Date.now();
+            const pages = [];
+            const seenImages = new Set();
+
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                setStatus(`Reading page ${pageNum} of ${pdf.numPages}...`);
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 1 });
+                const lines = await this.extractPdfLines(page, viewport);
+                const images = await this.extractPdfImages(page, seenImages);
+                pages.push({ lines, images });
+                page.cleanup();
+            }
+
+            // Drop running headers/footers before any of them can be mistaken for a title
+            this.stripPdfRunningText(pages);
+
+            // Upload the extracted bitmaps, then reference them by their public URL
+            const uploadedImages = [];
+            let imgFailures = 0;
+            let imgCounter = 0;
+            const totalImages = pages.reduce((n, p) => n + p.images.length, 0);
+
+            for (const page of pages) {
+                page.imageHtml = [];
+                for (const image of page.images) {
+                    imgCounter++;
+                    setStatus(`Uploading image ${imgCounter} of ${totalImages}...`);
+                    try {
+                        const base64 = await this.blobToBase64(image.blob);
+                        const ext = image.mimeType === 'image/png' ? 'png' : 'jpg';
+                        const filename = `pdf-img-${imgCounter}.${ext}`;
+
+                        const result = await this.uploadFile({
+                            base64,
+                            filename,
+                            mimeType: image.mimeType,
+                            type: 'image'
+                        }, draftPostId);
+
+                        if (!result || !result.success || !result.path) {
+                            imgFailures++;
+                            console.warn('PDF import: image upload failed', result && result.error);
+                            continue;
+                        }
+
+                        const alt = `${file.name.replace(/\.[^.]+$/, '')} image ${imgCounter}`;
+                        uploadedImages.push({ src: result.path, alt });
+                        page.imageHtml.push(`<p><img src="${result.path}" alt="${this.escapeHtmlText(alt)}"></p>`);
+                    } catch (err) {
+                        imgFailures++;
+                        console.error('PDF import: image handler error', err);
+                    }
+                }
+            }
+
+            setStatus('Building post...');
+
+            const built = this.pdfPagesToHtml(pages);
+            let html = built.html;
+
+            let titleCandidate = built.title;
+            if (!titleCandidate) {
+                titleCandidate = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').trim();
+            }
+
+            const textLength = pages.reduce(
+                (n, p) => n + p.lines.reduce((m, l) => m + l.text.length, 0), 0
+            );
+
+            // Open editor in "new post" mode, then populate
+            this.showEditor();
+
+            document.getElementById('post-title').value = titleCandidate;
+            this.setQuillContent(html);
+
+            if (uploadedImages.length > 0) {
+                this.postImages = uploadedImages.slice();
+                this.coverImageIndex = 0;
+                this.renderPostGalleryGrid();
+                this.updateCoverImagePreview();
+            }
+
+            this.markDirty();
+            clearStatus();
+
+            let doneMsg = `Imported "${file.name}"`;
+            if (uploadedImages.length > 0) doneMsg += ` with ${uploadedImages.length} image(s)`;
+            if (imgFailures > 0) doneMsg += ` (${imgFailures} image(s) failed to upload)`;
+            doneMsg += ' — please review the formatting before publishing';
+            showToast(doneMsg, imgFailures > 0 ? 'warning' : 'success');
+
+            if (textLength < 50) {
+                showToast(
+                    'This PDF has no selectable text (it looks scanned). Any images were imported, but the text needs to be typed in.',
+                    'warning'
+                );
+            }
+        } catch (error) {
+            console.error('PDF import failed:', error);
+            clearStatus();
+            const isPassword = error && (error.name === 'PasswordException' || /password/i.test(error.message || ''));
+            showToast(
+                isPassword
+                    ? 'This PDF is password protected. Remove the password and try again.'
+                    : 'Failed to import PDF: ' + ((error && error.message) || 'unknown error'),
+                'error'
+            );
+        }
+    }
+
+    // Group a page's text items into visual lines, top to bottom.
+    async extractPdfLines(page, viewport) {
+        const textContent = await page.getTextContent();
+        const pageHeight = viewport.height || 792;
+        const rows = [];
+
+        for (const item of textContent.items) {
+            if (!item.str || !item.str.trim()) continue;
+            const t = item.transform;
+            const size = Math.hypot(t[2], t[3]) || item.height || 12;
+            const x = t[4];
+            const y = t[5];
+            const width = item.width || 0;
+
+            let row = rows.find(r => Math.abs(r.y - y) <= Math.max(2, size * 0.4));
+            if (!row) {
+                row = { y, size: 0, items: [] };
+                rows.push(row);
+            }
+            row.size = Math.max(row.size, size);
+            row.items.push({ str: item.str, x, width, size, fontName: item.fontName });
+        }
+
+        rows.sort((a, b) => b.y - a.y);
+
+        return rows.map(row => {
+            row.items.sort((a, b) => a.x - b.x);
+            let text = '';
+            let prevEnd = null;
+            for (const it of row.items) {
+                if (prevEnd !== null && it.x - prevEnd > it.size * 0.2 && !/\s$/.test(text) && !/^\s/.test(it.str)) {
+                    text += ' ';
+                }
+                text += it.str;
+                prevEnd = it.x + it.width;
+            }
+            const minX = row.items.length ? row.items[0].x : 0;
+            const maxX = row.items.reduce((m, it) => Math.max(m, it.x + it.width), 0);
+            return {
+                text: text.replace(/\s+/g, ' ').trim(),
+                y: row.y,
+                size: row.size,
+                minX,
+                maxX,
+                bold: row.items.every(it => this.isPdfBoldFont(page, it.fontName)),
+                nearEdge: row.y > pageHeight * 0.92 || row.y < pageHeight * 0.08
+            };
+        }).filter(line => line.text);
+    }
+
+    isPdfBoldFont(page, fontName) {
+        if (!fontName) return false;
+        try {
+            if (page.commonObjs.has && !page.commonObjs.has(fontName)) return false;
+            const font = page.commonObjs.get(fontName);
+            const name = (font && (font.name || font.loadedName)) || '';
+            return /bold|black|heavy|semibold/i.test(name);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Remove page numbers and any header/footer line repeated across most pages.
+    stripPdfRunningText(pages) {
+        const counts = new Map();
+        for (const page of pages) {
+            const seen = new Set();
+            for (const line of page.lines) {
+                if (!line.nearEdge) continue;
+                const key = line.text.replace(/\d+/g, '#').toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                counts.set(key, (counts.get(key) || 0) + 1);
+            }
+        }
+
+        const repeatThreshold = Math.max(2, Math.ceil(pages.length * 0.6));
+        for (const page of pages) {
+            page.lines = page.lines.filter(line => {
+                if (/^\d{1,4}$/.test(line.text)) return false;
+                if (/^page\s+\d+(\s+of\s+\d+)?$/i.test(line.text)) return false;
+                if (!line.nearEdge) return true;
+                const key = line.text.replace(/\d+/g, '#').toLowerCase();
+                return (counts.get(key) || 0) < repeatThreshold;
+            });
+        }
+    }
+
+    // Turn the per-page lines into paragraphs, headings and lists.
+    pdfPagesToHtml(pages) {
+        const allLines = pages.flatMap(p => p.lines);
+        if (allLines.length === 0) {
+            return { html: pages.flatMap(p => p.imageHtml || []).join('\n'), title: '' };
+        }
+
+        // Body size = the size that the most characters are set in
+        const sizeWeights = new Map();
+        for (const line of allLines) {
+            const key = Math.round(line.size * 2) / 2;
+            sizeWeights.set(key, (sizeWeights.get(key) || 0) + line.text.length);
+        }
+        let bodySize = 12;
+        let bestWeight = -1;
+        for (const [size, weight] of sizeWeights) {
+            if (weight > bestWeight) { bestWeight = weight; bodySize = size; }
+        }
+
+        const bodyWidths = allLines
+            .filter(l => l.size <= bodySize * 1.1)
+            .map(l => l.maxX - l.minX);
+        const maxWidth = bodyWidths.length ? Math.max(...bodyWidths) : 0;
+
+        const html = [];
+        let title = '';
+        let paragraph = '';
+        let listType = null;
+        let listItems = [];
+        let prev = null;
+
+        const flushParagraph = () => {
+            if (paragraph.trim()) html.push(`<p>${this.escapeHtmlText(paragraph.trim())}</p>`);
+            paragraph = '';
+        };
+        const flushList = () => {
+            if (listItems.length) {
+                const tag = listType === 'ol' ? 'ol' : 'ul';
+                html.push(`<${tag}>${listItems.map(i => `<li>${this.escapeHtmlText(i)}</li>`).join('')}</${tag}>`);
+            }
+            listItems = [];
+            listType = null;
+        };
+        const flushAll = () => { flushParagraph(); flushList(); };
+
+        for (const page of pages) {
+            for (const line of page.lines) {
+                const bulletMatch = line.text.match(/^([•·▪◦‣∙*]|[-–—])\s+(.*)$/);
+                const numberMatch = line.text.match(/^(\d{1,2}[.)])\s+(.*)$/);
+                const isHeading =
+                    line.size >= bodySize * 1.15 ||
+                    (line.bold && line.size >= bodySize && line.text.length <= 80 && !/[.,;]$/.test(line.text));
+
+                if (bulletMatch || numberMatch) {
+                    flushParagraph();
+                    const type = bulletMatch ? 'ul' : 'ol';
+                    if (listType && listType !== type) flushList();
+                    listType = type;
+                    listItems.push((bulletMatch ? bulletMatch[2] : numberMatch[2]).trim());
+                    prev = line;
+                    continue;
+                }
+
+                // A short indented continuation belongs to the list item above it
+                if (listItems.length && prev && !isHeading && line.minX > prev.minX + 2) {
+                    listItems[listItems.length - 1] += ' ' + line.text;
+                    prev = line;
+                    continue;
+                }
+
+                if (isHeading) {
+                    flushAll();
+                    if (!title) {
+                        title = line.text;
+                    } else {
+                        const tag = line.size >= bodySize * 1.25 ? 'h2' : 'h3';
+                        html.push(`<${tag}>${this.escapeHtmlText(line.text)}</${tag}>`);
+                    }
+                    prev = line;
+                    continue;
+                }
+
+                // A plain line after a list closes the list before the paragraph starts
+                if (listItems.length) flushList();
+
+                if (paragraph) {
+                    let newBlock;
+                    if (!prev) {
+                        // First line of a page: only continue the paragraph if the
+                        // previous page ended mid-sentence.
+                        newBlock = /[.!?:"')\]]$/.test(paragraph) || !/^[a-z(]/.test(line.text);
+                    } else {
+                        const sameColumn = Math.abs(line.minX - prev.minX) < Math.max(6, bodySize * 0.6);
+                        const gap = prev.y - line.y;
+                        const bigGap = gap > 0 && gap > prev.size * 1.8;
+                        const shortPrevLine = maxWidth > 0 &&
+                            (prev.maxX - prev.minX) < maxWidth * 0.75 && /[.!?:]["')]?$/.test(prev.text);
+                        newBlock = bigGap || shortPrevLine || !sameColumn || gap < 0;
+                    }
+
+                    if (newBlock) {
+                        flushParagraph();
+                        paragraph = line.text;
+                    } else if (/[-‐]$/.test(paragraph) && /^[a-z]/.test(line.text)) {
+                        paragraph = paragraph.replace(/[-‐]$/, '') + line.text;
+                    } else {
+                        paragraph += ' ' + line.text;
+                    }
+                } else {
+                    paragraph = line.text;
+                }
+                prev = line;
+            }
+
+            // A page's images follow that page's text
+            if (page.imageHtml && page.imageHtml.length) {
+                flushAll();
+                html.push(...page.imageHtml);
+            }
+            // Line positions restart on the next page, so geometry comparisons do too
+            prev = null;
+        }
+        flushAll();
+
+        return { html: html.join('\n'), title };
+    }
+
+    // Pull embedded bitmaps out of a page's operator list.
+    async extractPdfImages(page, seenImages) {
+        const images = [];
+        let ops;
+        try {
+            ops = await page.getOperatorList();
+        } catch (err) {
+            console.warn('PDF import: could not read page images', err);
+            return images;
+        }
+
+        const OPS = pdfjsLib.OPS;
+        for (let i = 0; i < ops.fnArray.length; i++) {
+            const fn = ops.fnArray[i];
+            if (fn !== OPS.paintImageXObject && fn !== OPS.paintJpegXObject) continue;
+
+            const name = ops.argsArray[i] && ops.argsArray[i][0];
+            if (typeof name !== 'string' || seenImages.has(name)) continue;
+            seenImages.add(name);
+
+            const obj = await this.getPdfObject(page.objs, name);
+            if (!obj) continue;
+
+            try {
+                const image = await this.pdfImageToBlob(obj);
+                if (image) images.push(image);
+            } catch (err) {
+                console.warn('PDF import: could not decode an image', err);
+            }
+        }
+        return images;
+    }
+
+    // page.objs resolves asynchronously; never let a missing object hang the import.
+    getPdfObject(objs, name, timeoutMs = 10000) {
+        return new Promise((resolve) => {
+            let settled = false;
+            const finish = (value) => {
+                if (settled) return;
+                settled = true;
+                resolve(value);
+            };
+            const timer = setTimeout(() => finish(null), timeoutMs);
+            try {
+                objs.get(name, (obj) => {
+                    clearTimeout(timer);
+                    finish(obj);
+                });
+            } catch (err) {
+                clearTimeout(timer);
+                finish(null);
+            }
+        });
+    }
+
+    async pdfImageToBlob(img) {
+        const width = img.width;
+        const height = img.height;
+        if (!width || !height) return null;
+        // Skip icons, bullets and rules
+        if (width < 80 || height < 80) return null;
+        const ratio = width / height;
+        if (ratio > 20 || ratio < 0.05) return null;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        let hasAlpha = false;
+
+        if (img.bitmap) {
+            ctx.drawImage(img.bitmap, 0, 0);
+            hasAlpha = true;
+        } else if (img.data) {
+            const imageData = ctx.createImageData(width, height);
+            const src = img.data;
+            const dst = imageData.data;
+            const pixels = width * height;
+
+            if (src.length >= pixels * 4) {
+                dst.set(src.subarray(0, pixels * 4));
+                hasAlpha = true;
+            } else if (src.length >= pixels * 3) {
+                for (let i = 0, j = 0; i < pixels; i++) {
+                    dst[j++] = src[i * 3];
+                    dst[j++] = src[i * 3 + 1];
+                    dst[j++] = src[i * 3 + 2];
+                    dst[j++] = 255;
+                }
+            } else {
+                // 1 bit per pixel, packed per row
+                const rowBytes = (width + 7) >> 3;
+                if (src.length < rowBytes * height) return null;
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const bit = (src[y * rowBytes + (x >> 3)] >> (7 - (x & 7))) & 1;
+                        const value = bit ? 255 : 0;
+                        const o = (y * width + x) * 4;
+                        dst[o] = dst[o + 1] = dst[o + 2] = value;
+                        dst[o + 3] = 255;
+                    }
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        } else {
+            return null;
+        }
+
+        const scaled = this.downscaleCanvas(canvas, 2000);
+        // Keep alpha as PNG; use JPEG for photos so large scans stay under the upload limit
+        const useJpeg = !hasAlpha || scaled.width * scaled.height > 1200000;
+        const mimeType = useJpeg ? 'image/jpeg' : 'image/png';
+        const blob = await new Promise(resolve =>
+            scaled.toBlob(resolve, mimeType, useJpeg ? 0.9 : undefined)
+        );
+        if (!blob) return null;
+        return { blob, mimeType, width: scaled.width, height: scaled.height };
+    }
+
+    downscaleCanvas(canvas, maxDimension) {
+        const longest = Math.max(canvas.width, canvas.height);
+        if (longest <= maxDimension) return canvas;
+        const scale = maxDimension / longest;
+        const out = document.createElement('canvas');
+        out.width = Math.round(canvas.width * scale);
+        out.height = Math.round(canvas.height * scale);
+        const ctx = out.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(canvas, 0, 0, out.width, out.height);
+        return out;
+    }
+
+    blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result || '';
+                const comma = result.indexOf(',');
+                resolve(comma >= 0 ? result.slice(comma + 1) : result);
+            };
+            reader.onerror = () => reject(reader.error || new Error('Could not read image data'));
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    escapeHtmlText(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     // ========================================
     // Data Loading
     // ========================================
@@ -891,14 +1408,14 @@ class AdminDashboard {
         // Dashboard actions
         document.getElementById('create-new-btn').addEventListener('click', () => this.showEditor());
 
-        // Import Word doc
-        const importWordBtn = document.getElementById('import-word-btn');
-        const importWordFile = document.getElementById('import-word-file');
-        if (importWordBtn && importWordFile) {
-            importWordBtn.addEventListener('click', () => importWordFile.click());
-            importWordFile.addEventListener('change', (e) => {
+        // Import Word doc or PDF
+        const importDocBtn = document.getElementById('import-doc-btn');
+        const importDocFile = document.getElementById('import-doc-file');
+        if (importDocBtn && importDocFile) {
+            importDocBtn.addEventListener('click', () => importDocFile.click());
+            importDocFile.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0];
-                if (file) this.importWordDoc(file);
+                if (file) this.importDocument(file);
                 e.target.value = '';
             });
         }
