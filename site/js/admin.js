@@ -7259,7 +7259,7 @@ class FooterManager {
         document.getElementById('footer-image-alt').value = 'Children with desk donated by Omotani Caring Foundation';
         document.getElementById('footer-foundation-text').value = 'The Omotani Caring Foundation is a 501(c)(3) USA charity.';
         document.getElementById('footer-ein').value = '85-2581703';
-        document.getElementById('footer-email').value = 'info@omotanicaringfoundation.org';
+        document.getElementById('footer-email').value = 'info@omotanicaringfoundation.com';
         document.getElementById('footer-address-line1').value = '8337 N Lee Trevino Drive';
         document.getElementById('footer-address-city').value = 'Tucson, Arizona, USA';
         document.getElementById('footer-address-zip').value = '85742';

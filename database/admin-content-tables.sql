@@ -306,7 +306,7 @@ INSERT INTO footer_settings (
     'Children with desk donated by Omotani Caring Foundation',
     'The Omotani Caring Foundation is a 501(c)(3) USA charity.',
     '85-2581703',
-    'info@omotanicaringfoundation.org',
+    'info@omotanicaringfoundation.com',
     '8337 N Lee Trevino Drive',
     'Tucson, Arizona, USA',
     '85742',
