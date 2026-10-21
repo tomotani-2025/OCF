@@ -1,0 +1,386 @@
+/* Progress thermometer cards — shared by progress.html and the admin preview */
+
+.progress-page {
+    --red: #F02035;
+    --red-2: #FB6A81;
+    --red-deep: #E91D38;
+    --past: #AD0011;
+    --track: #F3DBDF;
+    --gold: #E9D342;
+    --ocf: #30201D;
+    --txt: #181414;
+    --ocf-2: #4D4846;
+    --hairline: #E2DCCD;
+}
+
+/* Toolbar: totals, legend, sort */
+.progress-toolbar {
+    color: var(--ocf);
+}
+
+.kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 36px;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.kpi-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+}
+
+.kpi-label {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--ocf-2);
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    color: var(--ocf-2);
+}
+
+.swatch {
+    display: inline-block;
+    width: 16px;
+    height: 9px;
+    margin-right: 7px;
+    border-radius: 99px;
+    vertical-align: -1px;
+}
+
+.swatch.is-hatch {
+    background-color: var(--track);
+    background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0 1.5px, rgba(255, 255, 255, 0) 1.5px 5px);
+    background-size: 7.07px 7.07px;
+    background-position: right top;
+}
+
+.swatch-mark {
+    position: relative;
+    display: inline-block;
+    width: 16px;
+    height: 12px;
+    margin-right: 7px;
+    vertical-align: -2px;
+}
+
+.swatch-mark::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #312121;
+}
+
+.sortbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.sort-label {
+    margin-right: 4px;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ocf-2);
+}
+
+.sort-btn {
+    appearance: none;
+    padding: 5px 13px;
+    border: 1px solid var(--hairline);
+    border-radius: 99px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4A3B37;
+    cursor: pointer;
+}
+
+.sort-btn[aria-pressed="true"] {
+    background: var(--ocf);
+    border-color: var(--ocf);
+    color: #F7F4EB;
+}
+
+.sort-btn:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+}
+
+/* Grid */
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(420px, 100%), 1fr));
+    gap: 16px;
+}
+
+/* Thermometer card */
+.progress-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 18px 13px;
+    background: #FFFFFF;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+}
+
+.goal-label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.25;
+    color: var(--ocf-2);
+}
+
+.goal-sub {
+    color: #9A8B85;
+}
+
+/* Scoped so admin heading rules don't override it in the editor preview */
+.progress-card .goal-title {
+    margin: 1px 0 0;
+    font-size: 17.5px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--txt);
+}
+
+.divider {
+    height: 1px;
+    margin: 10px 0 12px;
+    background: var(--gold);
+}
+
+/* Targets above the bar, right-aligned */
+.thermo-targets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2px 18px;
+    margin: 6px 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--txt);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Raised total under the bar, left-aligned */
+.thermo-raised {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-transform: none;
+    color: var(--ocf-2);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Hatch tiles from the right edge so the stripes line up with the rounded
+   cap of the unfilled remainder. 9.9px = 7px period x sqrt(2). */
+.thermo-track {
+    position: relative;
+    height: 20px;
+    border-radius: 99px;
+    overflow: hidden;
+    background-color: var(--track);
+    background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0 1.5px, rgba(255, 255, 255, 0) 1.5px 7px);
+    background-size: 9.9px 9.9px;
+    background-position: right 5px top;
+}
+
+.thermo-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(to right, var(--red-2), var(--red));
+}
+
+/* Fill segments are square; the track's rounded ends clip them */
+.thermo-past {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--past);
+}
+
+.thermo-cut {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    transform: translateX(-1px);
+    background: #FFFFFF;
+}
+
+/* Axis under the track: stacked mark labels, then the raised total.
+   Padding reserves room for however many label rows there are. */
+.thermo-axis {
+    position: relative;
+    margin: 4px 0 12px;
+    padding-top: 8px;
+    font-size: 11px;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+}
+
+.thermo-axis.rows-1 {
+    padding-top: 24px;
+}
+
+.thermo-axis.rows-2 {
+    padding-top: 44px;
+}
+
+/* Marks all sit on the right, so the total shares their band */
+.thermo-axis.is-shared {
+    min-height: 42px;
+    padding-top: 12px;
+}
+
+.thermo-mark {
+    position: absolute;
+    top: 2px;
+    white-space: nowrap;
+}
+
+.thermo-mark.is-phase,
+.thermo-mark.is-raised {
+    color: var(--red);
+}
+
+.thermo-mark.is-goal {
+    color: var(--txt);
+}
+
+/* 2px like the cuts in the track, centered on the mark and colored to
+   match its label. A 1px stem antialiased unevenly at fractional positions. */
+.thermo-mark .stem {
+    position: absolute;
+    bottom: 100%;
+    width: 2px;
+    height: 6px;
+    background: currentColor;
+}
+
+.thermo-mark.row-1 {
+    top: 22px;
+}
+
+.thermo-mark.row-1 .stem {
+    height: 26px;
+}
+
+.thermo-mark.anchor-r {
+    transform: translateX(-100%);
+}
+
+.thermo-mark.anchor-r .stem {
+    right: -1px;
+}
+
+.thermo-mark.anchor-l .stem {
+    left: -1px;
+}
+
+/* Footer: status + link */
+.card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 11px;
+    border-top: 1px solid #EFEADC;
+}
+
+.status-chip {
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: #FBE3E6;
+    color: #A82236;
+}
+
+.status-chip.is-funded {
+    background: var(--ocf);
+    color: #F7F4EB;
+}
+
+/* Bright enough to read on the dark chip */
+.status-check {
+    color: #5FD38D;
+}
+
+/* Matches .read-more on the News + Updates cards */
+.learn-more {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    text-decoration: none;
+    color: #000000;
+}
+
+.learn-more span {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+}
+
+.learn-more svg {
+    width: 24px;
+    height: 21px;
+    transform: rotate(-45deg);
+}
+
+.learn-more:focus-visible {
+    outline: 2px solid var(--ocf);
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .progress-card {
+        padding: 14px 14px 11px;
+    }
+
+    .progress-card .goal-title {
+        font-size: 16px;
+    }
+
+    .thermo-raised,
+    .thermo-targets {
+        font-size: 18px;
+    }
+
+    .kpi-value {
+        font-size: 22px;
+    }
+}
+

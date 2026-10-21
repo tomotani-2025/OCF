@@ -1,5 +1,5 @@
 // Progress Page Data Loader
-// Loads progress goals from Supabase and renders CSS-only charts
+// Loads progress goals from Supabase and renders them as thermometer cards
 // Supports new simplified data structure with backwards compatibility
 
 (async function() {
@@ -18,13 +18,24 @@
             return;
         }
 
-        // Clear loading and render goals
-        container.innerHTML = '';
+        const models = goals.map(parseGoal);
 
-        goals.forEach(goal => {
-            const card = createProgressCard(goal);
-            container.appendChild(card);
-        });
+        renderSummary(models);
+        renderGrid(container, models, 'order');
+
+        // Sort buttons re-render the grid in place
+        const sortbar = document.getElementById('progress-sort');
+        if (sortbar) {
+            sortbar.addEventListener('click', e => {
+                const button = e.target.closest('.sort-btn');
+                if (!button) return;
+                sortbar.querySelectorAll('.sort-btn').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+                renderGrid(container, models, button.dataset.sort);
+            });
+        }
+
+        const toolbar = document.getElementById('progress-toolbar');
+        if (toolbar) toolbar.hidden = false;
 
         // Show CTA section after charts are loaded
         const ctaSection = document.getElementById('progress-cta');
@@ -36,13 +47,10 @@
     }
 })();
 
-function createProgressCard(goal) {
-    const article = document.createElement('article');
-    article.className = 'progress-card';
-
-    // Parse new structure: goals array and donations object
+// Turn a Supabase row into { label, sub, title, link, raised, goal, marks }
+function parseGoal(goal) {
     let goalItems = [];
-    let donations = { value: 0, color: '#e85a71' };
+    let donations = { value: 0 };
 
     try {
         goalItems = typeof goal.goals === 'string' ? JSON.parse(goal.goals) : (goal.goals || []);
@@ -51,160 +59,158 @@ function createProgressCard(goal) {
     }
 
     try {
-        donations = typeof goal.donations === 'string' ? JSON.parse(goal.donations) : (goal.donations || { value: 0, color: '#e85a71' });
+        donations = typeof goal.donations === 'string' ? JSON.parse(goal.donations) : (goal.donations || { value: 0 });
     } catch (e) {
         console.error('Error parsing donations:', e);
     }
 
-    // Debug logging - remove in production
-    console.log('Progress card data:', goal.title, 'goalItems:', JSON.stringify(goalItems), 'donations:', JSON.stringify(donations));
-
-    // Backwards compatibility: if no new structure, fall back to old bars/markers
+    // Backwards compatibility: if no new structure, fall back to old bars
     if (goalItems.length === 0 && goal.bars) {
         const bars = typeof goal.bars === 'string' ? JSON.parse(goal.bars) : goal.bars;
-        const markers = goal.markers ? (typeof goal.markers === 'string' ? JSON.parse(goal.markers) : goal.markers) : [];
 
-        // Find donations bar (usually "Raised")
-        const raisedBar = bars.find(b => b.label && b.label.toLowerCase().includes('raised'));
-        if (raisedBar) {
-            donations = {
-                value: raisedBar.value,
-                color: raisedBar.color || '#e85a71',
-                markerEnabled: false
-            };
-        }
-
-        // Convert other bars to goals
         bars.forEach(bar => {
-            if (!bar.label.toLowerCase().includes('raised')) {
-                const matchingMarker = markers.find(m => m.value === bar.value);
-                goalItems.push({
-                    name: bar.label,
-                    value: bar.value,
-                    barLabel: bar.label,
-                    barColor: bar.color || '#F5E4AF',
-                    markerEnabled: !!matchingMarker,
-                    markerColor: matchingMarker?.color || '#312121',
-                    markerTextColor: matchingMarker?.textColor || '#F5E4AF'
-                });
+            if (bar.label && bar.label.toLowerCase().includes('raised')) {
+                donations = { value: bar.value };
+            } else {
+                goalItems.push({ name: bar.label, value: bar.value, barLabel: bar.label });
             }
         });
     }
 
-    // Get donations value
-    const donationsValue = parseFloat(donations.value) || 0;
-    const donationsColor = donations.color || '#e85a71';
+    // Targets smallest first; the largest is the goal, the rest are phase marks
+    const targets = goalItems
+        .map(g => ({ name: g.name || '', barLabel: g.barLabel || '', value: parseFloat(g.value) || 0 }))
+        .filter(g => g.value > 0)
+        .sort((a, b) => a.value - b.value);
 
-    // Find the highest goal value for chart scaling
-    const allValues = [donationsValue, ...goalItems.map(g => parseFloat(g.value) || 0)];
-    const maxValue = Math.max(...allValues) * 1.2;
+    const top = targets[targets.length - 1];
 
-    // Calculate donations percentage
-    const donationsPercent = maxValue > 0 ? (donationsValue / maxValue * 100) : 0;
+    // A date range like "Goal (2019–2025)" becomes the subtitle next to the label
+    const range = top && top.name.match(/\(([^)]+)\)/);
 
-    // Get label and title
-    const goalLabel = goal.label ? goal.label : '';
-    const goalTitle = goal.title || '';
-
-    // Generate grid lines (7 lines from 0 to max)
-    const gridLines = generateGridLines(maxValue);
-
-    // Build phase info section - show ALL goals with name and value
-    let phaseInfoHTML = '';
-    if (goalItems.length > 0) {
-        // Sort by value descending (largest first)
-        const sortedGoals = [...goalItems].sort((a, b) => (b.value || 0) - (a.value || 0));
-        phaseInfoHTML = sortedGoals.map(g => `
-            <div class="phase-info">
-                <span>${escapeHtml(g.name)}</span>
-                <span class="amount">${formatCurrency(g.value)}</span>
-            </div>
-        `).join('');
-    }
-
-    // Build goal bars HTML (stacked from bottom, largest first)
-    let goalBarsHTML = '';
-    const sortedGoals = [...goalItems].sort((a, b) => (b.value || 0) - (a.value || 0));
-    sortedGoals.forEach(g => {
-        const value = parseFloat(g.value) || 0;
-        const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
-        const color = g.barColor || '#F5E4AF';
-        const stripedClass = g.striped ? ' bar-striped' : '';
-
-        // Check for gradient colors
-        let backgroundStyle = '';
-        if (g.gradientColor1 && g.gradientColor2) {
-            backgroundStyle = `--bar-gradient: linear-gradient(to bottom, ${g.gradientColor1}, ${g.gradientColor2});`;
-        }
-
-        goalBarsHTML += `<div class="bar-goal${stripedClass}" style="--bar-height: ${percent}%; --bar-color: ${color}; ${backgroundStyle}"></div>`;
-    });
-
-    // Build markers HTML
-    let markersHTML = '';
-    goalItems.forEach(g => {
-        if (g.markerEnabled) {
-            const value = parseFloat(g.value) || 0;
-            const percent = maxValue > 0 ? (value / maxValue * 100) : 0;
-            const color = g.markerColor || '#312121';
-            const textColor = g.markerTextColor || '#F5E4AF';
-            const markerLabel = g.barLabel || g.name;
-            markersHTML += `<div class="goal-marker" style="--marker-position: ${percent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="${markerLabel} ${formatShortCurrency(value)}"></div>`;
-        }
-    });
-
-    // Add donations marker if enabled
-    if (donations.markerEnabled) {
-        const color = donations.markerColor || '#e85a71';
-        const textColor = donations.markerTextColor || '#f7f7f7';
-        markersHTML += `<div class="goal-marker" style="--marker-position: ${donationsPercent}%; --marker-color: ${color}; --marker-text-color: ${textColor};" data-label="Donations ${formatShortCurrency(donationsValue)}"></div>`;
-    }
-
-    article.innerHTML = `
-        <div class="card-body">
-            <h3 class="goal-label">${escapeHtml(goalLabel)}</h3>
-            <h2 class="goal-title">${escapeHtml(goalTitle)}</h2>
-            <div class="divider"></div>
-            ${phaseInfoHTML}
-        </div>
-        <div class="chart-area">
-            <div class="chart-grid">
-                ${gridLines}
-            </div>
-            <div class="chart-bar-container">
-                <div class="stacked-bar">
-                    ${goalBarsHTML}
-                    ${donationsValue > 0 ? `
-                    <div class="bar-raised" style="--bar-height: ${donationsPercent}%; --bar-color: ${donationsColor}; ${donations.gradientColor1 && donations.gradientColor2 ? `--bar-gradient: linear-gradient(to bottom, ${donations.gradientColor1}, ${donations.gradientColor2});` : ''}">
-                        <span class="bar-text">Donations To Date<br><strong>${formatCurrency(donationsValue)}</strong></span>
-                    </div>
-                    ` : ''}
-                    ${markersHTML}
-                </div>
-            </div>
-        </div>
-        <a href="${escapeHtml(goal.link || '#')}" class="learn-more">
-            <span>Learn More</span>
-            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-                <path d="M1 7H17M17 7L11 1M17 7L11 13" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </a>
-    `;
-
-    return article;
+    return {
+        label: (goal.label || '').replace(/:\s*$/, ''),
+        sub: range ? range[1] : '',
+        title: goal.title || '',
+        link: goal.link || '#',
+        raised: parseFloat(donations.value) || 0,
+        goal: top ? top.value : 0,
+        marks: targets.slice(0, -1).map(t => ({ value: t.value, name: markName(t) }))
+    };
 }
 
-function generateGridLines(maxValue) {
-    const lines = [];
-    const steps = 6; // 7 lines total (0 + 6 steps)
+// "Phase 1 Goal: Batwa Farm at Matanda" -> "Phase 1"
+function markName(target) {
+    const name = target.barLabel || target.name;
+    return name.split(':')[0].replace(/\s+goal$/i, '').trim() || 'Phase';
+}
 
-    for (let i = 0; i <= steps; i++) {
-        const position = (i / steps) * 100;
-        const value = (maxValue / steps) * i;
-        lines.push(`<div class="grid-line" style="--position: ${position}%"><span class="grid-label">${formatShortCurrency(value)}</span></div>`);
-    }
+const percentOf = m => m.goal > 0 ? Math.round(m.raised / m.goal * 100) : 0;
+const stillNeeded = m => Math.max(0, m.goal - m.raised);
+const isFunded = m => m.goal > 0 && m.raised >= m.goal;
 
-    return lines.join('\n                                ');
+const SORTS = {
+    order: list => list,
+    need: list => [...list].sort((a, b) => stillNeeded(b) - stillNeeded(a) || b.raised - a.raised),
+    pct: list => [...list].sort((a, b) => percentOf(b) - percentOf(a))
+};
+
+function renderGrid(container, models, sortKey) {
+    container.innerHTML = (SORTS[sortKey] || SORTS.order)(models).map(createProgressCard).join('');
+}
+
+function renderSummary(models) {
+    const el = document.getElementById('progress-kpis');
+    if (!el) return;
+
+    const raised = models.reduce((sum, m) => sum + m.raised, 0);
+    const needed = models.reduce((sum, m) => sum + stillNeeded(m), 0);
+    const funded = models.filter(isFunded).length;
+
+    el.innerHTML = `
+        <div class="kpi"><span class="kpi-value">${formatCurrency(raised)}</span><span class="kpi-label">Raised to date</span></div>
+        <div class="kpi"><span class="kpi-value">${formatCurrency(needed)}</span><span class="kpi-label">Still needed</span></div>
+        <div class="kpi"><span class="kpi-value">${funded} of ${models.length}</span><span class="kpi-label">Goals funded</span></div>
+    `;
+}
+
+// Labels hang to the left of their mark with the stem on their right edge,
+// so close marks only need different rows. Near the left end they flip.
+const anchorFor = position => position < 20 ? 'anchor-l' : 'anchor-r';
+
+function createProgressCard(m) {
+    const max = Math.max(m.raised, m.goal) || 1;
+    const over = m.goal > 0 && m.raised > m.goal;
+    const under = m.goal > 0 && m.raised > 0 && m.raised < m.goal;
+    const pGoal = 100 * m.goal / max;
+    const pRaised = 100 * m.raised / max;
+    const pct = percentOf(m);
+
+    // Targets listed above the bar: phases, then the goal
+    const targetsHTML = [
+        ...m.marks.map(mark => `<span>${escapeHtml(mark.name)}: ${formatCurrency(mark.value)}</span>`),
+        m.goal > 0 ? `<span>Goal: ${formatCurrency(m.goal)}</span>` : ''
+    ].join('');
+
+    // Every mark that needs a label under the track, left to right
+    const marks = m.marks.map(mark => ({ value: mark.value, label: `${mark.name} ${formatShortCurrency(mark.value)}`, kind: 'phase' }));
+    if (over) marks.push({ value: m.goal, label: `Goal ${formatShortCurrency(m.goal)}`, kind: 'goal' });
+    if (under) marks.push({ value: m.raised, label: formatCurrency(m.raised), kind: 'raised' });
+    marks.sort((a, b) => a.value - b.value);
+
+    const cutsHTML = marks
+        .filter(mark => mark.kind !== 'goal')
+        .map(mark => `<div class="thermo-cut" style="left: ${(100 * mark.value / max).toFixed(2)}%"></div>`)
+        .join('');
+
+    const labelsHTML = marks.map((mark, i) => {
+        const p = 100 * mark.value / max;
+        return `<div class="thermo-mark is-${mark.kind} row-${i % 2} ${anchorFor(p)}" style="left: ${p.toFixed(2)}%"><div class="stem"></div>${escapeHtml(mark.label)}</div>`;
+    }).join('');
+
+    // The raised total shares the label band when every mark sits far enough
+    // right to clear it; otherwise it drops below the labels
+    const rows = Math.min(marks.length, 2);
+    const shareBand = marks.length > 0 && marks.every(mark => 100 * mark.value / max >= 60);
+    const axisClass = shareBand ? 'is-shared' : `rows-${rows}`;
+
+    const phaseNote = m.marks.length ? `, phase target ${formatCurrency(m.marks[0].value)}` : '';
+    const status = isFunded(m)
+        ? `<span class="status-chip is-funded"><span class="status-check" aria-hidden="true">&#10003;</span> Funded &middot; ${pct}%</span>`
+        : (m.goal > 0 ? `<span class="status-chip">${formatCurrency(stillNeeded(m))} to go</span>` : '');
+
+    return `
+        <article class="progress-card">
+            <p class="goal-label">${escapeHtml(m.label)}${m.label ? ':' : ''}${m.sub ? ` <span class="goal-sub">${escapeHtml(m.sub)}</span>` : ''}</p>
+            <h2 class="goal-title">${escapeHtml(m.title)}</h2>
+            <div class="divider"></div>
+
+            ${targetsHTML ? `<div class="thermo-targets">${targetsHTML}</div>` : ''}
+
+            <div class="thermo-track" role="img" aria-label="${formatCurrency(m.raised)} raised${m.goal > 0 ? ` against a ${formatCurrency(m.goal)} goal, ${pct} percent` : ''}${phaseNote}">
+                <div class="thermo-fill" style="width: ${(over ? pGoal : pRaised).toFixed(2)}%"></div>
+                ${over ? `<div class="thermo-past" style="left: ${pGoal.toFixed(2)}%; width: ${(pRaised - pGoal).toFixed(2)}%"></div>
+                <div class="thermo-cut" style="left: ${pGoal.toFixed(2)}%"></div>` : ''}
+                ${cutsHTML}
+            </div>
+
+            <div class="thermo-axis ${axisClass}">
+                ${labelsHTML}
+                <p class="thermo-raised">${formatCurrency(m.raised)} Raised thus far</p>
+            </div>
+
+            <div class="card-foot">
+                ${status}
+                <a href="${escapeHtml(m.link)}" class="learn-more">
+                    <span>Learn More</span>
+                    <svg width="30" height="26" viewBox="0 0 30 26" fill="none" aria-hidden="true">
+                        <path d="M18 6L26 13L18 20" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 13H26" stroke="#EF3A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+    `;
 }
 
 function formatCurrency(value) {

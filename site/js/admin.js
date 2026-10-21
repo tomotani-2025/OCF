@@ -4280,23 +4280,21 @@ class ProgressManager {
 
     setupEventListeners() {
         // Add new progress card button (in the list)
-        const addBtn = document.getElementById('add-progress-goal-btn');
-        if (addBtn) {
-            addBtn.addEventListener('click', () => this.showEditor());
-        }
+        document.getElementById('add-progress-goal-btn').addEventListener('click', () => this.showEditor());
+
+        // Add target button (inside editor)
+        document.getElementById('add-progress-target-btn').addEventListener('click', () => {
+            this.addGoalItem();
+            this.updatePreview();
+        });
 
         // Save all button
         document.getElementById('save-all-progress-btn').addEventListener('click', () => this.saveAllGoals());
 
         // Form
         this.form.addEventListener('submit', (e) => this.saveGoal(e));
+        this.form.addEventListener('input', () => this.updatePreview());
         document.getElementById('cancel-progress-edit').addEventListener('click', () => this.closeEditor());
-
-        // Add goal item button (inside editor)
-        const addGoalBtn = document.getElementById('add-progress-goal-btn');
-        if (addGoalBtn) {
-            // This is now in the editor form - add goal target
-        }
 
         // Delete modal
         document.getElementById('cancel-progress-delete').addEventListener('click', () => this.closeDeleteModal());
@@ -4305,33 +4303,6 @@ class ProgressManager {
         // Close modals
         this.editorModal.querySelector('.modal-close').addEventListener('click', () => this.closeEditor());
         this.editorModal.querySelector('.modal-backdrop').addEventListener('click', () => this.closeEditor());
-
-        // Donations color sync
-        this.setupColorSync('donations-color', 'donations-color-text');
-        this.setupColorSync('donations-marker-color', 'donations-marker-color-text');
-        this.setupColorSync('donations-marker-text-color', 'donations-marker-text-color-text');
-
-        // Donations marker toggle
-        const donationsMarkerCheckbox = document.getElementById('donations-marker-enabled');
-        if (donationsMarkerCheckbox) {
-            donationsMarkerCheckbox.addEventListener('change', () => {
-                const colorsDiv = document.getElementById('donations-marker-colors');
-                colorsDiv.style.opacity = donationsMarkerCheckbox.checked ? '1' : '0.5';
-            });
-        }
-    }
-
-    setupColorSync(pickerId, textId) {
-        const picker = document.getElementById(pickerId);
-        const text = document.getElementById(textId);
-        if (picker && text) {
-            picker.addEventListener('input', () => { text.value = picker.value; });
-            text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
-                    picker.value = text.value;
-                }
-            });
-        }
     }
 
     renderGoalsList() {
@@ -4341,8 +4312,7 @@ class ProgressManager {
         }
 
         this.goalsList.innerHTML = this.goals.map((goal) => {
-            const donations = goal.donations || {};
-            const goalItems = goal.goals || [];
+            const m = parseGoal(goal);
 
             return `
             <div class="progress-goal-card" data-id="${goal.id}" draggable="true">
@@ -4352,31 +4322,8 @@ class ProgressManager {
                     </svg>
                 </div>
                 <div class="progress-goal-info">
-                    <h3 class="progress-goal-title">${goal.label ? goal.label + ' ' : ''}${goal.title}</h3>
-                    <div class="progress-goal-bars-preview">
-                        ${goalItems.map(g => `
-                            <span class="bar-preview" style="background-color: ${g.barColor || '#F5E4AF'}">
-                                ${g.barLabel || g.name}: $${this.formatMoney(g.value)}
-                            </span>
-                        `).join('')}
-                        <span class="bar-preview" style="background-color: ${donations.color || '#e85a71'}">
-                            Donations: $${this.formatMoney(donations.value || 0)}
-                        </span>
-                    </div>
-                    ${goalItems.some(g => g.markerEnabled) || donations.markerEnabled ? `
-                    <div class="progress-goal-markers-preview">
-                        ${goalItems.filter(g => g.markerEnabled).map(g => `
-                            <span class="marker-preview" style="background-color: ${g.markerColor || '#312121'}; color: ${g.markerTextColor || '#F5E4AF'}">
-                                ▸ ${g.barLabel || g.name}: $${this.formatMoney(g.value)}
-                            </span>
-                        `).join('')}
-                        ${donations.markerEnabled ? `
-                            <span class="marker-preview" style="background-color: ${donations.markerColor || '#e85a71'}; color: ${donations.markerTextColor || '#f7f7f7'}">
-                                ▸ Donations: $${this.formatMoney(donations.value || 0)}
-                            </span>
-                        ` : ''}
-                    </div>
-                    ` : ''}
+                    <h3 class="progress-goal-title">${escapeHtml(goal.label ? goal.label + ' ' : '')}${escapeHtml(goal.title)}</h3>
+                    ${this.miniThermometer(m)}
                 </div>
                 <div class="progress-goal-actions">
                     <button type="button" class="btn-action btn-edit" data-action="edit" data-id="${goal.id}">Edit</button>
@@ -4398,12 +4345,25 @@ class ProgressManager {
         this.setupDragAndDrop();
     }
 
-    formatMoney(value) {
-        if (!value) return '0';
-        if (value >= 1000) {
-            return (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1) + 'k';
-        }
-        return value.toString();
+    // Compact bar + summary line for the goals list, same colors as the page
+    miniThermometer(m) {
+        const max = Math.max(m.raised, m.goal) || 1;
+        const over = m.goal > 0 && m.raised > m.goal;
+        const fill = 100 * (over ? m.goal : m.raised) / max;
+        const summary = m.goal > 0
+            ? `${formatCurrency(m.raised)} raised of ${formatCurrency(m.goal)} &middot; ${percentOf(m)}%`
+            : `${formatCurrency(m.raised)} raised &middot; no target set`;
+
+        return `
+            <div class="progress-page progress-mini">
+                <div class="thermo-track">
+                    <div class="thermo-fill" style="width: ${fill.toFixed(2)}%"></div>
+                    ${over ? `<div class="thermo-past" style="left: ${fill.toFixed(2)}%; width: ${(100 - fill).toFixed(2)}%"></div>
+                    <div class="thermo-cut" style="left: ${fill.toFixed(2)}%"></div>` : ''}
+                </div>
+                <span class="progress-mini-summary">${summary}</span>
+            </div>
+        `;
     }
 
     setupDragAndDrop() {
@@ -4493,113 +4453,36 @@ class ProgressManager {
         const labelField = document.getElementById('progress-goal-label');
         const titleField = document.getElementById('progress-goal-title');
         const linkField = document.getElementById('progress-goal-link');
+        const donationsField = document.getElementById('donations-value');
 
-        // Clear goals container
+        // Clear targets container
         if (this.goalsContainer) {
             this.goalsContainer.innerHTML = '';
         }
 
-        // Setup add goal button
-        const addGoalBtn = document.querySelector('#add-progress-goal-btn');
-        if (addGoalBtn && !addGoalBtn._listenerAdded) {
-            addGoalBtn.addEventListener('click', () => this.addGoalItem());
-            addGoalBtn._listenerAdded = true;
-        }
+        const goal = goalId ? this.goals.find(g => g.id === goalId) : null;
 
-        if (goalId) {
-            const goal = this.goals.find(g => g.id === goalId);
-            if (goal) {
-                editorTitle.textContent = 'Edit Goal';
-                idField.value = goalId;
-                labelField.value = goal.label || '';
-                titleField.value = goal.title || '';
-                linkField.value = goal.link || '';
+        if (goal) {
+            editorTitle.textContent = 'Edit Goal';
+            idField.value = goalId;
+            labelField.value = goal.label || '';
+            titleField.value = goal.title || '';
+            linkField.value = goal.link || '';
+            donationsField.value = goal.donations?.value ?? '';
 
-                // Load goal items
-                if (goal.goals && goal.goals.length > 0) {
-                    goal.goals.forEach(g => this.addGoalItem(g));
-                } else {
-                    this.addGoalItem();
-                }
-
-                // Load donations
-                const donations = goal.donations || {};
-                document.getElementById('donations-value').value = donations.value || '';
-                document.getElementById('donations-color').value = donations.color || '#e85a71';
-                document.getElementById('donations-color-text').value = donations.color || '#e85a71';
-                document.getElementById('donations-marker-enabled').checked = donations.markerEnabled || false;
-                document.getElementById('donations-marker-color').value = donations.markerColor || '#e85a71';
-                document.getElementById('donations-marker-color-text').value = donations.markerColor || '#e85a71';
-                document.getElementById('donations-marker-text-color').value = donations.markerTextColor || '#f7f7f7';
-                document.getElementById('donations-marker-text-color-text').value = donations.markerTextColor || '#f7f7f7';
-
-                // Load donations gradient values
-                const isGradient = donations.gradientColor1 && donations.gradientColor2;
-                document.getElementById('donations-use-gradient').value = isGradient ? '1' : '0';
-                document.getElementById('donations-gradient-color1').value = donations.gradientColor1 || '#e85a71';
-                document.getElementById('donations-gradient-color1-text').value = donations.gradientColor1 || '#e85a71';
-                document.getElementById('donations-gradient-color2').value = donations.gradientColor2 || '#c44a5f';
-                document.getElementById('donations-gradient-color2-text').value = donations.gradientColor2 || '#c44a5f';
-
-                // Update gradient picker UI
-                const gradientPicker = document.getElementById('donations-gradient-picker');
-                const solidPicker = gradientPicker.querySelector('.gradient-solid-picker');
-                const gradientColorsPicker = gradientPicker.querySelector('.gradient-colors-picker');
-                const toggleBtns = gradientPicker.querySelectorAll('.gradient-type-toggle button');
-                toggleBtns.forEach(btn => btn.classList.remove('active'));
-                if (isGradient) {
-                    toggleBtns[1].classList.add('active');
-                    solidPicker.classList.remove('active');
-                    gradientColorsPicker.classList.add('active');
-                } else {
-                    toggleBtns[0].classList.add('active');
-                    solidPicker.classList.add('active');
-                    gradientColorsPicker.classList.remove('active');
-                }
-                document.getElementById('donations-gradient-preview').style.background =
-                    `linear-gradient(to bottom, ${donations.gradientColor1 || '#e85a71'}, ${donations.gradientColor2 || '#c44a5f'})`;
-
-                // Update marker colors visibility
-                const colorsDiv = document.getElementById('donations-marker-colors');
-                colorsDiv.style.opacity = donations.markerEnabled ? '1' : '0.5';
+            if (goal.goals && goal.goals.length > 0) {
+                goal.goals.forEach(g => this.addGoalItem(g));
+            } else {
+                this.addGoalItem({ name: 'Goal' });
             }
         } else {
             editorTitle.textContent = 'Add New Goal';
             this.form.reset();
             idField.value = '';
-
-            // Reset donations defaults
-            document.getElementById('donations-color').value = '#e85a71';
-            document.getElementById('donations-color-text').value = '#e85a71';
-            document.getElementById('donations-marker-color').value = '#e85a71';
-            document.getElementById('donations-marker-color-text').value = '#e85a71';
-            document.getElementById('donations-marker-text-color').value = '#f7f7f7';
-            document.getElementById('donations-marker-text-color-text').value = '#f7f7f7';
-            document.getElementById('donations-marker-colors').style.opacity = '0.5';
-
-            // Reset donations gradient defaults
-            document.getElementById('donations-use-gradient').value = '0';
-            document.getElementById('donations-gradient-color1').value = '#e85a71';
-            document.getElementById('donations-gradient-color1-text').value = '#e85a71';
-            document.getElementById('donations-gradient-color2').value = '#c44a5f';
-            document.getElementById('donations-gradient-color2-text').value = '#c44a5f';
-            const gradientPicker = document.getElementById('donations-gradient-picker');
-            const solidPicker = gradientPicker.querySelector('.gradient-solid-picker');
-            const gradientColorsPicker = gradientPicker.querySelector('.gradient-colors-picker');
-            const toggleBtns = gradientPicker.querySelectorAll('.gradient-type-toggle button');
-            toggleBtns.forEach(btn => btn.classList.remove('active'));
-            toggleBtns[0].classList.add('active');
-            solidPicker.classList.add('active');
-            gradientColorsPicker.classList.remove('active');
-            document.getElementById('donations-gradient-preview').style.background =
-                'linear-gradient(to bottom, #e85a71, #c44a5f)';
-
-            // Add default goal
-            this.addGoalItem({ name: 'Goal', value: '', barLabel: 'Goal', barColor: '#F5E4AF', markerEnabled: true, markerColor: '#312121', markerTextColor: '#F5E4AF' });
+            this.addGoalItem({ name: 'Goal' });
         }
 
-        // Setup donations gradient picker event listeners
-        this.setupDonationsGradientPicker();
+        this.updatePreview();
 
         this.editorModal.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -4615,280 +4498,42 @@ class ProgressManager {
         item.className = 'progress-goal-item';
         item.dataset.index = index;
 
-        const markerEnabled = data.markerEnabled || false;
-
         item.innerHTML = `
             <div class="progress-goal-item-header">
-                <span class="progress-goal-item-number">Goal ${index}</span>
+                <span class="progress-goal-item-number">Target ${this.goalsContainer.children.length + 1}</span>
                 <button type="button" class="media-item-remove" data-action="remove-goal-item">Remove</button>
             </div>
             <div class="form-row two-col">
                 <div class="form-group">
-                    <label for="goal-name-${index}">Goal Name *</label>
-                    <input type="text" id="goal-name-${index}" placeholder="Phase 1 (Batwa Farm)" value="${data.name || ''}">
+                    <label for="goal-name-${index}">Name *</label>
+                    <input type="text" id="goal-name-${index}" placeholder="Goal" value="${escapeHtml(data.name || '')}">
                 </div>
                 <div class="form-group">
-                    <label for="goal-value-${index}">Value ($) *</label>
-                    <input type="number" id="goal-value-${index}" placeholder="27000" value="${data.value || ''}">
+                    <label for="goal-value-${index}">Amount ($) *</label>
+                    <input type="number" id="goal-value-${index}" min="0" placeholder="30000" value="${data.value || ''}">
                 </div>
             </div>
-            <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="goal-bar-label-${index}">Bar Label</label>
-                    <input type="text" id="goal-bar-label-${index}" placeholder="Phase 1" value="${data.barLabel || ''}">
-                </div>
-                <div class="form-group">
-                    <label>Bar Color</label>
-                    ${this.createGradientPickerHTML(index, data.barColor, data.gradientColor1, data.gradientColor2)}
-                </div>
-            </div>
-            <div class="marker-toggle-row">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="goal-striped-${index}" ${data.striped ? 'checked' : ''}>
-                    <span>Striped Fill</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="goal-marker-enabled-${index}" ${markerEnabled ? 'checked' : ''}>
-                    <span>Show Marker</span>
-                </label>
-                <div class="marker-colors" id="goal-marker-colors-${index}" style="opacity: ${markerEnabled ? '1' : '0.5'}">
-                    <div class="form-group">
-                        <label for="goal-marker-color-${index}">Line/Pill</label>
-                        <div class="color-input-wrapper compact">
-                            <input type="color" id="goal-marker-color-${index}" value="${data.markerColor || '#312121'}">
-                            <input type="text" id="goal-marker-color-text-${index}" value="${data.markerColor || '#312121'}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="goal-marker-text-color-${index}">Text</label>
-                        <div class="color-input-wrapper compact">
-                            <input type="color" id="goal-marker-text-color-${index}" value="${data.markerTextColor || '#F5E4AF'}">
-                            <input type="text" id="goal-marker-text-color-text-${index}" value="${data.markerTextColor || '#F5E4AF'}">
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="goal-bar-label-${index}">Short label (optional)</label>
+                <input type="text" id="goal-bar-label-${index}" placeholder="Phase 1" value="${escapeHtml(data.barLabel && data.barLabel !== data.name ? data.barLabel : '')}">
+                <p class="form-help">Used for phase marks when the name is long. Leave blank to use the name.</p>
             </div>
         `;
 
         this.goalsContainer.appendChild(item);
 
-        // Remove button
         item.querySelector('[data-action="remove-goal-item"]').addEventListener('click', () => {
             item.remove();
             this.renumberGoalItems();
+            this.updatePreview();
         });
-
-        // Setup gradient picker
-        this.setupGradientPicker(index);
-
-        // Color syncs
-        this.setupColorSyncDynamic(`goal-marker-color-${index}`, `goal-marker-color-text-${index}`);
-        this.setupColorSyncDynamic(`goal-marker-text-color-${index}`, `goal-marker-text-color-text-${index}`);
-
-        // Marker toggle
-        const checkbox = item.querySelector(`#goal-marker-enabled-${index}`);
-        checkbox.addEventListener('change', () => {
-            const colorsDiv = item.querySelector(`#goal-marker-colors-${index}`);
-            colorsDiv.style.opacity = checkbox.checked ? '1' : '0.5';
-        });
-    }
-
-    setupColorSyncDynamic(pickerId, textId) {
-        const picker = document.getElementById(pickerId);
-        const text = document.getElementById(textId);
-        if (picker && text) {
-            picker.addEventListener('input', () => { text.value = picker.value; });
-            text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
-                    picker.value = text.value;
-                }
-            });
-        }
-    }
-
-    createGradientPickerHTML(index, barColor, gradientColor1, gradientColor2) {
-        // Determine if using gradient based on whether gradient colors exist
-        const isGradient = gradientColor1 && gradientColor2;
-        const solidColor = barColor || '#F5E4AF';
-        const color1 = gradientColor1 || '#F5E4AF';
-        const color2 = gradientColor2 || '#D4C48A';
-
-        return `
-            <div class="gradient-picker" id="gradient-picker-${index}">
-                <div class="gradient-type-toggle">
-                    <button type="button" data-type="solid" class="${!isGradient ? 'active' : ''}">Solid</button>
-                    <button type="button" data-type="gradient" class="${isGradient ? 'active' : ''}">Gradient</button>
-                </div>
-                <div class="gradient-solid-picker ${!isGradient ? 'active' : ''}">
-                    <div class="color-input-wrapper">
-                        <input type="color" id="goal-bar-color-${index}" value="${solidColor}">
-                        <input type="text" id="goal-bar-color-text-${index}" value="${solidColor}">
-                    </div>
-                </div>
-                <div class="gradient-colors-picker ${isGradient ? 'active' : ''}">
-                    <div class="gradient-color-row">
-                        <label>Top</label>
-                        <div class="color-input-wrapper">
-                            <input type="color" id="goal-gradient-color1-${index}" value="${color1}">
-                            <input type="text" id="goal-gradient-color1-text-${index}" value="${color1}">
-                        </div>
-                    </div>
-                    <div class="gradient-color-row">
-                        <label>Bottom</label>
-                        <div class="color-input-wrapper">
-                            <input type="color" id="goal-gradient-color2-${index}" value="${color2}">
-                            <input type="text" id="goal-gradient-color2-text-${index}" value="${color2}">
-                        </div>
-                    </div>
-                    <div class="gradient-preview" id="gradient-preview-${index}" style="background: linear-gradient(to bottom, ${color1}, ${color2});"></div>
-                </div>
-                <input type="hidden" id="goal-use-gradient-${index}" value="${isGradient ? '1' : '0'}">
-            </div>
-        `;
-    }
-
-    setupGradientPicker(index) {
-        const picker = document.getElementById(`gradient-picker-${index}`);
-        if (!picker) return;
-
-        const toggleBtns = picker.querySelectorAll('.gradient-type-toggle button');
-        const solidPicker = picker.querySelector('.gradient-solid-picker');
-        const gradientPicker = picker.querySelector('.gradient-colors-picker');
-        const useGradientInput = document.getElementById(`goal-use-gradient-${index}`);
-
-        // Toggle buttons
-        toggleBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                toggleBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                if (btn.dataset.type === 'solid') {
-                    solidPicker.classList.add('active');
-                    gradientPicker.classList.remove('active');
-                    useGradientInput.value = '0';
-                } else {
-                    solidPicker.classList.remove('active');
-                    gradientPicker.classList.add('active');
-                    useGradientInput.value = '1';
-                }
-            });
-        });
-
-        // Sync solid color
-        this.setupColorSyncDynamic(`goal-bar-color-${index}`, `goal-bar-color-text-${index}`);
-
-        // Sync gradient colors and update preview
-        const color1Picker = document.getElementById(`goal-gradient-color1-${index}`);
-        const color1Text = document.getElementById(`goal-gradient-color1-text-${index}`);
-        const color2Picker = document.getElementById(`goal-gradient-color2-${index}`);
-        const color2Text = document.getElementById(`goal-gradient-color2-text-${index}`);
-        const preview = document.getElementById(`gradient-preview-${index}`);
-
-        const updatePreview = () => {
-            if (preview) {
-                preview.style.background = `linear-gradient(to bottom, ${color1Picker.value}, ${color2Picker.value})`;
-            }
-        };
-
-        if (color1Picker && color1Text) {
-            color1Picker.addEventListener('input', () => {
-                color1Text.value = color1Picker.value;
-                updatePreview();
-            });
-            color1Text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(color1Text.value)) {
-                    color1Picker.value = color1Text.value;
-                    updatePreview();
-                }
-            });
-        }
-
-        if (color2Picker && color2Text) {
-            color2Picker.addEventListener('input', () => {
-                color2Text.value = color2Picker.value;
-                updatePreview();
-            });
-            color2Text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(color2Text.value)) {
-                    color2Picker.value = color2Text.value;
-                    updatePreview();
-                }
-            });
-        }
-    }
-
-    setupDonationsGradientPicker() {
-        const picker = document.getElementById('donations-gradient-picker');
-        if (!picker) return;
-
-        const toggleBtns = picker.querySelectorAll('.gradient-type-toggle button');
-        const solidPicker = picker.querySelector('.gradient-solid-picker');
-        const gradientPicker = picker.querySelector('.gradient-colors-picker');
-        const useGradientInput = document.getElementById('donations-use-gradient');
-
-        // Toggle buttons
-        toggleBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                toggleBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                if (btn.dataset.type === 'solid') {
-                    solidPicker.classList.add('active');
-                    gradientPicker.classList.remove('active');
-                    useGradientInput.value = '0';
-                } else {
-                    solidPicker.classList.remove('active');
-                    gradientPicker.classList.add('active');
-                    useGradientInput.value = '1';
-                }
-            });
-        });
-
-        // Sync gradient colors and update preview
-        const color1Picker = document.getElementById('donations-gradient-color1');
-        const color1Text = document.getElementById('donations-gradient-color1-text');
-        const color2Picker = document.getElementById('donations-gradient-color2');
-        const color2Text = document.getElementById('donations-gradient-color2-text');
-        const preview = document.getElementById('donations-gradient-preview');
-
-        const updatePreview = () => {
-            if (preview) {
-                preview.style.background = `linear-gradient(to bottom, ${color1Picker.value}, ${color2Picker.value})`;
-            }
-        };
-
-        if (color1Picker && color1Text) {
-            color1Picker.addEventListener('input', () => {
-                color1Text.value = color1Picker.value;
-                updatePreview();
-            });
-            color1Text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(color1Text.value)) {
-                    color1Picker.value = color1Text.value;
-                    updatePreview();
-                }
-            });
-        }
-
-        if (color2Picker && color2Text) {
-            color2Picker.addEventListener('input', () => {
-                color2Text.value = color2Picker.value;
-                updatePreview();
-            });
-            color2Text.addEventListener('input', () => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(color2Text.value)) {
-                    color2Picker.value = color2Text.value;
-                    updatePreview();
-                }
-            });
-        }
     }
 
     renumberGoalItems() {
         if (!this.goalsContainer) return;
         const items = this.goalsContainer.querySelectorAll('.progress-goal-item');
         items.forEach((item, idx) => {
-            item.querySelector('.progress-goal-item-number').textContent = `Goal ${idx + 1}`;
+            item.querySelector('.progress-goal-item-number').textContent = `Target ${idx + 1}`;
         });
     }
 
@@ -4906,49 +4551,34 @@ class ProgressManager {
             const index = item.dataset.index;
             const name = document.getElementById(`goal-name-${index}`)?.value.trim() || '';
             const value = parseInt(document.getElementById(`goal-value-${index}`)?.value) || 0;
+            const barLabel = document.getElementById(`goal-bar-label-${index}`)?.value.trim() || '';
 
             if (name && value > 0) {
-                const useGradient = document.getElementById(`goal-use-gradient-${index}`)?.value === '1';
-                const goalData = {
-                    name,
-                    value,
-                    barLabel: document.getElementById(`goal-bar-label-${index}`)?.value.trim() || name,
-                    barColor: document.getElementById(`goal-bar-color-${index}`)?.value || '#F5E4AF',
-                    striped: document.getElementById(`goal-striped-${index}`)?.checked || false,
-                    markerEnabled: document.getElementById(`goal-marker-enabled-${index}`)?.checked || false,
-                    markerColor: document.getElementById(`goal-marker-color-${index}`)?.value || '#312121',
-                    markerTextColor: document.getElementById(`goal-marker-text-color-${index}`)?.value || '#F5E4AF'
-                };
-
-                // Add gradient colors if using gradient
-                if (useGradient) {
-                    goalData.gradientColor1 = document.getElementById(`goal-gradient-color1-${index}`)?.value || '#F5E4AF';
-                    goalData.gradientColor2 = document.getElementById(`goal-gradient-color2-${index}`)?.value || '#D4C48A';
-                }
-
-                items.push(goalData);
+                items.push(barLabel ? { name, value, barLabel } : { name, value });
             }
         });
         return items;
     }
 
     collectDonations() {
-        const useGradient = document.getElementById('donations-use-gradient')?.value === '1';
-        const donations = {
-            value: parseInt(document.getElementById('donations-value')?.value) || 0,
-            color: document.getElementById('donations-color')?.value || '#e85a71',
-            markerEnabled: document.getElementById('donations-marker-enabled')?.checked || false,
-            markerColor: document.getElementById('donations-marker-color')?.value || '#e85a71',
-            markerTextColor: document.getElementById('donations-marker-text-color')?.value || '#f7f7f7'
+        return {
+            value: parseInt(document.getElementById('donations-value')?.value) || 0
         };
+    }
 
-        // Add gradient colors if using gradient
-        if (useGradient) {
-            donations.gradientColor1 = document.getElementById('donations-gradient-color1')?.value || '#e85a71';
-            donations.gradientColor2 = document.getElementById('donations-gradient-color2')?.value || '#c44a5f';
-        }
+    // Render the card exactly as progress.html will, using progress-loader.js
+    updatePreview() {
+        const preview = document.getElementById('progress-card-preview');
+        if (!preview) return;
 
-        return donations;
+        const model = parseGoal({
+            label: document.getElementById('progress-goal-label').value.trim(),
+            title: document.getElementById('progress-goal-title').value.trim() || 'Untitled goal',
+            link: document.getElementById('progress-goal-link').value.trim(),
+            goals: this.collectGoalItems(),
+            donations: this.collectDonations()
+        });
+        preview.innerHTML = createProgressCard(model);
     }
 
     async saveGoal(e) {
@@ -4965,8 +4595,14 @@ class ProgressManager {
             return;
         }
 
-        if (!donations.value) {
-            showToast('Please enter a donations value.', 'error');
+        if (goals.length === 0) {
+            showToast('Please add at least one target with a name and amount.', 'error');
+            return;
+        }
+
+        // $0 is a valid amount for a new campaign; only an empty field is missing
+        if (document.getElementById('donations-value').value === '') {
+            showToast('Please enter the amount raised.', 'error');
             return;
         }
 
