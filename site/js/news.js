@@ -100,9 +100,35 @@ class NewsCMS {
     }
 
     deriveCategoriesFromPosts() {
-        const set = new Set();
-        this.posts.forEach(p => { if (p.category) set.add(p.category); });
-        this.categories = [...set].sort((a, b) => a.localeCompare(b));
+        // Merge categories that differ only by case/spacing, preferring a mixed-case spelling
+        const byKey = new Map();
+        this.posts.forEach(p => {
+            if (!p.category) return;
+            const name = p.category.trim().replace(/\s+/g, ' ');
+            const key = name.toLowerCase();
+            const existing = byKey.get(key);
+            if (!existing || (this.isAllCaps(existing) && !this.isAllCaps(name))) {
+                byKey.set(key, name);
+            }
+        });
+        byKey.forEach((name, key) => {
+            if (this.isAllCaps(name)) byKey.set(key, this.toTitleCase(name));
+        });
+        this.posts.forEach(p => {
+            if (p.category) p.category = byKey.get(p.category.trim().replace(/\s+/g, ' ').toLowerCase());
+        });
+        this.categories = [...byKey.values()].sort((a, b) => a.localeCompare(b));
+    }
+
+    isAllCaps(str) {
+        return /[A-Z]/.test(str) && str === str.toUpperCase();
+    }
+
+    toTitleCase(str) {
+        const minor = new Set(['a', 'an', 'and', 'at', 'for', 'in', 'of', 'on', 'or', 'the', 'to']);
+        return str.toLowerCase().split(' ').map((word, i) =>
+            i > 0 && minor.has(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
     }
 
     async loadPosts() {
