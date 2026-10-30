@@ -115,7 +115,7 @@
     <script src="js/main.js?v=3"></script>
     <script src="js/footer-loader.js"></script>
     <script src="js/supabase-client.js?v=2"></script>
-    <script src="js/news.js?v=10"></script>
+    <script src="js/news.js?v=11"></script>
 
     <style>
         /* News Page Specific Styles */
@@ -162,11 +162,20 @@
         .news-filter-links {
             display: flex;
             flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 14px 28px;
+            align-items: flex-start;
+            gap: 28px;
             padding: 0 4px;
             border-bottom: 1px solid rgba(49, 17, 15, 0.15);
+        }
+
+        /* Categories wrap as a block so row 2 lines up with the first category, not "All" */
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px 28px;
+            flex: 1;
+            min-width: 0;
         }
 
         .filter-link {
@@ -231,6 +240,16 @@
         /* Show count badge only on active/highlighted filter */
         .filter-link.active .filter-count {
             display: inline-flex;
+        }
+
+        /* Reserve the "All" badge space so the categories don't shift when it hides */
+        .filter-link-all .filter-count {
+            display: inline-flex;
+            visibility: hidden;
+        }
+
+        .filter-link-all.active .filter-count {
+            visibility: visible;
         }
 
         .sort-by {
@@ -540,9 +559,9 @@
                 align-items: flex-start;
             }
 
-            .news-filter-links {
-                flex-wrap: wrap;
-                gap: 16px;
+            .news-filter-links,
+            .filter-group {
+                gap: 12px 16px;
             }
 
             .card-text h2 {

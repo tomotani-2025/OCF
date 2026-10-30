@@ -297,16 +297,18 @@ class NewsCMS {
         const totalPosts = this.posts.length;
 
         filterContainer.innerHTML = `
-            <a href="#" class="filter-link ${this.currentFilter === 'all' ? 'active' : ''}" data-category="all">
+            <a href="#" class="filter-link filter-link-all ${this.currentFilter === 'all' ? 'active' : ''}" data-category="all">
                 <span class="filter-text">All</span>
                 <span class="filter-count">${totalPosts}</span>
             </a>
-            ${this.categories.map(cat => `
-                <a href="#" class="filter-link ${this.currentFilter === cat ? 'active' : ''}" data-category="${cat}">
-                    <span class="filter-text">${cat}</span>
-                    <span class="filter-count">${counts[cat]}</span>
-                </a>
-            `).join('')}
+            <div class="filter-group">
+                ${this.categories.map(cat => `
+                    <a href="#" class="filter-link ${this.currentFilter === cat ? 'active' : ''}" data-category="${cat}">
+                        <span class="filter-text">${cat}</span>
+                        <span class="filter-count">${counts[cat]}</span>
+                    </a>
+                `).join('')}
+            </div>
         `;
 
         filterContainer.addEventListener('click', (e) => {
